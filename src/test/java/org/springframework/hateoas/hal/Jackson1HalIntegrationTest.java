@@ -15,8 +15,8 @@
  */
 package org.springframework.hateoas.hal;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.core.AnnotationRelProvider;
+import org.springframework.hateoas.hal.Jackson1HalModule.HalHandlerInstantiator;
 
 /**
  * Integration tests for Jackson 1 based HAL integration.
@@ -48,10 +50,9 @@ public class Jackson1HalIntegrationTest extends AbstractMarshallingIntegrationTe
 
 	@Before
 	public void setUpModule() {
+
 		mapper.registerModule(new Jackson1HalModule());
-		Jackson1HalModule.HalHandlerInstantiator hi = new Jackson1HalModule.HalHandlerInstantiator();
-		hi.setRelationResolver(new AnnotationRelProvider());
-		mapper.setHandlerInstantiator(hi);
+		mapper.setHandlerInstantiator(new HalHandlerInstantiator(new AnnotationRelProvider()));
 	}
 
 	/**
@@ -215,5 +216,4 @@ public class Jackson1HalIntegrationTest extends AbstractMarshallingIntegrationTe
 
 		assertThat(result, is(expected));
 	}
-
 }

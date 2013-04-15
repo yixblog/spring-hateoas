@@ -15,8 +15,8 @@
  */
 package org.springframework.hateoas.hal;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.core.AnnotationRelProvider;
 import org.springframework.hateoas.hal.Jackson2HalModule.HalHandlerInstantiator;
 
 /**
@@ -49,10 +50,9 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 
 	@Before
 	public void setUpModule() {
+
 		mapper.registerModule(new Jackson2HalModule());
-		HalHandlerInstantiator hi = new Jackson2HalModule.HalHandlerInstantiator();
-		hi.setRelationResolver(new AnnotationRelProvider());
-		mapper.setHandlerInstantiator(hi);
+		mapper.setHandlerInstantiator(new HalHandlerInstantiator(new AnnotationRelProvider()));
 	}
 
 	/**
@@ -189,8 +189,11 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 
 	}
 
+	/**
+	 * @see #47, #60
+	 */
 	@Test
-	public void rendersAnnotatedResourceResourcesAsEmbedded() throws Exception {
+	public void serializesAnnotatedResourceResourcesAsEmbedded() throws Exception {
 
 		List<Resource<SimpleAnnotatedPojo>> content = new ArrayList<Resource<SimpleAnnotatedPojo>>();
 		content.add(new Resource<SimpleAnnotatedPojo>(new SimpleAnnotatedPojo("test1", 1), new Link("localhost")));
@@ -201,6 +204,9 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 		assertThat(write(resources), is(ANNOTATED_EMBEDDED_RESOURCE_REFERENCE));
 	}
 
+	/**
+	 * @see #47, #60
+	 */
 	@Test
 	public void deserializesAnnotatedResourceResourcesAsEmbedded() throws Exception {
 

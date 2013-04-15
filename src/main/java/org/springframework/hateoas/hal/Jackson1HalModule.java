@@ -53,11 +53,14 @@ import org.codehaus.jackson.map.ser.std.ContainerSerializerBase;
 import org.codehaus.jackson.map.ser.std.MapSerializer;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.type.JavaType;
+import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.core.ObjectUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -198,7 +201,9 @@ public class Jackson1HalModule extends SimpleModule {
 
 			for (Object resource : value) {
 
-				String relation = relProvider == null ? "content" : relProvider.getRelForSingleResource(resource);
+				Class<?> type = ObjectUtils.getResourceType(resource);
+				String relation = relProvider == null ? "content" : relProvider.getSingleResourceRelFor(type);
+
 				if (relation == null) {
 					relation = "content";
 				}
@@ -460,28 +465,13 @@ public class Jackson1HalModule extends SimpleModule {
 
 	public static class HalHandlerInstantiator extends HandlerInstantiator {
 
-		private Map<Class, Object> instanceMap = new HashMap<Class, Object>();
+		private final Map<Class<?>, Object> instanceMap = new HashMap<Class<?>, Object>();
 
-		public void setInstanceMap(Map<Class, Object> instanceMap) {
-			this.instanceMap = instanceMap;
-		}
+		public HalHandlerInstantiator(RelProvider relProvider) {
 
-		public void setRelationResolver(RelProvider provider) {
-			instanceMap.put(HalResourcesSerializer.class, new HalResourcesSerializer(null, provider));
-		}
+			Assert.notNull(relProvider, "RelProvider must not be null!");
+			this.instanceMap.put(HalResourcesSerializer.class, new HalResourcesSerializer(null, relProvider));
 
-		private Object findInstance(Class type, boolean createInstance) {
-			Object result = instanceMap.get(type);
-			if (null == result && createInstance) {
-				try {
-					result = type.newInstance();
-				} catch (InstantiationException e) {
-					return new RuntimeException(e);
-				} catch (IllegalAccessException e) {
-					return new RuntimeException(e);
-				}
-			}
-			return result;
 		}
 
 		@Override
@@ -516,5 +506,15 @@ public class Jackson1HalModule extends SimpleModule {
 			return (TypeIdResolver) findInstance(resolverClass, false);
 		}
 
+		private Object findInstance(Class<?> type, boolean createInstance) {
+
+			Object result = instanceMap.get(type);
+
+			if (result != null) {
+				return result;
+			}
+
+			return createInstance ? BeanUtils.instantiateClass(type) : null;
+		}
 	}
 }
