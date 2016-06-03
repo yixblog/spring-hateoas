@@ -76,12 +76,12 @@ public class HalFormsUtils {
 
 		// TODO: templated comes from an Input attribute?
 		boolean templated = false;
-		// FIXME: input.readOnly or input.editable?
-		boolean readOnly = inputConstraints.containsKey(ActionInputParameter.EDITABLE) ? !((Boolean) inputConstraints.get(ActionInputParameter.EDITABLE))
-				: true;
-		String regex = inputConstraints.containsKey(ActionInputParameter.PATTERN) ? (String) inputConstraints.get(ActionInputParameter.PATTERN) : null;
-		boolean required = inputConstraints.containsKey(ActionInputParameter.REQUIRED) ? (Boolean) inputConstraints.get(ActionInputParameter.REQUIRED)
-				: false;
+
+		boolean readOnly = inputConstraints.containsKey(ActionInputParameter.EDITABLE)
+				? !((Boolean) inputConstraints.get(ActionInputParameter.EDITABLE)) : true;
+		String regex =  (String) inputConstraints.get(ActionInputParameter.PATTERN);
+		boolean required = inputConstraints.containsKey(ActionInputParameter.REQUIRED)
+				? (Boolean) inputConstraints.get(ActionInputParameter.REQUIRED) : false;
 
 		String value = null;
 		if (propertyValue != null) {
