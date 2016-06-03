@@ -120,6 +120,8 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			hidden = inputAnnotation.hidden();
 			include = inputAnnotation.include();
 			type = ParameterType.INPUT;
+		} else {
+			setReadOnly(!editable);
 		}
 		if (inputAnnotation == null || inputAnnotation.value() == Type.FROM_JAVA) {
 			if (isArrayOrCollection() || isRequestBody()) {
