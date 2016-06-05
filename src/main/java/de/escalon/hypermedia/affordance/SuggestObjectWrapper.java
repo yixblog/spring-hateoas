@@ -1,6 +1,11 @@
 package de.escalon.hypermedia.affordance;
 
+import de.escalon.hypermedia.spring.Path;
+
 public class SuggestObjectWrapper<T> implements WrappedValue<T> {
+
+	static final String ID = Path.path(new SuggestObjectWrapper(null, null, null).getId());
+	static final String TEXT = Path.path(new SuggestObjectWrapper(null, null, null).getText());
 
 	private final String text;
 	private final String id;

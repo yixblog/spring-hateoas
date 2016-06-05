@@ -16,7 +16,7 @@ import de.escalon.hypermedia.affordance.Suggest;
 import de.escalon.hypermedia.affordance.SuggestObjectWrapper;
 import de.escalon.hypermedia.affordance.SuggestType;
 
-public class StringOptions implements Options<SuggestObjectWrapper> {
+public class StringOptions implements Options<SuggestObjectWrapper<String>> {
 
 	/**
 	 * Allows to specify possible values for an argument. This allows an {@link ActionDescriptor} to determine possible
@@ -32,7 +32,7 @@ public class StringOptions implements Options<SuggestObjectWrapper> {
 	 * </pre>
 	 */
 	@Override
-	public Suggest<SuggestObjectWrapper>[] get(SuggestType type, String[] value, Object... args) {
+	public Suggest<SuggestObjectWrapper<String>>[] get(SuggestType type, String[] value, Object... args) {
 		return SimpleSuggest.wrap(value, type);
 	}
 }

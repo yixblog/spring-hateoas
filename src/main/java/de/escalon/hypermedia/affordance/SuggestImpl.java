@@ -80,6 +80,7 @@ public class SuggestImpl<T> implements Suggest<T> {
 		return suggests;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public <U> U getUnwrappedValue() {
 		if (value instanceof WrappedValue) {
