@@ -68,14 +68,15 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	private final Object value;
 	private Boolean arrayOrCollection = null;
 	private final Map<String, Object> inputConstraints = new HashMap<String, Object>();
-	Suggest[] possibleValues;
+	Suggest<?>[] possibleValues;
 	String[] excluded = EMPTY;
 	String[] readOnly = EMPTY;
 	String[] hidden = EMPTY;
 	String[] include = EMPTY;
 	boolean editable = true;
 	ParameterType type = ParameterType.UNKNOWN;
-	PossibleValuesResolver resolver = new FixedPossibleValuesResolver(EMPTY_SUGGEST);
+	@SuppressWarnings({ "unchecked",
+			"rawtypes" }) PossibleValuesResolver<?> resolver = new FixedPossibleValuesResolver(EMPTY_SUGGEST);
 
 	private ConversionService conversionService = new DefaultFormattingConversionService();
 	private Type fieldType;
@@ -151,6 +152,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		typeDescriptor = TypeDescriptor.nested(methodParameter, 0);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createResolver(MethodParameter methodParameter) {
 		Class<?> parameterType = methodParameter.getNestedParameterType();
 		Class<?> nested;
@@ -162,7 +164,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		}
 
 		if (select != null && (select.options() != StringOptions.class || !isEnumType(parameterType))) {
-			resolver = new OptionsPossibleValuesResolver(select);
+			resolver = new OptionsPossibleValuesResolver<Object>(select);
 		} else if (Enum[].class.isAssignableFrom(parameterType)) {
 			resolver = new FixedPossibleValuesResolver(
 					SimpleSuggest.wrap(parameterType.getComponentType().getEnumConstants(), type));
@@ -367,13 +369,13 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		}
 
 		Object[] args = from.toArray();
-		return resolver.getValues(args);
+		return (Suggest<T>[]) resolver.getValues(args);
 
 	}
 
 	@Override
 	public <T> void setPossibleValues(Suggest<T>[] possibleValues) {
-		resolver = new FixedPossibleValuesResolver(possibleValues);
+		resolver = new FixedPossibleValuesResolver<T>(possibleValues);
 	}
 
 	/**
@@ -523,7 +525,6 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		return inputConstraints;
 	}
 
-
 	@Override
 	public String toString() {
 		String kind;
@@ -542,8 +543,8 @@ public class SpringActionInputParameter implements ActionInputParameter {
 				+ (value != null ? value.toString() : "no value");
 	}
 
-	private static <T extends Options<?>> Options<?> getOptions(Class<? extends Options<?>> beanType) {
-		Options<?> options = getBean(beanType);
+	private static <T extends Options<V>, V> Options<V> getOptions(Class<? extends Options<V>> beanType) {
+		Options<V> options = getBean(beanType);
 		if (options == null) {
 			try {
 				options = beanType.newInstance();
@@ -582,17 +583,17 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		INPUT, SELECT, UNKNOWN
 	}
 
-	interface PossibleValuesResolver {
+	interface PossibleValuesResolver<T> {
 		String[] getParams();
 
-		Suggest[] getValues(Object[] value);
+		Suggest<T>[] getValues(Object[] value);
 	}
 
-	class FixedPossibleValuesResolver implements PossibleValuesResolver {
+	class FixedPossibleValuesResolver<T> implements PossibleValuesResolver<T> {
 
-		private final Suggest<?>[] values;
+		private final Suggest<T>[] values;
 
-		public FixedPossibleValuesResolver(Suggest<?>[] values) {
+		public FixedPossibleValuesResolver(Suggest<T>[] values) {
 			this.values = values;
 		}
 
@@ -602,19 +603,20 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		}
 
 		@Override
-		public Suggest<?>[] getValues(Object[] value) {
+		public Suggest<T>[] getValues(Object[] value) {
 			return values;
 		}
 
 	}
 
-	class OptionsPossibleValuesResolver implements PossibleValuesResolver {
-		private final Options<?> options;
+	class OptionsPossibleValuesResolver<T> implements PossibleValuesResolver<T> {
+		private final Options<T> options;
 		private final Select select;
 
+		@SuppressWarnings("unchecked")
 		public OptionsPossibleValuesResolver(Select select) {
 			this.select = select;
-			options = getOptions(select.options());
+			options = getOptions((Class<Options<T>>) select.options());
 		}
 
 		@Override
@@ -623,7 +625,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		}
 
 		@Override
-		public Suggest[] getValues(Object[] args) {
+		public Suggest<T>[] getValues(Object[] args) {
 			return options.get(select.type(), select.value(), args);
 		}
 	}
