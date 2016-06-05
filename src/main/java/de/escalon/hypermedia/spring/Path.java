@@ -22,16 +22,13 @@ import org.springframework.util.ReflectionUtils;
 
 public class Path {
 
-	public static ThreadLocal<RecordingMethodInterceptor> interceptorThreadLocal;
+	public static ThreadLocal<RecordingMethodInterceptor> interceptorThreadLocal = new ThreadLocal<Path.RecordingMethodInterceptor>();
 
 	public static <T> T on(Class<T> type) {
 		return on(type, true);
 	}
 
 	public static <T> T on(Class<T> type, boolean init) {
-		if (interceptorThreadLocal == null) {
-			interceptorThreadLocal = new ThreadLocal<Path.RecordingMethodInterceptor>();
-		}
 		if (init) {
 			interceptorThreadLocal.remove();
 			interceptorThreadLocal.set(new RecordingMethodInterceptor(type));
@@ -65,7 +62,7 @@ public class Path {
 
 	public static String path(Object obj) {
 		RecordingMethodInterceptor interceptor = interceptorThreadLocal.get();
-		Assert.notNull(interceptor);
+		Assert.notNull(interceptor, "Path.on(Class) should be called first");
 		interceptorThreadLocal.remove();
 		return interceptor.getLastInvocation().toString();
 	}
