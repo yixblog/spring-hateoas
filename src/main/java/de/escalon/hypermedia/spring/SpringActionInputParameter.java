@@ -41,6 +41,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import de.escalon.hypermedia.action.Input;
 import de.escalon.hypermedia.action.Options;
 import de.escalon.hypermedia.action.Select;
+import de.escalon.hypermedia.action.StringOptions;
 import de.escalon.hypermedia.action.Type;
 import de.escalon.hypermedia.affordance.ActionDescriptor;
 import de.escalon.hypermedia.affordance.ActionInputParameter;
@@ -100,6 +101,13 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		// always determine input constraints,
 		// might be a nested property which is neither requestBody, requestParam nor pathVariable
 		Input inputAnnotation = methodParameter.getParameterAnnotation(Input.class);
+
+		/**
+		 * Check if annotations indicate that is required, for now only for request params & headers
+		 */
+		boolean requiredByAnnotations = (requestParam != null && requestParam.required())
+				|| (requestHeader != null && requestHeader.required());
+
 		if (inputAnnotation != null) {
 			putInputConstraint(ActionInputParameter.MIN, Integer.MIN_VALUE, inputAnnotation.min());
 			putInputConstraint(ActionInputParameter.MAX, Integer.MAX_VALUE, inputAnnotation.max());
@@ -113,7 +121,10 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			 * I think this is not correct, or at least makes XmlHtmlWriter to write readonly="[java.lang.String"
 			 */
 			// putInputConstraint(Input.READONLY, "", inputAnnotation.readOnly());
-			putInputConstraint(ActionInputParameter.REQUIRED, "", inputAnnotation.required());
+			/**
+			 * Check if annotations indicate that is required
+			 */
+			putInputConstraint(ActionInputParameter.REQUIRED, "", inputAnnotation.required() || requiredByAnnotations);
 
 			excluded = inputAnnotation.exclude();
 			readOnly = inputAnnotation.readOnly();
@@ -122,6 +133,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			type = ParameterType.INPUT;
 		} else {
 			setReadOnly(!editable);
+			putInputConstraint(ActionInputParameter.REQUIRED, "", requiredByAnnotations);
 		}
 		if (inputAnnotation == null || inputAnnotation.value() == Type.FROM_JAVA) {
 			if (isArrayOrCollection() || isRequestBody()) {
@@ -149,7 +161,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			putInputConstraint(ActionInputParameter.REQUIRED, "", true);
 		}
 
-		if (select != null) {
+		if (select != null && (select.options() != StringOptions.class || !isEnumType(parameterType))) {
 			resolver = new OptionsPossibleValuesResolver(select);
 		} else if (Enum[].class.isAssignableFrom(parameterType)) {
 			resolver = new FixedPossibleValuesResolver(
@@ -161,6 +173,12 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(nested.getEnumConstants(), type));
 		}
 
+	}
+
+	private boolean isEnumType(Class<?> parameterType) {
+		return Enum[].class.isAssignableFrom(parameterType) || Enum.class.isAssignableFrom(parameterType)
+				|| Collection.class.isAssignableFrom(parameterType)
+						&& Enum.class.isAssignableFrom(TypeDescriptor.nested(methodParameter, 1).getType());
 	}
 
 	public SpringActionInputParameter(MethodParameter methodParameter, Object value, String name) {
@@ -504,6 +522,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	public Map<String, Object> getInputConstraints() {
 		return inputConstraints;
 	}
+
 
 	@Override
 	public String toString() {
