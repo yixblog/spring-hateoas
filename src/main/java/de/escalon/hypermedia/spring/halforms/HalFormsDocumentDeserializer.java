@@ -21,7 +21,7 @@ import de.escalon.hypermedia.affordance.SuggestType;
 import de.escalon.hypermedia.spring.halforms.Jackson2HalFormsModule.HalTemplateListDeserializer;
 
 public class HalFormsDocumentDeserializer extends JsonDeserializer<HalFormsDocument> {
-	private HalEmbeddedResourcesDeserializer resourcesDeser = new HalEmbeddedResourcesDeserializer();
+	private final HalEmbeddedResourcesDeserializer resourcesDeser = new HalEmbeddedResourcesDeserializer();
 	private final HalTemplateListDeserializer templateDeser = new HalTemplateListDeserializer();
 	private final HalLinkListDeserializer linkDeser = new HalLinkListDeserializer();
 
@@ -69,6 +69,11 @@ public class HalFormsDocumentDeserializer extends JsonDeserializer<HalFormsDocum
 	}
 
 	private static class HalEmbeddedResourcesDeserializer extends ContainerDeserializerBase<Map<String, List<Object>>> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -4095044620400284554L;
 
 		protected HalEmbeddedResourcesDeserializer() {
 			super(Map.class);
@@ -124,6 +129,11 @@ public class HalFormsDocumentDeserializer extends JsonDeserializer<HalFormsDocum
 	}
 
 	private static class HalLinkListDeserializer extends ContainerDeserializerBase<List<Link>> {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2929073640668230663L;
 
 		protected HalLinkListDeserializer() {
 			super(List.class);
@@ -195,6 +205,7 @@ public class HalFormsDocumentDeserializer extends JsonDeserializer<HalFormsDocum
 			this.templated = templated;
 		}
 
+		@Override
 		public boolean isTemplated() {
 			return templated;
 		}

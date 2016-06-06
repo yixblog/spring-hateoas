@@ -50,7 +50,7 @@ public class SuggestObjectWrapper<T> implements WrappedValue<T> {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		SuggestObjectWrapper other = (SuggestObjectWrapper) obj;
+		SuggestObjectWrapper<?> other = (SuggestObjectWrapper<?>) obj;
 		if (id == null) {
 			if (other.id != null) {
 				return false;

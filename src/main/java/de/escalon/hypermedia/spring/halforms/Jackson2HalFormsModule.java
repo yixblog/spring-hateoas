@@ -252,6 +252,11 @@ public class Jackson2HalFormsModule extends SimpleModule {
 
 	public static class HalTemplateListDeserializer extends ContainerDeserializerBase<List<Template>> {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -221189377971966066L;
+
 		protected HalTemplateListDeserializer() {
 			super(List.class);
 		}

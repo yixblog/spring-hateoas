@@ -28,8 +28,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_EMPTY)
 class Form extends Template {
 
-	private static final long serialVersionUID = -933494757445089955L;
-
 	private Object body;
 
 	public Form() {}

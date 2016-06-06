@@ -494,7 +494,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 					} else {
 						int i = 0;
 
-						for (Object value : (Collection) propertyValue) {
+						for (Object value : (Collection<?>) propertyValue) {
 							recurseBeanCreationParams(value.getClass(), annotatedParameter, value,
 									parentParamName + paramName + "[" + (i++) + "].", knownFields, handler, bodyInputParameters);
 						}
