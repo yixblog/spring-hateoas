@@ -4,16 +4,16 @@ import de.escalon.hypermedia.spring.Path;
 
 public class SuggestObjectWrapper<T> implements WrappedValue<T> {
 
-	static final String ID = Path.path(Path.on(SuggestObjectWrapper.class).getId());
-	static final String TEXT = Path.path(Path.on(SuggestObjectWrapper.class).getText());
+	public static final String ID = Path.path(Path.on(SuggestObjectWrapper.class).getSvalue());
+	public static final String TEXT = Path.path(Path.on(SuggestObjectWrapper.class).getText());
 
 	private final String text;
-	private final String id;
+	private final String svalue;
 	private final T original;
 
 	public SuggestObjectWrapper(String text, String id, T original) {
 		this.text = text;
-		this.id = id;
+		this.svalue = id;
 		this.original = original;
 	}
 
@@ -21,8 +21,8 @@ public class SuggestObjectWrapper<T> implements WrappedValue<T> {
 		return text;
 	}
 
-	public String getId() {
-		return id;
+	public String getSvalue() {
+		return svalue;
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class SuggestObjectWrapper<T> implements WrappedValue<T> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((svalue == null) ? 0 : svalue.hashCode());
 		result = prime * result + ((text == null) ? 0 : text.hashCode());
 		return result;
 	}
@@ -51,11 +51,11 @@ public class SuggestObjectWrapper<T> implements WrappedValue<T> {
 			return false;
 		}
 		SuggestObjectWrapper<?> other = (SuggestObjectWrapper<?>) obj;
-		if (id == null) {
-			if (other.id != null) {
+		if (svalue == null) {
+			if (other.svalue != null) {
 				return false;
 			}
-		} else if (!id.equals(other.id)) {
+		} else if (!svalue.equals(other.svalue)) {
 			return false;
 		}
 		if (text == null) {
