@@ -213,4 +213,6 @@ public interface ActionInputParameter {
 
 	void setReadOnly(boolean readOnly);
 
+	void setRequired(boolean required);
+
 }

@@ -125,7 +125,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			/**
 			 * Check if annotations indicate that is required
 			 */
-			putInputConstraint(ActionInputParameter.REQUIRED, "", inputAnnotation.required() || requiredByAnnotations);
+			setRequired(inputAnnotation.required() || requiredByAnnotations);
 
 			excluded = inputAnnotation.exclude();
 			readOnly = inputAnnotation.readOnly();
@@ -307,6 +307,11 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	public void setReadOnly(boolean readOnly) {
 		editable = !readOnly;
 		putInputConstraint(ActionInputParameter.EDITABLE, "", editable);
+	}
+
+	@Override
+	public void setRequired(boolean required) {
+		putInputConstraint(ActionInputParameter.REQUIRED, "", required);
 	}
 
 	@Override
