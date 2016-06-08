@@ -165,14 +165,18 @@ public class SpringActionInputParameter implements ActionInputParameter {
 
 		if (select != null && (select.options() != StringOptions.class || !isEnumType(parameterType))) {
 			resolver = new OptionsPossibleValuesResolver<Object>(select);
+			this.type = ParameterType.SELECT;
 		} else if (Enum[].class.isAssignableFrom(parameterType)) {
 			resolver = new FixedPossibleValuesResolver(
 					SimpleSuggest.wrap(parameterType.getComponentType().getEnumConstants(), type));
+			this.type = ParameterType.SELECT;
 		} else if (Enum.class.isAssignableFrom(parameterType)) {
 			resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(parameterType.getEnumConstants(), type));
+			this.type = ParameterType.SELECT;
 		} else if (Collection.class.isAssignableFrom(parameterType)
 				&& Enum.class.isAssignableFrom(nested = TypeDescriptor.nested(methodParameter, 1).getType())) {
 			resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(nested.getEnumConstants(), type));
+			this.type = ParameterType.SELECT;
 		}
 
 	}
@@ -582,6 +586,14 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	public ParameterType getType() {
+		return type;
+	}
+
+	public void setType(ParameterType type) {
+		this.type = type;
 	}
 
 	public enum ParameterType {
