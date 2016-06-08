@@ -54,7 +54,7 @@ public class SuggestImpl<T> implements Suggest<T> {
 			try {
 				return String.valueOf(getField(valueField).get(value));
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Textfield could not be serialized", e);
+				throw new IllegalArgumentException("Valuefield could not be serialized", e);
 			}
 		}
 		return null;
