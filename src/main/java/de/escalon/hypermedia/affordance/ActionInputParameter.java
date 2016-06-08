@@ -215,4 +215,6 @@ public interface ActionInputParameter {
 
 	void setRequired(boolean required);
 
+	ParameterType getType();
+
 }

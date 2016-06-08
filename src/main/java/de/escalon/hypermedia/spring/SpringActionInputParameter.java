@@ -46,6 +46,7 @@ import de.escalon.hypermedia.action.Type;
 import de.escalon.hypermedia.affordance.ActionDescriptor;
 import de.escalon.hypermedia.affordance.ActionInputParameter;
 import de.escalon.hypermedia.affordance.DataType;
+import de.escalon.hypermedia.affordance.ParameterType;
 import de.escalon.hypermedia.affordance.SimpleSuggest;
 import de.escalon.hypermedia.affordance.Suggest;
 import de.escalon.hypermedia.affordance.SuggestType;
@@ -588,16 +589,13 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		return name;
 	}
 
+	@Override
 	public ParameterType getType() {
 		return type;
 	}
 
 	public void setType(ParameterType type) {
 		this.type = type;
-	}
-
-	public enum ParameterType {
-		INPUT, SELECT, UNKNOWN
 	}
 
 	interface PossibleValuesResolver<T> {
