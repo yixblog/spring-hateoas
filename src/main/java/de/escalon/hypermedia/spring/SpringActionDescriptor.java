@@ -482,21 +482,22 @@ public class SpringActionDescriptor implements ActionDescriptor {
 				handler.visit(inputParameter);
 				return inputParameter.getName();
 			} else if (annotatedParameter.isIncluded(paramName) && !knownFields.contains(parentParamName + paramName)) {
-				if (propertyValue != null && DataType.isArrayOrCollection(parameterType)
-						&& methodParameter.hasParameterAnnotation(DTOParam.class)) {
-					if (parameterType.isArray()) {
-						Object[] array = (Object[]) propertyValue;
-						for (int i = 0; i < array.length; i++) {
-							Object value = array[i];
-							recurseBeanCreationParams(array[i].getClass(), annotatedParameter, value,
-									parentParamName + paramName + "[" + i + "].", knownFields, handler, bodyInputParameters);
-						}
-					} else {
-						int i = 0;
+				if (DataType.isArrayOrCollection(parameterType) && methodParameter.hasParameterAnnotation(DTOParam.class)) {
+					if (propertyValue != null) {
+						if (parameterType.isArray()) {
+							Object[] array = (Object[]) propertyValue;
+							for (int i = 0; i < array.length; i++) {
+								Object value = array[i];
+								recurseBeanCreationParams(array[i].getClass(), annotatedParameter, value,
+										parentParamName + paramName + "[" + i + "].", knownFields, handler, bodyInputParameters);
+							}
+						} else {
+							int i = 0;
 
-						for (Object value : (Collection<?>) propertyValue) {
-							recurseBeanCreationParams(value.getClass(), annotatedParameter, value,
-									parentParamName + paramName + "[" + (i++) + "].", knownFields, handler, bodyInputParameters);
+							for (Object value : (Collection<?>) propertyValue) {
+								recurseBeanCreationParams(value.getClass(), annotatedParameter, value,
+										parentParamName + paramName + "[" + (i++) + "].", knownFields, handler, bodyInputParameters);
+							}
 						}
 					}
 				} else {
