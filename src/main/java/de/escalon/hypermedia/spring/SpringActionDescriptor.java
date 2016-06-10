@@ -470,6 +470,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 			ActionInputParameter annotatedParameter, String parentParamName, String paramName, Class<?> parameterType,
 			Object propertyValue, Set<String> knownFields, ActionInputParameterVisitor handler,
 			List<ActionInputParameter> bodyInputParameters) {
+
 		if (DataType.isSingleValueType(parameterType) || DataType.isArrayOrCollection(parameterType)
 				|| methodParameter.hasParameterAnnotation(Select.class)) {
 			/**
@@ -500,6 +501,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							}
 						}
 					}
+					return parentParamName + paramName;
 				} else {
 					SpringActionInputParameter inputParameter = new SpringActionInputParameter(methodParameter, propertyValue,
 							parentParamName + paramName);
