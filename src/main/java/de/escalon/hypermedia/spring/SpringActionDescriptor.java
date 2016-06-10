@@ -470,6 +470,10 @@ public class SpringActionDescriptor implements ActionDescriptor {
 			ActionInputParameter annotatedParameter, String parentParamName, String paramName, Class<?> parameterType,
 			Object propertyValue, Set<String> knownFields, ActionInputParameterVisitor handler,
 			List<ActionInputParameter> bodyInputParameters) {
+		if ((parentParamName + paramName).equals("subEntity.subEntity")) {
+			System.out.println(parentParamName + paramName + " " + (DataType.isSingleValueType(parameterType)
+					|| DataType.isArrayOrCollection(parameterType) || methodParameter.hasParameterAnnotation(Select.class)));
+		}
 
 		if (DataType.isSingleValueType(parameterType) || DataType.isArrayOrCollection(parameterType)
 				|| methodParameter.hasParameterAnnotation(Select.class)) {
@@ -520,8 +524,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 			} else {
 				callValueBean = propertyValue;
 			}
-			recurseBeanCreationParams(parameterType, annotatedParameter, callValueBean, paramName + ".", knownFields, handler,
-					bodyInputParameters);
+			recurseBeanCreationParams(parameterType, annotatedParameter, callValueBean, parentParamName + paramName + ".",
+					knownFields, handler, bodyInputParameters);
 		}
 
 		return null;
