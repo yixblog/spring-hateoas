@@ -220,10 +220,13 @@ public class Path {
 
 		private String getPropertyFromMethod(Method method) {
 			String name = method.getName();
-			if (name.length() > 0 && name.toLowerCase().startsWith("get")) {
-				char c[] = name.replace("get", "").toCharArray();
-				c[0] = Character.toLowerCase(c[0]);
-				return new String(c);
+			String[] prefixes = { "get", "is" };
+			for (String prefix : prefixes) {
+				if (name.length() > 0 && name.startsWith(prefix)) {
+					char c[] = name.replace(prefix, "").toCharArray();
+					c[0] = Character.toLowerCase(c[0]);
+					return new String(c);
+				}
 			}
 			return "";
 		}

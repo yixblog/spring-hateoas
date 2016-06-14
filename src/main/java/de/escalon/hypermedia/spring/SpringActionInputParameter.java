@@ -174,10 +174,15 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		} else if (Enum.class.isAssignableFrom(parameterType)) {
 			resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(parameterType.getEnumConstants(), type));
 			this.type = ParameterType.SELECT;
-		} else if (Collection.class.isAssignableFrom(parameterType)
-				&& Enum.class.isAssignableFrom(nested = TypeDescriptor.nested(methodParameter, 1).getType())) {
-			resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(nested.getEnumConstants(), type));
-			this.type = ParameterType.SELECT;
+		} else if (Collection.class.isAssignableFrom(parameterType)) {
+			TypeDescriptor descriptor = TypeDescriptor.nested(methodParameter, 1);
+			if (descriptor != null) {
+				nested = descriptor.getType();
+				if (Enum.class.isAssignableFrom(nested)) {
+					resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(nested.getEnumConstants(), type));
+					this.type = ParameterType.SELECT;
+				}
+			}
 		}
 
 	}
