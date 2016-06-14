@@ -79,7 +79,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	@SuppressWarnings({ "unchecked",
 			"rawtypes" }) PossibleValuesResolver<?> resolver = new FixedPossibleValuesResolver(EMPTY_SUGGEST);
 
-	private ConversionService conversionService = new DefaultFormattingConversionService();
+	private final ConversionService conversionService;
 	private Type fieldType;
 
 	private final String name;
