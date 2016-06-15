@@ -61,10 +61,10 @@ import de.escalon.hypermedia.affordance.ActionInputParameterVisitor;
 import de.escalon.hypermedia.affordance.DataType;
 
 /**
- * Describes an HTTP method independently of a specific rest framework. Has knowledge about possible request data, i.e.
- * which types and values are suitable for an action. For example, an action descriptor can be used to create a form
- * with select options and typed input fields that calls a POST handler. It has {@link ActionInputParameter}s which
- * represent method handler arguments. Supported method handler arguments are:
+ * Describes an HTTP method independently of a specific rest framework. Has knowledge about possible request data, i.e. which types and
+ * values are suitable for an action. For example, an action descriptor can be used to create a form with select options and typed input
+ * fields that calls a POST handler. It has {@link ActionInputParameter}s which represent method handler arguments. Supported method handler
+ * arguments are:
  * <ul>
  * <li>path variables</li>
  * <li>request params (url query params)</li>
@@ -77,16 +77,23 @@ import de.escalon.hypermedia.affordance.DataType;
 public class SpringActionDescriptor implements ActionDescriptor {
 
 	private final String httpMethod;
+
 	private final String actionName;
+
 	private final String consumes;
+
 	private final String produces;
 
 	private String semanticActionType;
+
 	private final Map<String, ActionInputParameter> requestParams = new LinkedHashMap<String, ActionInputParameter>();
+
 	private final Map<String, ActionInputParameter> pathVariables = new LinkedHashMap<String, ActionInputParameter>();
+
 	private final Map<String, ActionInputParameter> requestHeaders = new LinkedHashMap<String, ActionInputParameter>();
 
 	private ActionInputParameter requestBody;
+
 	private final Map<String, ActionInputParameter> bodyInputParameters = new LinkedHashMap<String, ActionInputParameter>();
 
 	private Cardinality cardinality = Cardinality.SINGLE;
@@ -94,15 +101,15 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	/**
 	 * Creates an {@link ActionDescriptor}.
 	 *
-	 * @param actionName name of the action, e.g. the method name of the handler method. Can be used by an action
-	 *          representation, e.g. to identify the action using a form name.
+	 * @param actionName name of the action, e.g. the method name of the handler method. Can be used by an action representation, e.g. to
+	 * identify the action using a form name.
 	 * @param httpMethod used during submit
 	 */
-	public SpringActionDescriptor(String actionName, String httpMethod) {
+	public SpringActionDescriptor(final String actionName, final String httpMethod) {
 		this(actionName, httpMethod, null, null);
 	}
 
-	public SpringActionDescriptor(String actionName, String httpMethod, String consumes, String produces) {
+	public SpringActionDescriptor(final String actionName, final String httpMethod, final String consumes, final String produces) {
 		Assert.notNull(actionName);
 		Assert.notNull(httpMethod);
 		this.httpMethod = httpMethod;
@@ -111,7 +118,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 		this.produces = produces;
 	}
 
-	public SpringActionDescriptor(Method method) {
+	public SpringActionDescriptor(final Method method) {
 		RequestMethod requestMethod = getHttpMethod(method);
 		httpMethod = requestMethod.name();
 		actionName = method.getName();
@@ -186,7 +193,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 * @param key name of request param
 	 * @param actionInputParameter descriptor
 	 */
-	public void addRequestParam(String key, ActionInputParameter actionInputParameter) {
+	public void addRequestParam(final String key, final ActionInputParameter actionInputParameter) {
 		requestParams.put(key, actionInputParameter);
 	}
 
@@ -197,7 +204,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 * @param actionInputParameter descriptorg+ann#2
 	 */
 
-	public void addPathVariable(String key, ActionInputParameter actionInputParameter) {
+	public void addPathVariable(final String key, final ActionInputParameter actionInputParameter) {
 		pathVariables.put(key, actionInputParameter);
 	}
 
@@ -207,19 +214,18 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 * @param key name of request header
 	 * @param actionInputParameter descriptor
 	 */
-	public void addRequestHeader(String key, ActionInputParameter actionInputParameter) {
+	public void addRequestHeader(final String key, final ActionInputParameter actionInputParameter) {
 		requestHeaders.put(key, actionInputParameter);
 	}
 
 	/**
-	 * Gets input parameter info which is part of the URL mapping, be it request parameters, path variables or request
-	 * body attributes.
+	 * Gets input parameter info which is part of the URL mapping, be it request parameters, path variables or request body attributes.
 	 *
 	 * @param name to retrieve
 	 * @return parameter descriptor or null
 	 */
 	@Override
-	public ActionInputParameter getActionInputParameter(String name) {
+	public ActionInputParameter getActionInputParameter(final String name) {
 		ActionInputParameter ret = requestParams.get(name);
 		if (ret == null) {
 			ret = pathVariables.get(name);
@@ -236,7 +242,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 * @param propertyPath property property path, which may be nested
 	 * @return a BeanWrapper for the target bean
 	 */
-	PropertyDescriptor getPropertyDescriptorForPropertyPath(String propertyPath, Class<?> propertyType) {
+	PropertyDescriptor getPropertyDescriptorForPropertyPath(final String propertyPath, final Class<?> propertyType) {
 		int pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
 		// Handle nested properties recursively.
 		if (pos > -1) {
@@ -245,7 +251,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 			PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(propertyType, nestedProperty);
 			// BeanWrapperImpl nestedBw = getNestedBeanWrapper(nestedProperty);
 			return getPropertyDescriptorForPropertyPath(nestedPath, propertyDescriptor.getPropertyType());
-		} else {
+		}
+		else {
 			return BeanUtils.getPropertyDescriptor(propertyType, propertyPath);
 		}
 	}
@@ -256,7 +263,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 * @param name of the request header
 	 * @return request header descriptor or null
 	 */
-	public ActionInputParameter getRequestHeader(String name) {
+	public ActionInputParameter getRequestHeader(final String name) {
 		return requestHeaders.get(name);
 	}
 
@@ -285,7 +292,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 *
 	 * @param requestBody descriptor to set
 	 */
-	public void setRequestBody(ActionInputParameter requestBody) {
+	public void setRequestBody(final ActionInputParameter requestBody) {
 		this.requestBody = requestBody;
 		if (requestBody != null) {
 			List<ActionInputParameter> bodyInputParameters = new ArrayList<ActionInputParameter>();
@@ -293,7 +300,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 					Collections.<String> emptySet(), new ActionInputParameterVisitor() {
 
 						@Override
-						public void visit(ActionInputParameter inputParameter) {}
+						public void visit(final ActionInputParameter inputParameter) {
+						}
 					}, bodyInputParameters);
 			for (ActionInputParameter actionInputParameter : bodyInputParameters) {
 				this.bodyInputParameters.put(actionInputParameter.getName(), actionInputParameter);
@@ -302,8 +310,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	}
 
 	/**
-	 * Gets semantic type of action, e.g. a subtype of hydra:Operation or schema:Action. Use {@link Action} on a method
-	 * handler to define the semantic type of an action.
+	 * Gets semantic type of action, e.g. a subtype of hydra:Operation or schema:Action. Use {@link Action} on a method handler to define
+	 * the semantic type of an action.
 	 *
 	 * @return URL identifying the type
 	 */
@@ -317,7 +325,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 *
 	 * @param semanticActionType URL identifying the type
 	 */
-	public void setSemanticActionType(String semanticActionType) {
+	public void setSemanticActionType(final String semanticActionType) {
 		this.semanticActionType = semanticActionType;
 	}
 
@@ -349,7 +357,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 *
 	 * @param cardinality to set
 	 */
-	public void setCardinality(Cardinality cardinality) {
+	public void setCardinality(final Cardinality cardinality) {
 		this.cardinality = cardinality;
 	}
 
@@ -364,12 +372,13 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	}
 
 	@Override
-	public void accept(ActionInputParameterVisitor visitor) {
+	public void accept(final ActionInputParameterVisitor visitor) {
 		if (hasRequestBody()) {
 			for (ActionInputParameter inputParameter : bodyInputParameters.values()) {
 				visitor.visit(inputParameter);
 			}
-		} else {
+		}
+		else {
 			Collection<String> paramNames = getRequestParamNames();
 			for (String paramName : paramNames) {
 				ActionInputParameter inputParameter = getActionInputParameter(paramName);
@@ -390,7 +399,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	 */
 	static void recurseBeanCreationParams(final Class<?> beanType, final ActionInputParameter annotatedParameter,
 			final Object currentCallValue, final String parentParamName, final Set<String> knownFields,
-			final ActionInputParameterVisitor methodHandler, List<ActionInputParameter> bodyInputParameters) {
+			final ActionInputParameterVisitor methodHandler, final List<ActionInputParameter> bodyInputParameters) {
 
 		// TODO collection, map and object node creation are only describable by an annotation, not via type reflection
 		if (ObjectNode.class.isAssignableFrom(beanType) || Map.class.isAssignableFrom(beanType)
@@ -425,8 +434,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							Object propertyValue = PropertyUtils.getPropertyOrFieldValue(currentCallValue, paramName);
 							MethodParameter methodParameter = new MethodParameter(constructor, paramIndex);
 
-							String fieldName = invokeHandlerOrFollowRecurse(methodParameter, annotatedParameter, parentParamName,
-									paramName, parameterType, propertyValue, knownConstructorFields, methodHandler, bodyInputParameters);
+							String fieldName = invokeHandlerOrFollowRecurse(methodParameter, annotatedParameter, parentParamName, paramName,
+									parameterType, propertyValue, knownConstructorFields, methodHandler, bodyInputParameters);
 
 							if (fieldName != null) {
 								knownConstructorFields.add(fieldName);
@@ -436,8 +445,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 						}
 					}
 				}
-				Assert.isTrue(parameters.length == paramIndex, "not all constructor arguments of @JsonCreator "
-						+ constructor.getName() + " are annotated with @JsonProperty");
+				Assert.isTrue(parameters.length == paramIndex,
+						"not all constructor arguments of @JsonCreator " + constructor.getName() + " are annotated with @JsonProperty");
 			}
 
 			// TODO support Option provider by other method args?
@@ -461,18 +470,21 @@ public class SpringActionDescriptor implements ActionDescriptor {
 						propertyValue, knownConstructorFields, methodHandler, bodyInputParameters);
 
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException("Failed to write input fields for constructor", e);
 		}
 	}
 
-	private static String invokeHandlerOrFollowRecurse(MethodParameter methodParameter,
-			ActionInputParameter annotatedParameter, String parentParamName, String paramName, Class<?> parameterType,
-			Object propertyValue, Set<String> knownFields, ActionInputParameterVisitor handler,
-			List<ActionInputParameter> bodyInputParameters) {
+	private static String invokeHandlerOrFollowRecurse(final MethodParameter methodParameter, final ActionInputParameter annotatedParameter,
+			final String parentParamName, final String paramName, final Class<?> parameterType, final Object propertyValue,
+			final Set<String> knownFields, final ActionInputParameterVisitor handler,
+			final List<ActionInputParameter> bodyInputParameters) {
+
+		Annotation[] annotations = methodParameter.getParameterAnnotations();
 
 		if (DataType.isSingleValueType(parameterType) || DataType.isArrayOrCollection(parameterType)
-				|| methodParameter.hasParameterAnnotation(Select.class)) {
+				|| getParameterAnnotation(annotations, Select.class) != null) {
 			/**
 			 * TODO This is a temporal patch, to be reviewed...
 			 */
@@ -482,9 +494,20 @@ public class SpringActionDescriptor implements ActionDescriptor {
 				bodyInputParameters.add(inputParameter);
 				handler.visit(inputParameter);
 				return inputParameter.getName();
-			} else if (annotatedParameter.isIncluded(paramName) && !knownFields.contains(parentParamName + paramName)) {
-				if (DataType.isArrayOrCollection(parameterType) && methodParameter.hasParameterAnnotation(DTOParam.class)) {
-					if (propertyValue != null) {
+			}
+			else if (annotatedParameter.isIncluded(paramName) && !knownFields.contains(parentParamName + paramName)) {
+
+				DTOParam dtoAnnotation = getParameterAnnotation(annotations, DTOParam.class);
+
+				if (DataType.isArrayOrCollection(parameterType) && dtoAnnotation != null) {
+					if (dtoAnnotation.wildcard()) {
+						Type type = methodParameter.getGenericParameterType();
+						if (type != null && type instanceof ParameterizedType) {
+							recurseBeanCreationParams((Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0], annotatedParameter,
+									null, parentParamName + paramName + "[*].", knownFields, handler, bodyInputParameters);
+						}
+					}
+					else if (propertyValue != null) {
 						if (parameterType.isArray()) {
 							Object[] array = (Object[]) propertyValue;
 							for (int i = 0; i < array.length; i++) {
@@ -492,7 +515,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 								recurseBeanCreationParams(array[i].getClass(), annotatedParameter, value,
 										parentParamName + paramName + "[" + i + "].", knownFields, handler, bodyInputParameters);
 							}
-						} else {
+						}
+						else {
 							int i = 0;
 
 							for (Object value : (Collection<?>) propertyValue) {
@@ -502,7 +526,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 						}
 					}
 					return parentParamName + paramName;
-				} else {
+				}
+				else {
 					SpringActionInputParameter inputParameter = new SpringActionInputParameter(methodParameter, propertyValue,
 							parentParamName + paramName);
 					// TODO We need to find a better solution for this
@@ -513,37 +538,41 @@ public class SpringActionDescriptor implements ActionDescriptor {
 				}
 			}
 
-		} else {
+		}
+		else {
 			Object callValueBean;
 			if (propertyValue instanceof Resource) {
 				callValueBean = ((Resource<?>) propertyValue).getContent();
-			} else {
+			}
+			else {
 				callValueBean = propertyValue;
 			}
-			recurseBeanCreationParams(parameterType, annotatedParameter, callValueBean, parentParamName + paramName + ".",
-					knownFields, handler, bodyInputParameters);
+			recurseBeanCreationParams(parameterType, annotatedParameter, callValueBean, parentParamName + paramName + ".", knownFields,
+					handler, bodyInputParameters);
 		}
 
 		return null;
 	}
 
-	private static RequestMethod getHttpMethod(Method method) {
+	private static RequestMethod getHttpMethod(final Method method) {
 		RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
 		RequestMethod requestMethod;
 		if (methodRequestMapping != null) {
 			RequestMethod[] methods = methodRequestMapping.method();
 			if (methods.length == 0) {
 				requestMethod = RequestMethod.GET;
-			} else {
+			}
+			else {
 				requestMethod = methods[0];
 			}
-		} else {
+		}
+		else {
 			requestMethod = RequestMethod.GET; // default
 		}
 		return requestMethod;
 	}
 
-	private static String getConsumes(Method method) {
+	private static String getConsumes(final Method method) {
 		RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
 		if (methodRequestMapping != null) {
 			StringBuilder sb = new StringBuilder();
@@ -558,7 +587,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 		return null;
 	}
 
-	private static String getProduces(Method method) {
+	private static String getProduces(final Method method) {
 		RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
 		if (methodRequestMapping != null) {
 			StringBuilder sb = new StringBuilder();
@@ -573,23 +602,25 @@ public class SpringActionDescriptor implements ActionDescriptor {
 		return null;
 	}
 
-	private Cardinality getCardinality(Method invokedMethod, RequestMethod httpMethod, Type genericReturnType) {
+	private Cardinality getCardinality(final Method invokedMethod, final RequestMethod httpMethod, final Type genericReturnType) {
 		Cardinality cardinality;
 
 		ResourceHandler resourceAnn = AnnotationUtils.findAnnotation(invokedMethod, ResourceHandler.class);
 		if (resourceAnn != null) {
 			cardinality = resourceAnn.value();
-		} else {
+		}
+		else {
 			if (RequestMethod.POST == httpMethod || containsCollection(genericReturnType)) {
 				cardinality = Cardinality.COLLECTION;
-			} else {
+			}
+			else {
 				cardinality = Cardinality.SINGLE;
 			}
 		}
 		return cardinality;
 	}
 
-	private boolean containsCollection(Type genericReturnType) {
+	private boolean containsCollection(final Type genericReturnType) {
 		final boolean ret;
 		if (genericReturnType instanceof ParameterizedType) {
 			ParameterizedType t = (ParameterizedType) genericReturnType;
@@ -599,32 +630,40 @@ public class SpringActionDescriptor implements ActionDescriptor {
 			if (HttpEntity.class.isAssignableFrom(cls)) {
 				Type[] typeArguments = t.getActualTypeArguments();
 				ret = containsCollection(typeArguments[0]);
-			} else if (Resources.class.isAssignableFrom(cls) || Collection.class.isAssignableFrom(cls)) {
+			}
+			else if (Resources.class.isAssignableFrom(cls) || Collection.class.isAssignableFrom(cls)) {
 				ret = true;
-			} else {
+			}
+			else {
 				ret = false;
 			}
-		} else if (genericReturnType instanceof GenericArrayType) {
+		}
+		else if (genericReturnType instanceof GenericArrayType) {
 			ret = true;
-		} else if (genericReturnType instanceof WildcardType) {
+		}
+		else if (genericReturnType instanceof WildcardType) {
 			WildcardType t = (WildcardType) genericReturnType;
 			ret = containsCollection(getBound(t.getLowerBounds())) || containsCollection(getBound(t.getUpperBounds()));
-		} else if (genericReturnType instanceof TypeVariable) {
+		}
+		else if (genericReturnType instanceof TypeVariable) {
 			ret = false;
-		} else if (genericReturnType instanceof Class) {
+		}
+		else if (genericReturnType instanceof Class) {
 			Class<?> cls = (Class<?>) genericReturnType;
 			ret = Resources.class.isAssignableFrom(cls) || Collection.class.isAssignableFrom(cls);
-		} else {
+		}
+		else {
 			ret = false;
 		}
 		return ret;
 	}
 
-	private Type getBound(Type[] lowerBounds) {
+	private Type getBound(final Type[] lowerBounds) {
 		Type ret;
 		if (lowerBounds != null && lowerBounds.length > 0) {
 			ret = lowerBounds[0];
-		} else {
+		}
+		else {
 			ret = null;
 		}
 		return ret;
@@ -633,6 +672,15 @@ public class SpringActionDescriptor implements ActionDescriptor {
 	@Override
 	public String toString() {
 		return "SpringActionDescriptor [httpMethod=" + httpMethod + ", actionName=" + actionName + "]";
+	}
+
+	private static <T extends Annotation> T getParameterAnnotation(final Annotation[] anns, final Class<T> annotationType) {
+		for (Annotation ann : anns) {
+			if (annotationType.isInstance(ann)) {
+				return (T) ann;
+			}
+		}
+		return null;
 	}
 
 }

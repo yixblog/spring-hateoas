@@ -9,4 +9,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 public @interface DTOParam {
 
+	/**
+	 * Set the behavior of the object as wildcard. Its properties will be checked as editable values.
+	 * 
+	 * @return
+	 */
+	boolean wildcard() default false;
 }
