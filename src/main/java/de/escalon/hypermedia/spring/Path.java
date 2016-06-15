@@ -1,5 +1,6 @@
 package de.escalon.hypermedia.spring;
 
+import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -220,15 +221,7 @@ public class Path {
 
 		private String getPropertyFromMethod(Method method) {
 			String name = method.getName();
-			String[] prefixes = { "get", "is" };
-			for (String prefix : prefixes) {
-				if (name.length() > 0 && name.startsWith(prefix)) {
-					char c[] = name.replace(prefix, "").toCharArray();
-					c[0] = Character.toLowerCase(c[0]);
-					return new String(c);
-				}
-			}
-			return "";
+			return Introspector.decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
 		}
 	}
 
