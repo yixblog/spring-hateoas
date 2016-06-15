@@ -61,10 +61,10 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	private static final String[] EMPTY = new String[0];
 	private static final Suggest<?>[] EMPTY_SUGGEST = new Suggest<?>[0];
 	private final TypeDescriptor typeDescriptor;
-	private final RequestBody requestBody;
-	private final RequestParam requestParam;
-	private final PathVariable pathVariable;
-	private final RequestHeader requestHeader;
+	private RequestBody requestBody;
+	private RequestParam requestParam;
+	private PathVariable pathVariable;
+	private RequestHeader requestHeader;
 	private final MethodParameter methodParameter;
 	private final Object value;
 	private Boolean arrayOrCollection = null;
@@ -79,6 +79,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	@SuppressWarnings({ "unchecked",
 			"rawtypes" }) PossibleValuesResolver<?> resolver = new FixedPossibleValuesResolver(EMPTY_SUGGEST);
 
+	private static final ConversionService DEFAULT_CONVERSION_SERVICE = new DefaultFormattingConversionService();
 	private final ConversionService conversionService;
 	private Type fieldType;
 
@@ -96,13 +97,24 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		this.methodParameter = methodParameter;
 		this.value = value;
 		this.name = name;
-		requestBody = methodParameter.getParameterAnnotation(RequestBody.class);
-		requestParam = methodParameter.getParameterAnnotation(RequestParam.class);
-		pathVariable = methodParameter.getParameterAnnotation(PathVariable.class);
-		requestHeader = methodParameter.getParameterAnnotation(RequestHeader.class);
-		// always determine input constraints,
-		// might be a nested property which is neither requestBody, requestParam nor pathVariable
-		Input inputAnnotation = methodParameter.getParameterAnnotation(Input.class);
+		Annotation[] annotations = methodParameter.getParameterAnnotations();
+		Input inputAnnotation = null;
+		Select select = null;
+		for (Annotation annotation : annotations) {
+			if (RequestBody.class.isInstance(annotation)) {
+				requestBody = (RequestBody) annotation;
+			} else if (RequestParam.class.isInstance(annotation)) {
+				requestParam = (RequestParam) annotation;
+			} else if (PathVariable.class.isInstance(annotation)) {
+				pathVariable = (PathVariable) annotation;
+			} else if (RequestHeader.class.isInstance(annotation)) {
+				requestHeader = (RequestHeader) annotation;
+			} else if (Input.class.isInstance(annotation)) {
+				inputAnnotation = (Input) annotation;
+			} else if (Select.class.isInstance(annotation)) {
+				select = (Select) annotation;
+			}
+		}
 
 		/**
 		 * Check if annotations indicate that is required, for now only for request params & headers
@@ -148,16 +160,15 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		} else {
 			fieldType = inputAnnotation.value();
 		}
-		createResolver(methodParameter);
+		createResolver(methodParameter, select);
 		this.conversionService = conversionService;
 		typeDescriptor = TypeDescriptor.nested(methodParameter, 0);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void createResolver(MethodParameter methodParameter) {
+	private void createResolver(MethodParameter methodParameter, Select select) {
 		Class<?> parameterType = methodParameter.getNestedParameterType();
 		Class<?> nested;
-		Select select = methodParameter.getParameterAnnotation(Select.class);
 		SuggestType type = SuggestType.INTERNAL;
 		if (select != null && select.required()) {
 			type = select.type();
@@ -194,7 +205,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	}
 
 	public SpringActionInputParameter(MethodParameter methodParameter, Object value, String name) {
-		this(methodParameter, value, new DefaultFormattingConversionService(), name);
+		this(methodParameter, value, DEFAULT_CONVERSION_SERVICE, name);
 	}
 
 	/**
