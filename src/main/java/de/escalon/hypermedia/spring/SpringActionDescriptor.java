@@ -496,33 +496,50 @@ public class SpringActionDescriptor implements ActionDescriptor {
 				return inputParameter.getName();
 			}
 			else if (annotatedParameter.isIncluded(paramName) && !knownFields.contains(parentParamName + paramName)) {
-
 				DTOParam dtoAnnotation = getParameterAnnotation(annotations, DTOParam.class);
-
 				if (DataType.isArrayOrCollection(parameterType) && dtoAnnotation != null) {
-					if (dtoAnnotation.wildcard()) {
-						Type type = methodParameter.getGenericParameterType();
-						if (type != null && type instanceof ParameterizedType) {
-							recurseBeanCreationParams((Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0], annotatedParameter,
-									null, parentParamName + paramName + "[*].", knownFields, handler, bodyInputParameters);
-						}
-					}
-					else if (propertyValue != null) {
+					Object wildCardValue = null;
+					if (propertyValue != null) {
+						// if the element is wildcard dto type element we need to get the first value
 						if (parameterType.isArray()) {
 							Object[] array = (Object[]) propertyValue;
-							for (int i = 0; i < array.length; i++) {
-								Object value = array[i];
-								recurseBeanCreationParams(array[i].getClass(), annotatedParameter, value,
-										parentParamName + paramName + "[" + i + "].", knownFields, handler, bodyInputParameters);
+							if (!dtoAnnotation.wildcard()) {
+								for (int i = 0; i < array.length; i++) {
+									recurseBeanCreationParams(array[i].getClass(), annotatedParameter, array[i],
+											parentParamName + paramName + "[" + i + "].", knownFields, handler, bodyInputParameters);
+								}
+							}
+							else if (array.length > 0) {
+								wildCardValue = array[0];
 							}
 						}
 						else {
 							int i = 0;
-
-							for (Object value : (Collection<?>) propertyValue) {
-								recurseBeanCreationParams(value.getClass(), annotatedParameter, value,
-										parentParamName + paramName + "[" + (i++) + "].", knownFields, handler, bodyInputParameters);
+							if (!dtoAnnotation.wildcard()) {
+								for (Object value : (Collection<?>) propertyValue) {
+									recurseBeanCreationParams(value.getClass(), annotatedParameter, value,
+											parentParamName + paramName + "[" + (i++) + "].", knownFields, handler, bodyInputParameters);
+								}
 							}
+							else if (!((Collection<?>) propertyValue).isEmpty()) {
+								wildCardValue = ((Collection<?>) propertyValue).iterator().next();
+							}
+						}
+					}
+					if (dtoAnnotation.wildcard()) {
+						Class<?> willCardClass = null;
+						if (wildCardValue != null) {
+							willCardClass = wildCardValue.getClass();
+						}
+						else {
+							Type type = methodParameter.getGenericParameterType();
+							if (type != null && type instanceof ParameterizedType) {
+								willCardClass = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+							}
+						}
+						if (willCardClass != null) {
+							recurseBeanCreationParams(willCardClass, annotatedParameter, wildCardValue,
+									parentParamName + paramName + "[*].", knownFields, handler, bodyInputParameters);
 						}
 					}
 					return parentParamName + paramName;
