@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 public @interface DTOParam {
 
+	public static final String WILDCARD_LIST_MASK = "[*]";
+
 	/**
 	 * Set the behavior of the object as wildcard. Its properties will be checked as editable values.
 	 * 

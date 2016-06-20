@@ -497,6 +497,7 @@ public class SpringActionDescriptor implements ActionDescriptor {
 			}
 			else if (annotatedParameter.isIncluded(paramName) && !knownFields.contains(parentParamName + paramName)) {
 				DTOParam dtoAnnotation = getParameterAnnotation(annotations, DTOParam.class);
+				StringBuilder wholeParamName = new StringBuilder(64);
 				if (DataType.isArrayOrCollection(parameterType) && dtoAnnotation != null) {
 					Object wildCardValue = null;
 					if (propertyValue != null) {
@@ -505,8 +506,10 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							Object[] array = (Object[]) propertyValue;
 							if (!dtoAnnotation.wildcard()) {
 								for (int i = 0; i < array.length; i++) {
+
 									recurseBeanCreationParams(array[i].getClass(), annotatedParameter, array[i],
-											parentParamName + paramName + "[" + i + "].", knownFields, handler, bodyInputParameters);
+											wholeParamName.append(parentParamName).append(paramName).append("[" + i + "].").toString(),
+											knownFields, handler, bodyInputParameters);
 								}
 							}
 							else if (array.length > 0) {
@@ -517,8 +520,10 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							int i = 0;
 							if (!dtoAnnotation.wildcard()) {
 								for (Object value : (Collection<?>) propertyValue) {
-									recurseBeanCreationParams(value.getClass(), annotatedParameter, value,
-											parentParamName + paramName + "[" + (i++) + "].", knownFields, handler, bodyInputParameters);
+									recurseBeanCreationParams(
+											value.getClass(), annotatedParameter, value, wholeParamName.append(parentParamName)
+													.append(paramName).append("[").append(i++).append("].").toString(),
+											knownFields, handler, bodyInputParameters);
 								}
 							}
 							else if (!((Collection<?>) propertyValue).isEmpty()) {
@@ -538,8 +543,10 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							}
 						}
 						if (willCardClass != null) {
-							recurseBeanCreationParams(willCardClass, annotatedParameter, wildCardValue,
-									parentParamName + paramName + "[*].", knownFields, handler, bodyInputParameters);
+							recurseBeanCreationParams(willCardClass, annotatedParameter,
+									wildCardValue, wholeParamName.append(parentParamName).append(paramName)
+											.append(DTOParam.WILDCARD_LIST_MASK).append(".").toString(),
+									knownFields, handler, bodyInputParameters);
 						}
 					}
 					return parentParamName + paramName;
