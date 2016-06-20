@@ -506,10 +506,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							Object[] array = (Object[]) propertyValue;
 							if (!dtoAnnotation.wildcard()) {
 								for (int i = 0; i < array.length; i++) {
-
 									recurseBeanCreationParams(array[i].getClass(), annotatedParameter, array[i],
-											wholeParamName.append(parentParamName).append(paramName).append("[" + i + "].").toString(),
-											knownFields, handler, bodyInputParameters);
+											parentParamName + paramName + "[" + i + "].", knownFields, handler, bodyInputParameters);
 								}
 							}
 							else if (array.length > 0) {
@@ -520,10 +518,8 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							int i = 0;
 							if (!dtoAnnotation.wildcard()) {
 								for (Object value : (Collection<?>) propertyValue) {
-									recurseBeanCreationParams(
-											value.getClass(), annotatedParameter, value, wholeParamName.append(parentParamName)
-													.append(paramName).append("[").append(i++).append("].").toString(),
-											knownFields, handler, bodyInputParameters);
+									recurseBeanCreationParams(value.getClass(), annotatedParameter, value,
+											parentParamName + paramName + "[" + (i++) + "].", knownFields, handler, bodyInputParameters);
 								}
 							}
 							else if (!((Collection<?>) propertyValue).isEmpty()) {
@@ -543,10 +539,9 @@ public class SpringActionDescriptor implements ActionDescriptor {
 							}
 						}
 						if (willCardClass != null) {
-							recurseBeanCreationParams(willCardClass, annotatedParameter,
-									wildCardValue, wholeParamName.append(parentParamName).append(paramName)
-											.append(DTOParam.WILDCARD_LIST_MASK).append(".").toString(),
-									knownFields, handler, bodyInputParameters);
+							recurseBeanCreationParams(willCardClass, annotatedParameter, wildCardValue,
+									parentParamName + paramName + DTOParam.WILDCARD_LIST_MASK + ".", knownFields, handler,
+									bodyInputParameters);
 						}
 					}
 					return parentParamName + paramName;
