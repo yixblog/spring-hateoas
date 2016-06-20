@@ -107,18 +107,19 @@ public class DummyController {
 
 	public static final List<Integer> ARRAY_READONLY = Arrays.asList(3);
 
-	List<Item> items = new ArrayList<Item>();
+	public List<Item> items = new ArrayList<Item>();
 
-	private ArrayList<ItemResource> resources;
-
-	private ArrayList<ResourceSupport> resourcesById;
+	private final List<ItemResource> resources = new ArrayList<ItemResource>();
+	public static final String MODIFY = "modify";
+	public static final String DELETE = "delete";
 
 	public DummyController() {
 		for (int i = 0; i < INITIAL; i++) {
 			SubSubEntity subEntity = new SubSubEntity(i + 1, "SE" + i + 1,
 					Arrays.asList(SubItem.VALIDS_SELECTED[(i + 2) % SubItem.VALIDS_SELECTED.length]),
 					ItemType.values()[(i + 2) % ItemType.values().length]);
-			SubEntity entity = new SubEntity(i, "E" + i, Arrays.asList(SubItem.VALIDS_SELECTED[(i + 1) % SubItem.VALIDS_SELECTED.length]),
+			SubEntity entity = new SubEntity(i, "E" + i,
+					Arrays.asList(SubItem.VALIDS_SELECTED[(i + 1) % SubItem.VALIDS_SELECTED.length]),
 					ItemType.values()[(i + 1) % ItemType.values().length], subEntity);
 			List<ListableSubEntity> listSubEntity = new ArrayList<ListableSubEntity>();
 			List<ListableSubEntity> listWCEntity = new ArrayList<ListableSubEntity>();
@@ -126,115 +127,117 @@ public class DummyController {
 			ArrayList<SubItem> listSubEntitySubItem;
 			for (int j = 0; j < i + 2; j++) {
 
-				listSubEntity.add(new ListableSubEntity(j, "LSE" + j, ListableItemType.values()[(i + 2) % ListableItemType.values().length],
-						Arrays.asList(ListableItemType.values()[(i) % ListableItemType.values().length],
-								ListableItemType.values()[(i + 1) % ListableItemType.values().length])));
+				listSubEntity.add(
+						new ListableSubEntity(j, "LSE" + j, ListableItemType.values()[(i + 2) % ListableItemType.values().length],
+								Arrays.asList(ListableItemType.values()[(i) % ListableItemType.values().length],
+										ListableItemType.values()[(i + 1) % ListableItemType.values().length])));
 
-				listWCEntity.add(new ListableSubEntity(2, "LSE", ListableItemType.values()[(i + 2) % ListableItemType.values().length],
-						Arrays.asList(ListableItemType.values()[(i) % ListableItemType.values().length],
-								ListableItemType.values()[(i + 1) % ListableItemType.values().length])));
+				listWCEntity
+						.add(new ListableSubEntity(2, "LSE", ListableItemType.values()[(i + 2) % ListableItemType.values().length],
+								Arrays.asList(ListableItemType.values()[(i) % ListableItemType.values().length],
+										ListableItemType.values()[(i + 1) % ListableItemType.values().length])));
 
 				listSubEntitySubItem = new ArrayList<SubItem>();
 
 				for (int x = 0; x < i + 2; x++) {
 					listSubEntitySubItem.add(new SubItem(i * 10, String.valueOf(i * 10).concat("_name")));
 				}
-				listDoubleLevelWCEntity.add(
-						new WildCardedListableSubEntity(2, "LSE", ListableItemType.values()[(i + 2) % ListableItemType.values().length],
-								Arrays.asList(ListableItemType.values()[(i) % ListableItemType.values().length],
-										ListableItemType.values()[(i + 1) % ListableItemType.values().length]),
-								listSubEntitySubItem));
+				listDoubleLevelWCEntity.add(new WildCardedListableSubEntity(2, "LSE",
+						ListableItemType.values()[(i + 2) % ListableItemType.values().length],
+						Arrays.asList(ListableItemType.values()[(i) % ListableItemType.values().length],
+								ListableItemType.values()[(i + 1) % ListableItemType.values().length]),
+						listSubEntitySubItem));
 
 			}
 
 			items.add(new Item(i, "Name" + Integer.toString(i), ItemType.values()[i % ItemType.values().length],
-					Arrays.asList(SubItem.VALIDS_SELECTED[i % SubItem.VALIDS_SELECTED.length]), SubItem.VALIDS[i % SubItem.VALIDS.length],
-					SubItem.VALIDS[i % SubItem.VALIDS.length].getId(), SubItem.VALIDS[(i + 1) % SubItem.VALIDS.length].getId(),
-					AnotherSubItem.VALIDS[(i) % AnotherSubItem.VALIDS.length], entity, listSubEntity, 1.0, i % 2 == 0, getIntegerList(i),
-					new ArrayList<String>(), listWCEntity, listDoubleLevelWCEntity, new String[] { "def_element", "second_one" },
+					Arrays.asList(SubItem.VALIDS_SELECTED[i % SubItem.VALIDS_SELECTED.length]),
+					SubItem.VALIDS[i % SubItem.VALIDS.length], SubItem.VALIDS[i % SubItem.VALIDS.length].getId(),
+					SubItem.VALIDS[(i + 1) % SubItem.VALIDS.length].getId(),
+					AnotherSubItem.VALIDS[(i) % AnotherSubItem.VALIDS.length], entity, listSubEntity, 1.0, i % 2 == 0,
+					getIntegerList(i), new ArrayList<String>(), listWCEntity, listDoubleLevelWCEntity,
+					new String[] { "def_element", "second_one" },
 					listSubEntity.toArray(new ListableSubEntity[listSubEntity.size()]),
 					listSubEntity.toArray(new ListableSubEntity[listSubEntity.size()])));
 		}
-		// resources = new ArrayList<ItemResource>();
-		// resourcesById = new ArrayList<ResourceSupport>();
-		// for (Item transfer : items) {
-		// resources.add(new ItemResource(transfer));
-		// resourcesById.add(getById(transfer.getId()));
-		// }
 	}
 
-	public void prepareResources() {
-		resources = new ArrayList<ItemResource>();
-		resourcesById = new ArrayList<ResourceSupport>();
+	public void setUp() {
 		for (Item transfer : items) {
 			resources.add(new ItemResource(transfer));
-			resourcesById.add(getById(transfer.getId()));
 		}
 	}
 
-	public ResourceSupport getById(final Integer id) {
+	public ResourceSupport getById(final Integer id, String rel) {
 		Item item = findById(id);
 		ResourceSupport resourceSupport = new ResourceSupport();
+		AffordanceBuilder builder = linkTo(methodOn(DummyController.class).get(id, null));
+		if (MODIFY.equals(rel)) {
+			AffordanceBuilder editTransferBuilder = linkTo(methodOn(DummyController.class).edit(id, item));
 
-		AffordanceBuilder getByIdBuilder = linkTo(methodOn(DummyController.class).get(id));
-		AffordanceBuilder editTransferBuilder = linkTo(methodOn(DummyController.class).edit(id, item));
+			ActionInputParameter nameInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getName()));
+			ActionInputParameter amountInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getAmount()));
+			ActionInputParameter typeInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getType()));
+			ActionInputParameter subItemIdInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getSubItemId()));
+			ActionInputParameter subItemInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getSingleSub()));
+			ActionInputParameter searchedSubItemInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getSearchedSubItem()));
+			ActionInputParameter anotherSubItemInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getAnother()));
+			ActionInputParameter flagInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).isFlag()));
+			ActionInputParameter integerListInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getIntegerList()));
+			ActionInputParameter subEntityNameInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getSubEntity().getName()));
+			ActionInputParameter subEntityMultipleInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getSubEntity().getMultiple()));
+			ActionInputParameter wildcardsubEntityKeyInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(
+							path(on(Item.class).getDoubleLevelWildCardEntityList()) + DTOParam.WILDCARD_LIST_MASK + ".lkey");
+			ActionInputParameter wildcardsubEntityNameInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(
+							path(on(Item.class).getDoubleLevelWildCardEntityList()) + DTOParam.WILDCARD_LIST_MASK + ".lname");
+			ActionInputParameter wildcardsubItemListSubEntityIdInputParameter = editTransferBuilder.getActionDescriptors()
+					.get(0).getActionInputParameter(path(on(Item.class).getDoubleLevelWildCardEntityList())
+							+ DTOParam.WILDCARD_LIST_MASK + ".subItemList" + DTOParam.WILDCARD_LIST_MASK + ".id");
+			ActionInputParameter subEntityListKeyInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getListSubEntity()) + "[0].lkey");
 
-		ActionInputParameter nameInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getName()));
-		ActionInputParameter amountInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getAmount()));
-		ActionInputParameter typeInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getType()));
-		ActionInputParameter subItemIdInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getSubItemId()));
-		ActionInputParameter subItemInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getSingleSub()));
-		ActionInputParameter searchedSubItemInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getSearchedSubItem()));
-		ActionInputParameter anotherSubItemInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getAnother()));
-		ActionInputParameter flagInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).isFlag()));
-		ActionInputParameter integerListInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getIntegerList()));
-		ActionInputParameter subEntityNameInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getSubEntity().getName()));
-		ActionInputParameter subEntityMultipleInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getSubEntity().getMultiple()));
-		ActionInputParameter wildcardsubEntityKeyInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getDoubleLevelWildCardEntityList()) + DTOParam.WILDCARD_LIST_MASK + ".lkey");
-		ActionInputParameter wildcardsubEntityNameInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getDoubleLevelWildCardEntityList()) + DTOParam.WILDCARD_LIST_MASK + ".lname");
-		ActionInputParameter wildcardsubItemListSubEntityIdInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getDoubleLevelWildCardEntityList()) + DTOParam.WILDCARD_LIST_MASK
-						+ ".subItemList" + DTOParam.WILDCARD_LIST_MASK + ".id");
-		ActionInputParameter subEntityListKeyInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getListSubEntity()) + "[0].lkey");
+			ActionInputParameter stringArrayInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getStringArray()));
 
-		ActionInputParameter stringArrayInputParameter = editTransferBuilder.getActionDescriptors().get(0)
-				.getActionInputParameter(path(on(Item.class).getStringArray()));
+			param(item, nameInputParameter, NAME_READONLY, NAME_REQUIRED);
+			param(item, amountInputParameter, AMOUNT_READONLY, AMOUNT_REQUIRED);
+			param(item, typeInputParameter, TYPE_READONLY, TYPE_REQUIRED);
+			param(item, subItemIdInputParameter, SUBITEM_ID_READONLY, SUBITEM_ID_REQUIRED);
+			param(item, subItemInputParameter, SUBITEM_READONLY, SUBITEM_REQUIRED);
+			param(item, searchedSubItemInputParameter, SEARCHED_SUBITEM_READONLY, SEARCHED_SUBITEM_REQUIRED);
+			param(item, anotherSubItemInputParameter, ANOTHER_SUBITEM_READONLY, ANOTHER_SUBITEM_REQUIRED);
+			param(item, flagInputParameter, FLAG_READONLY, FLAG_REQUIRED);
+			param(item, integerListInputParameter, INTEGER_LIST_READONLY, INTEGER_LIST_REQUIRED);
+			param(item, subEntityNameInputParameter, SUBENTITY_NAME_READONLY, SUBENTITY_NAME_REQUIRED);
+			param(item, subEntityMultipleInputParameter, SUBENTITY_MULTIPLE_READONLY, SUBENTITY_MULTIPLE_REQUIRED);
+			param(item, subEntityListKeyInputParameter, LIST_SUBENTITY_KEY_READONLY, LIST_SUBENTITY_KEY_REQUIRED);
+			param(item, wildcardsubEntityKeyInputParameter, LIST_WC_SUBENTITY_KEY_READONLY, LIST_WC_SUBENTITY_KEY_REQUIRED);
+			param(item, wildcardsubEntityNameInputParameter, LIST_WC_SUBENTITY_NAME_READONLY,
+					LIST_WC_SUBENTITY_NAME_REQUIRED);
+			param(item, wildcardsubItemListSubEntityIdInputParameter, LIST_WC_SUBENTITYLIST_ID_READONLY,
+					LIST_WC_SUBENTITYLIST_ID_REQUIRED);
+			param(item, stringArrayInputParameter, ARRAY_READONLY, ARRAY_REQUIRED);
+			builder.and(editTransferBuilder);
 
-		param(item, nameInputParameter, NAME_READONLY, NAME_REQUIRED);
-		param(item, amountInputParameter, AMOUNT_READONLY, AMOUNT_REQUIRED);
-		param(item, typeInputParameter, TYPE_READONLY, TYPE_REQUIRED);
-		param(item, subItemIdInputParameter, SUBITEM_ID_READONLY, SUBITEM_ID_REQUIRED);
-		param(item, subItemInputParameter, SUBITEM_READONLY, SUBITEM_REQUIRED);
-		param(item, searchedSubItemInputParameter, SEARCHED_SUBITEM_READONLY, SEARCHED_SUBITEM_REQUIRED);
-		param(item, anotherSubItemInputParameter, ANOTHER_SUBITEM_READONLY, ANOTHER_SUBITEM_REQUIRED);
-		param(item, flagInputParameter, FLAG_READONLY, FLAG_REQUIRED);
-		param(item, integerListInputParameter, INTEGER_LIST_READONLY, INTEGER_LIST_REQUIRED);
-		param(item, subEntityNameInputParameter, SUBENTITY_NAME_READONLY, SUBENTITY_NAME_REQUIRED);
-		param(item, subEntityMultipleInputParameter, SUBENTITY_MULTIPLE_READONLY, SUBENTITY_MULTIPLE_REQUIRED);
-		param(item, subEntityListKeyInputParameter, LIST_SUBENTITY_KEY_READONLY, LIST_SUBENTITY_KEY_REQUIRED);
-		param(item, wildcardsubEntityKeyInputParameter, LIST_WC_SUBENTITY_KEY_READONLY, LIST_WC_SUBENTITY_KEY_REQUIRED);
-		param(item, wildcardsubEntityNameInputParameter, LIST_WC_SUBENTITY_NAME_READONLY, LIST_WC_SUBENTITY_NAME_REQUIRED);
-		param(item, wildcardsubItemListSubEntityIdInputParameter, LIST_WC_SUBENTITYLIST_ID_READONLY, LIST_WC_SUBENTITYLIST_ID_REQUIRED);
-		param(item, stringArrayInputParameter, ARRAY_READONLY, ARRAY_REQUIRED);
-
-		AffordanceBuilder deleteTransferBuilder = linkTo(methodOn(DummyController.class).delete(id));
-		AffordanceBuilder builder = linkTo(methodOn(DummyController.class).get(id, null)).and(getByIdBuilder);
-		builder.and(editTransferBuilder).and(deleteTransferBuilder);
+		} else if (DELETE.equals(rel)) {
+			AffordanceBuilder deleteTransferBuilder = linkTo(methodOn(DummyController.class).delete(id));
+			builder.and(deleteTransferBuilder);
+		}
 		resourceSupport.add(builder.withSelfRel());
+
 		return resourceSupport;
 	}
 
@@ -289,15 +292,18 @@ public class DummyController {
 	@RequestMapping(value = "/item/", method = RequestMethod.GET)
 	public Resources<ItemResource> get() {
 		return new Resources<ItemResource>(resources, linkTo(methodOn(DummyController.class).get()).withSelfRel(),
-				linkTo(methodOn(DummyController.class).getFiltered((Date) null, (Date) null, null)).withRel("list-after-date-transfers"));
+				linkTo(methodOn(DummyController.class).getFiltered((Date) null, (Date) null, null))
+						.withRel("list-after-date-transfers"));
 	}
 
-	@RequestMapping(value = "/item/{id}", method = RequestMethod.GET, params = "rel", produces = "application/prs.hal-forms+json")
+	@RequestMapping(value = "/item/{id}", method = RequestMethod.GET, params = "rel",
+			produces = "application/prs.hal-forms+json")
 	public ResourceSupport get(@PathVariable("id") final Integer id, @RequestParam final String rel) {
-		return resourcesById.get(id);
+		return getById(id, rel);
 	}
 
-	private void param(final Item item, final ActionInputParameter parameter, final List<Integer> readOnly, final List<Integer> required) {
+	private void param(final Item item, final ActionInputParameter parameter, final List<Integer> readOnly,
+			final List<Integer> required) {
 		if (readOnly.contains(item.getId())) {
 			parameter.setReadOnly(true);
 		}
@@ -306,7 +312,8 @@ public class DummyController {
 		}
 	}
 
-	@RequestMapping(value = "/item/", method = RequestMethod.GET, params = "rel", produces = "application/prs.hal-forms+json")
+	@RequestMapping(value = "/item/", method = RequestMethod.GET, params = "rel",
+			produces = "application/prs.hal-forms+json")
 	public ResourceSupport get(@RequestParam final String rel) {
 		ResourceSupport resourceSupport = new ResourceSupport();
 
@@ -317,13 +324,15 @@ public class DummyController {
 		// Separated iterations because they do not have to contain the same parameters
 		if (paramRequiredValuesMap != null) {
 			for (Entry<ItemParams, Boolean> param : paramRequiredValuesMap.entrySet()) {
-				inputParameter = transferBuilder.getActionDescriptors().get(0).getActionInputParameter(param.getKey().getPath());
+				inputParameter = transferBuilder.getActionDescriptors().get(0)
+						.getActionInputParameter(param.getKey().getPath());
 				inputParameter.setRequired(param.getValue());
 			}
 		}
 		if (paramReadOnlyValuesMap != null) {
 			for (Entry<ItemParams, Boolean> param : paramReadOnlyValuesMap.entrySet()) {
-				inputParameter = transferBuilder.getActionDescriptors().get(0).getActionInputParameter(param.getKey().getPath());
+				inputParameter = transferBuilder.getActionDescriptors().get(0)
+						.getActionInputParameter(param.getKey().getPath());
 				inputParameter.setReadOnly(param.getValue());
 			}
 		}
@@ -332,7 +341,8 @@ public class DummyController {
 		return resourceSupport;
 	}
 
-	@RequestMapping(value = "/item/filter", method = RequestMethod.GET, params = "rel", produces = "application/prs.hal-forms+json")
+	@RequestMapping(value = "/item/filter", method = RequestMethod.GET, params = "rel",
+			produces = "application/prs.hal-forms+json")
 	public ResourceSupport getFiltered(@RequestParam final String rel) {
 		ResourceSupport resourceSupport = new ResourceSupport();
 
@@ -344,8 +354,10 @@ public class DummyController {
 
 	@RequestMapping(value = "/item/filter", method = RequestMethod.GET)
 	public Resources<ItemResource> getFiltered(
-			@RequestParam(value = "dateFrom", required = false) @Input(value = Type.DATE) @DateTimeFormat(pattern = "yyyy-MM-dd") final Date dateFrom,
-			@RequestParam(value = "dateTo", required = false) @Input(value = Type.DATE) @DateTimeFormat(pattern = "yyyy-MM-dd") final Date dateTo,
+			@RequestParam(value = "dateFrom",
+					required = false) @Input(value = Type.DATE) @DateTimeFormat(pattern = "yyyy-MM-dd") final Date dateFrom,
+			@RequestParam(value = "dateTo",
+					required = false) @Input(value = Type.DATE) @DateTimeFormat(pattern = "yyyy-MM-dd") final Date dateTo,
 			@RequestParam(value = "status", required = false) final ItemType type) {
 
 		List<ItemResource> resources = new ArrayList<ItemResource>();
@@ -356,7 +368,8 @@ public class DummyController {
 		}
 
 		return new Resources<ItemResource>(resources, linkTo(methodOn(DummyController.class).get()).withSelfRel(),
-				linkTo(methodOn(DummyController.class).getFiltered((Date) null, (Date) null, null)).withRel("list-after-date-transfers"));
+				linkTo(methodOn(DummyController.class).getFiltered((Date) null, (Date) null, null))
+						.withRel("list-after-date-transfers"));
 	}
 
 	@RequestMapping(value = "/subitem/filter", method = RequestMethod.GET, params = "filter")
