@@ -497,7 +497,6 @@ public class SpringActionDescriptor implements ActionDescriptor {
 			}
 			else if (annotatedParameter.isIncluded(paramName) && !knownFields.contains(parentParamName + paramName)) {
 				DTOParam dtoAnnotation = getParameterAnnotation(annotations, DTOParam.class);
-				StringBuilder wholeParamName = new StringBuilder(64);
 				if (DataType.isArrayOrCollection(parameterType) && dtoAnnotation != null) {
 					Object wildCardValue = null;
 					if (propertyValue != null) {
