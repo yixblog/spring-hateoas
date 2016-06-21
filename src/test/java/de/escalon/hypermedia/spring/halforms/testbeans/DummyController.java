@@ -226,7 +226,7 @@ public class DummyController {
 			param(item, wildcardsubItemListSubEntityIdInputParameter, LIST_WC_SUBENTITYLIST_ID_READONLY, LIST_WC_SUBENTITYLIST_ID_REQUIRED);
 			param(item, stringArrayInputParameter, ARRAY_READONLY, ARRAY_REQUIRED);
 			builder.and(editTransferBuilder);
-
+			resourceSupport.add(editTransferBuilder.withRel(rel));
 		}
 		else if (DELETE.equals(rel)) {
 			AffordanceBuilder deleteTransferBuilder = linkTo(methodOn(DummyController.class).delete(id));

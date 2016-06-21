@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.springframework.hateoas</groupId>
@@ -124,11 +125,8 @@
 
 		<profile>
 
-			<!--
-				Profile to be activated when building the distribution atrifacts.
-
-				Generates reference documentation, aggregates JavaDoc etc.
-			-->
+			<!-- Profile to be activated when building the distribution atrifacts. 
+				Generates reference documentation, aggregates JavaDoc etc. -->
 
 			<id>distribute</id>
 
@@ -153,9 +151,8 @@
 
 				<plugins>
 
-					<!--
-						Unpacks the content of spring-data-build-resources into the shared resources folder.
-					-->
+					<!-- Unpacks the content of spring-data-build-resources into the shared 
+						resources folder. -->
 
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -178,9 +175,7 @@
 						</configuration>
 					</plugin>
 
-					<!--
-						Configures JavaDoc generation.
-					-->
+					<!-- Configures JavaDoc generation. -->
 
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -234,19 +229,9 @@
 								</configuration>
 							</execution>
 
-							<!--
-							<execution>
-								<id>epub</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>process-asciidoc</goal>
-								</goals>
-								<configuration>
-									<backend>epub3</backend>
-									<sourceHighlighter>coderay</sourceHighlighter>
-								</configuration>
-							</execution>
-							-->
+							<!-- <execution> <id>epub</id> <phase>generate-resources</phase> <goals> 
+								<goal>process-asciidoc</goal> </goals> <configuration> <backend>epub3</backend> 
+								<sourceHighlighter>coderay</sourceHighlighter> </configuration> </execution> -->
 
 							<execution>
 								<id>pdf</id>
@@ -290,13 +275,15 @@
 								<configuration>
 									<target>
 										<copy todir="${project.root}/target/site/reference/html">
-											<fileset dir="${shared.resources}/asciidoc" erroronmissingdir="false">
+											<fileset dir="${shared.resources}/asciidoc"
+												erroronmissingdir="false">
 												<include name="**/*.css" />
 											</fileset>
 											<flattenmapper />
 										</copy>
 										<copy todir="${project.root}/target/site/reference/html/images">
-											<fileset dir="${basedir}/src/main/asciidoc" erroronmissingdir="false">
+											<fileset dir="${basedir}/src/main/asciidoc"
+												erroronmissingdir="false">
 												<include name="**/*.png" />
 												<include name="**/*.gif" />
 												<include name="**/*.jpg" />
@@ -315,8 +302,12 @@
 								<phase>process-resources</phase>
 								<configuration>
 									<target>
-										<copy file="${project.build.directory}/generated-docs/index.pdf" tofile="${project.root}/target/site/reference/pdf/${project.artifactId}-reference.pdf" failonerror="false" />
-										<copy file="${project.build.directory}/generated-docs/index.epub" tofile="${project.root}/target/site/reference/epub/${project.artifactId}-reference.epub" failonerror="false" />
+										<copy file="${project.build.directory}/generated-docs/index.pdf"
+											tofile="${project.root}/target/site/reference/pdf/${project.artifactId}-reference.pdf"
+											failonerror="false" />
+										<copy file="${project.build.directory}/generated-docs/index.epub"
+											tofile="${project.root}/target/site/reference/epub/${project.artifactId}-reference.epub"
+											failonerror="false" />
 									</target>
 								</configuration>
 								<goals>
@@ -551,13 +542,22 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!--  Needs to be after Jadler to make sure it sees the Servlet 3.0 dependency pulled in for testing -->
+		<!-- Needs to be after Jadler to make sure it sees the Servlet 3.0 dependency 
+			pulled in for testing -->
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<!-- jsoup HTML parser library @ http://jsoup.org/ -->
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<scope>test</scope>
+			<version>1.9.2</version>
 		</dependency>
 
 	</dependencies>
