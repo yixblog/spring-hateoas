@@ -246,59 +246,63 @@ public class HalFormsResponseTest {
 	public void testRequestWithStatusFound() throws Exception {
 
 		int index = 0;
-		// for (Item item : dm.items) {
-		Item item = dm.items.get(0);
-		assertCommonForItem(index, DummyController.DELETE, HttpMethod.DELETE.toString());
-		JsonNode jsonNode = assertCommonForItem(index, DummyController.MODIFY, HttpMethod.PUT.toString());
-		String jsonEdit = jsonNode.toString();
-		System.out.println(jsonEdit);
+		for (Item item : dm.items) {
+			assertCommonForItem(index, DummyController.DELETE, HttpMethod.DELETE.toString());
+			JsonNode jsonNode = assertCommonForItem(index, DummyController.MODIFY, HttpMethod.PUT.toString());
+			String jsonEdit = jsonNode.toString();
+			System.out.println(jsonEdit);
 
-		assertProperty(jsonEdit, 0, path(on(Item.class).getId()), false, false, Integer.toString(item.getId()));
-		assertProperty(jsonEdit, 1, path(on(Item.class).getName()), DummyController.NAME_READONLY.contains(index),
-				DummyController.NAME_REQUIRED.contains(index), item.getName());
-		assertProperty(jsonEdit, 2, path(on(Item.class).getType()), DummyController.TYPE_READONLY.contains(index),
-				DummyController.TYPE_REQUIRED.contains(index), item.getType().toString());
-		assertProperty(jsonEdit, 3, path(on(Item.class).getMultiple()), false, false, item.getMultiple().toString());
-		assertProperty(jsonEdit, 4, path(on(Item.class).getSingleSub()), DummyController.SUBITEM_READONLY.contains(index),
-				DummyController.SUBITEM_REQUIRED.contains(index), item.getSingleSub().toString());
-		assertProperty(jsonEdit, 5, path(on(Item.class).getSubItemId()), DummyController.SUBITEM_ID_READONLY.contains(index),
-				DummyController.SUBITEM_ID_REQUIRED.contains(index), Integer.toString(item.getSubItemId()));
-		assertProperty(jsonEdit, 6, path(on(Item.class).getSearchedSubItem()), DummyController.SEARCHED_SUBITEM_READONLY.contains(index),
-				DummyController.SEARCHED_SUBITEM_REQUIRED.contains(index), Double.toString(item.getSearchedSubItem()));
-		assertProperty(jsonEdit, 7, path(on(Item.class).getAnother()), DummyController.ANOTHER_SUBITEM_READONLY.contains(index),
-				DummyController.ANOTHER_SUBITEM_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getAnother()));
-		assertProperty(jsonEdit, 9, path(on(Item.class).getSubEntity().getName()), DummyController.SUBENTITY_NAME_READONLY.contains(index),
-				DummyController.SUBENTITY_NAME_REQUIRED.contains(index), item.getSubEntity().getName());
-		assertProperty(jsonEdit, 10, path(on(Item.class).getSubEntity().getMultiple()),
-				DummyController.SUBENTITY_MULTIPLE_READONLY.contains(index), DummyController.SUBENTITY_MULTIPLE_REQUIRED.contains(index),
-				item.getSubEntity().getMultiple().toString());
-		assertProperty(jsonEdit, 16, path(on(Item.class).getListSubEntity()) + "[0].lkey",
-				DummyController.LIST_SUBENTITY_KEY_READONLY.contains(index), DummyController.LIST_SUBENTITY_KEY_REQUIRED.contains(index),
-				Integer.toString(item.getListSubEntity().get(0).getLkey()));
-		assertProperty(jsonEdit, 24, path(on(Item.class).getAmount()), DummyController.AMOUNT_READONLY.contains(index),
-				DummyController.AMOUNT_REQUIRED.contains(index), Double.toString(item.getAmount()));
-		assertProperty(jsonEdit, 25, path(on(Item.class).isFlag()), DummyController.FLAG_READONLY.contains(index),
-				DummyController.FLAG_REQUIRED.contains(index), String.valueOf(item.isFlag()));
-		assertProperty(jsonEdit, 26, path(on(Item.class).getIntegerList()), DummyController.INTEGER_LIST_READONLY.contains(index),
-				DummyController.INTEGER_LIST_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getIntegerList()));
-		assertProperty(jsonEdit, 32, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].lkey",
-				DummyController.LIST_WC_SUBENTITY_KEY_READONLY.contains(index),
-				DummyController.LIST_WC_SUBENTITY_KEY_REQUIRED.contains(index),
-				Integer.toString(item.getDoubleLevelWildCardEntityList().get(0).getLkey()));
-		assertProperty(jsonEdit, 33, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].lname",
-				DummyController.LIST_WC_SUBENTITY_NAME_READONLY.contains(index),
-				DummyController.LIST_WC_SUBENTITY_NAME_REQUIRED.contains(index), item.getDoubleLevelWildCardEntityList().get(0).getLname());
-		assertProperty(jsonEdit, 36, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].subItemList[*].id",
-				DummyController.LIST_WC_SUBENTITYLIST_ID_READONLY.contains(index),
-				DummyController.LIST_WC_SUBENTITYLIST_ID_REQUIRED.contains(index),
-				Integer.toString(item.getDoubleLevelWildCardEntityList().get(0).getSubItemList().get(0).getId()));
-		assertProperty(jsonEdit, 38, path(on(Item.class).getStringArray()), DummyController.ARRAY_READONLY.contains(index),
-				DummyController.ARRAY_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getStringArray()));
+			assertProperty(jsonEdit, 0, path(on(Item.class).getId()), false, false, Integer.toString(item.getId()));
+			assertProperty(jsonEdit, 1, path(on(Item.class).getName()), DummyController.NAME_READONLY.contains(index),
+					DummyController.NAME_REQUIRED.contains(index), item.getName());
+			assertProperty(jsonEdit, 2, path(on(Item.class).getType()), DummyController.TYPE_READONLY.contains(index),
+					DummyController.TYPE_REQUIRED.contains(index), item.getType().toString());
+			assertProperty(jsonEdit, 3, path(on(Item.class).getMultiple()), false, false, item.getMultiple().toString());
+			assertProperty(jsonEdit, 4, path(on(Item.class).getSingleSub()), DummyController.SUBITEM_READONLY.contains(index),
+					DummyController.SUBITEM_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getSingleSub()));
+			assertProperty(jsonEdit, 5, path(on(Item.class).getSubItemId()), DummyController.SUBITEM_ID_READONLY.contains(index),
+					DummyController.SUBITEM_ID_REQUIRED.contains(index), Integer.toString(item.getSubItemId()));
+			assertProperty(jsonEdit, 6, path(on(Item.class).getSearchedSubItem()),
+					DummyController.SEARCHED_SUBITEM_READONLY.contains(index), DummyController.SEARCHED_SUBITEM_REQUIRED.contains(index),
+					Double.toString(item.getSearchedSubItem()));
+			assertProperty(jsonEdit, 7, path(on(Item.class).getAnother()), DummyController.ANOTHER_SUBITEM_READONLY.contains(index),
+					DummyController.ANOTHER_SUBITEM_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getAnother()));
+			assertProperty(jsonEdit, 9, path(on(Item.class).getSubEntity().getName()),
+					DummyController.SUBENTITY_NAME_READONLY.contains(index), DummyController.SUBENTITY_NAME_REQUIRED.contains(index),
+					item.getSubEntity().getName());
+			assertProperty(jsonEdit, 10, path(on(Item.class).getSubEntity().getMultiple()),
+					DummyController.SUBENTITY_MULTIPLE_READONLY.contains(index),
+					DummyController.SUBENTITY_MULTIPLE_REQUIRED.contains(index),
+					objectMapper.writeValueAsString(item.getSubEntity().getMultiple()));
+			assertProperty(jsonEdit, 16, path(on(Item.class).getListSubEntity()) + "[0].lkey",
+					DummyController.LIST_SUBENTITY_KEY_READONLY.contains(index),
+					DummyController.LIST_SUBENTITY_KEY_REQUIRED.contains(index),
+					Integer.toString(item.getListSubEntity().get(0).getLkey()));
+			assertProperty(jsonEdit, 24, path(on(Item.class).getAmount()), DummyController.AMOUNT_READONLY.contains(index),
+					DummyController.AMOUNT_REQUIRED.contains(index), Double.toString(item.getAmount()));
+			assertProperty(jsonEdit, 25, path(on(Item.class).isFlag()), DummyController.FLAG_READONLY.contains(index),
+					DummyController.FLAG_REQUIRED.contains(index), String.valueOf(item.isFlag()));
+			assertProperty(jsonEdit, 26, path(on(Item.class).getIntegerList()), DummyController.INTEGER_LIST_READONLY.contains(index),
+					DummyController.INTEGER_LIST_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getIntegerList()));
+			assertProperty(jsonEdit, 32, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].lkey",
+					DummyController.LIST_WC_SUBENTITY_KEY_READONLY.contains(index),
+					DummyController.LIST_WC_SUBENTITY_KEY_REQUIRED.contains(index),
+					Integer.toString(item.getDoubleLevelWildCardEntityList().get(0).getLkey()));
+			assertProperty(jsonEdit, 33, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].lname",
+					DummyController.LIST_WC_SUBENTITY_NAME_READONLY.contains(index),
+					DummyController.LIST_WC_SUBENTITY_NAME_REQUIRED.contains(index),
+					item.getDoubleLevelWildCardEntityList().get(0).getLname());
+			assertProperty(jsonEdit, 36, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].subItemList[*].id",
+					DummyController.LIST_WC_SUBENTITYLIST_ID_READONLY.contains(index),
+					DummyController.LIST_WC_SUBENTITYLIST_ID_REQUIRED.contains(index),
+					Integer.toString(item.getDoubleLevelWildCardEntityList().get(0).getSubItemList().get(0).getId()));
+			assertProperty(jsonEdit, 38, path(on(Item.class).getStringArray()), DummyController.ARRAY_READONLY.contains(index),
+					DummyController.ARRAY_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getStringArray()));
 
-		assertSuggest(jsonNode);
+			assertSuggest(jsonNode);
 
-		index++;
-		// }
+			index++;
+		}
 	}
 
 	private void assertProperty(final String jsonEdit, final int i, final String name, final boolean readOnly, final boolean required,
