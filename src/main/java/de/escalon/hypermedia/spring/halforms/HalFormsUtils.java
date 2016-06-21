@@ -18,7 +18,7 @@ import de.escalon.hypermedia.affordance.SuggestType;
 
 public class HalFormsUtils {
 
-	public static Object toHalFormsDocument(final Object object) {
+	public static Object toHalFormsDocument(final Object object, final ObjectMapper objectMapper) {
 		if (object == null) {
 			return null;
 		}
@@ -27,15 +27,17 @@ public class HalFormsUtils {
 			ResourceSupport rs = (ResourceSupport) object;
 			List<Template> templates = new ArrayList<Template>();
 			List<Link> links = new ArrayList<Link>();
-			process(rs, links, templates);
+			process(rs, links, templates, objectMapper);
 			return new HalFormsDocument(links, templates);
 
-		} else { // bean
+		}
+		else { // bean
 			return object;
 		}
 	}
 
-	private static void process(final ResourceSupport resource, final List<Link> links, final List<Template> templates) {
+	private static void process(final ResourceSupport resource, final List<Link> links, final List<Template> templates,
+			final ObjectMapper objectMapper) {
 		for (Link link : resource.getLinks()) {
 			if (link instanceof Affordance) {
 				Affordance affordance = (Affordance) link;
@@ -45,7 +47,8 @@ public class HalFormsUtils {
 					ActionDescriptor actionDescriptor = affordance.getActionDescriptors().get(i);
 					if (i == 0) {
 						links.add(affordance);
-					} else {
+					}
+					else {
 						String key = actionDescriptor.getSemanticActionType();
 						if (true || actionDescriptor.hasRequestBody() || !actionDescriptor.getRequestParamNames().isEmpty()) {
 							Template template = templates.isEmpty() ? new Template()
@@ -55,7 +58,7 @@ public class HalFormsUtils {
 							// there is only one httpmethod??
 							template.setMethod(actionDescriptor.getHttpMethod());
 							TemplateActionInputParameterVisitor visitor = new TemplateActionInputParameterVisitor(template,
-									actionDescriptor);
+									actionDescriptor, objectMapper);
 
 							actionDescriptor.accept(visitor);
 
@@ -63,15 +66,16 @@ public class HalFormsUtils {
 						}
 					}
 				}
-			} else {
+			}
+			else {
 				links.add(link);
 			}
 		}
 
 	}
 
-	public static Property getProperty(final ActionInputParameter actionInputParameter,
-			final ActionDescriptor actionDescriptor, final Object propertyValue, final String name) {
+	public static Property getProperty(final ActionInputParameter actionInputParameter, final ActionDescriptor actionDescriptor,
+			final Object propertyValue, final String name, final ObjectMapper objectMapper) {
 		Map<String, Object> inputConstraints = actionInputParameter.getInputConstraints();
 
 		// TODO: templated comes from an Input attribute?
@@ -79,28 +83,28 @@ public class HalFormsUtils {
 
 		boolean readOnly = inputConstraints.containsKey(ActionInputParameter.EDITABLE)
 				? !((Boolean) inputConstraints.get(ActionInputParameter.EDITABLE)) : true;
-		String regex =  (String) inputConstraints.get(ActionInputParameter.PATTERN);
+		String regex = (String) inputConstraints.get(ActionInputParameter.PATTERN);
 		boolean required = inputConstraints.containsKey(ActionInputParameter.REQUIRED)
 				? (Boolean) inputConstraints.get(ActionInputParameter.REQUIRED) : false;
 
 		String value = null;
-		if (propertyValue != null) {
-			value = propertyValue.toString();
-		}
 
-		final de.escalon.hypermedia.affordance.Suggest<Object>[] possibleValues = actionInputParameter
-				.getPossibleValues(actionDescriptor);
+		final de.escalon.hypermedia.affordance.Suggest<Object>[] possibleValues = actionInputParameter.getPossibleValues(actionDescriptor);
 		ValueSuggest<?> suggest = null;
 		SuggestType suggestType = SuggestType.INTERNAL;
 		boolean multi = false;
 		if (possibleValues.length > 0) {
-
 			try {
 				if (propertyValue != null) {
-					value = new ObjectMapper().writeValueAsString(propertyValue);
+					if (propertyValue.getClass().isEnum()) {
+						value = propertyValue.toString();
+					}
+					else {
+						value = objectMapper.writeValueAsString(propertyValue);
+					}
 				}
-			} catch (JsonProcessingException e) {
-
+			}
+			catch (JsonProcessingException e) {
 			}
 
 			if (actionInputParameter.isArrayOrCollection()) {
@@ -117,6 +121,20 @@ public class HalFormsUtils {
 			}
 			suggest = new ValueSuggest<Object>(values, textField, valueField, suggestType);
 		}
+		else {
+			if (propertyValue != null) {
+				try {
+					if (propertyValue instanceof List || propertyValue.getClass().isArray()) {
+						value = objectMapper.writeValueAsString(propertyValue);
+					}
+					else {
+						value = propertyValue.toString();
+					}
+				}
+				catch (JsonProcessingException e) {
+				}
+			}
+		}
 
 		return new Property(name, readOnly, templated, value, null, regex, required, multi, suggest);
 	}
@@ -127,15 +145,19 @@ public class HalFormsUtils {
 
 		private final ActionDescriptor actionDescriptor;
 
-		public TemplateActionInputParameterVisitor(final Template template, final ActionDescriptor actionDescriptor) {
+		private final ObjectMapper objectMapper;
+
+		public TemplateActionInputParameterVisitor(final Template template, final ActionDescriptor actionDescriptor,
+				final ObjectMapper objectMapper) {
 			this.template = template;
 			this.actionDescriptor = actionDescriptor;
+			this.objectMapper = objectMapper;
 		}
 
 		@Override
-		public void visit(ActionInputParameter inputParameter) {
-			Property property = getProperty(inputParameter, actionDescriptor, inputParameter.getValue(),
-					inputParameter.getName());
+		public void visit(final ActionInputParameter inputParameter) {
+			Property property = getProperty(inputParameter, actionDescriptor, inputParameter.getValue(), inputParameter.getName(),
+					objectMapper);
 
 			template.getProperties().add(property);
 		}

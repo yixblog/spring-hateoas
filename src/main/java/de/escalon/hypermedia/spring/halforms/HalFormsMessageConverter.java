@@ -24,45 +24,44 @@ public class HalFormsMessageConverter extends AbstractHttpMessageConverter<Objec
 
 	private final ObjectMapper objectMapper;
 
-	public HalFormsMessageConverter(ObjectMapper objectMapper, RelProvider relProvider, CurieProvider curieProvider,
-			MessageSourceAccessor messageSourceAccessor) {
+	public HalFormsMessageConverter(final ObjectMapper objectMapper, final RelProvider relProvider, final CurieProvider curieProvider,
+			final MessageSourceAccessor messageSourceAccessor) {
 		this.objectMapper = objectMapper;
 
 		objectMapper.registerModule(new Jackson2HalModule());
 		objectMapper.registerModule(new Jackson2HalFormsModule());
-		objectMapper.setHandlerInstantiator(
-				new HalFormsHandlerInstantiator(relProvider, curieProvider, messageSourceAccessor, true));
+		objectMapper.setHandlerInstantiator(new HalFormsHandlerInstantiator(relProvider, curieProvider, messageSourceAccessor, true));
 	}
 
 	@Override
-	protected boolean supports(Class<?> clazz) {
+	protected boolean supports(final Class<?> clazz) {
 		return true;
 	}
 
 	@Override
-	protected Object readInternal(Class<? extends Object> clazz, HttpInputMessage inputMessage)
+	protected Object readInternal(final Class<? extends Object> clazz, final HttpInputMessage inputMessage)
 			throws IOException, HttpMessageNotReadableException {
 		return null;
 	}
 
 	@Override
-	protected void writeInternal(Object t, HttpOutputMessage outputMessage)
+	protected void writeInternal(final Object t, final HttpOutputMessage outputMessage)
 			throws IOException, HttpMessageNotWritableException {
 
-		Object entity = HalFormsUtils.toHalFormsDocument(t);
+		Object entity = HalFormsUtils.toHalFormsDocument(t, objectMapper);
 
-		JsonGenerator jsonGenerator = this.objectMapper.getFactory().createGenerator(outputMessage.getBody(),
-				JsonEncoding.UTF8);
+		JsonGenerator jsonGenerator = objectMapper.getFactory().createGenerator(outputMessage.getBody(), JsonEncoding.UTF8);
 
 		// A workaround for JsonGenerators not applying serialization features
 		// https://github.com/FasterXML/jackson-databind/issues/12
-		if (this.objectMapper.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
+		if (objectMapper.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
 			jsonGenerator.useDefaultPrettyPrinter();
 		}
 
 		try {
-			this.objectMapper.writeValue(jsonGenerator, entity);
-		} catch (JsonProcessingException ex) {
+			objectMapper.writeValue(jsonGenerator, entity);
+		}
+		catch (JsonProcessingException ex) {
 			throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getMessage(), ex);
 		}
 	}
