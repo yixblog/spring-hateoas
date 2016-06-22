@@ -3,7 +3,6 @@ package de.escalon.hypermedia.affordance;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import de.escalon.hypermedia.action.Input;
 import de.escalon.hypermedia.action.Type;
 
 /**
@@ -42,6 +41,13 @@ public interface ActionInputParameter {
 	 * @return type
 	 */
 	Type getHtmlInputFieldType();
+
+	/**
+	 * Set the type of parameter when used in html-like contexts (e.g. Siren, Uber, XHtml)
+	 *
+	 * @return type
+	 */
+	void setHtmlInputFieldType(Type type);
 
 	/**
 	 * Parameter is a complex body.
@@ -94,39 +100,6 @@ public interface ActionInputParameter {
 	 * @return annotation or null
 	 */
 	<T extends Annotation> T getAnnotation(Class<T> annotation);
-
-	/**
-	 * Property is hidden, e.g. according to {@link Input#hidden()}
-	 *
-	 * @param property name or property path
-	 * @return true if hidden
-	 */
-	boolean isHidden(String property);
-
-	/**
-	 * Determines if request body input parameter has a read-only input property.
-	 *
-	 * @param property name or property path
-	 * @return true if read-only
-	 */
-	boolean isReadOnly(String property);
-
-	/**
-	 * Determines if request body input parameter should be included. E.g. considering all of {@link Input#include},
-	 * {@link Input#hidden} and {@link Input#readOnly}.
-	 *
-	 * @param property name or property path
-	 * @return true if included
-	 */
-	boolean isIncluded(String property);
-
-	/**
-	 * Checks if property should be excluded according to {@link Input#exclude()}.
-	 *
-	 * @param property name or property path
-	 * @return true if excluded
-	 */
-	boolean isExcluded(String property);
 
 	/**
 	 * Gets possible values for this parameter.
@@ -197,8 +170,8 @@ public interface ActionInputParameter {
 	/**
 	 * Gets input constraints.
 	 *
-	 * @return constraints where the key is one of {@link ActionInputParameter#MAX} etc. and the value is a string or number, depending
-	 *         on the input constraint.
+	 * @return constraints where the key is one of {@link ActionInputParameter#MAX} etc. and the value is a string or
+	 *         number, depending on the input constraint.
 	 * @see ActionInputParameter#MAX
 	 * @see ActionInputParameter#MIN
 	 * @see ActionInputParameter#MAX_LENGTH

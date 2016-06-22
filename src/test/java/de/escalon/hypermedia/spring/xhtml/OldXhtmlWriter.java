@@ -345,12 +345,14 @@ public class OldXhtmlWriter extends Writer {
 								value = null;
 							}
 							appendInput(requestParamName, actionInputParameter, value,
-									actionInputParameter.isReadOnly(requestParamName)); // not readonly
+									(Boolean) actionInputParameter.getInputConstraints().get(ActionInputParameter.EDITABLE)); // not
+																																																						// readonly
 						}
 					} else {
 						String callValueFormatted = actionInputParameter.getValueFormatted();
 						appendInput(requestParamName, actionInputParameter, callValueFormatted,
-								actionInputParameter.isReadOnly(requestParamName)); // not readonly
+								(Boolean) actionInputParameter.getInputConstraints().get(ActionInputParameter.EDITABLE)); // not
+																																																					// readonly
 					}
 				}
 			}
@@ -558,7 +560,7 @@ public class OldXhtmlWriter extends Writer {
 								// TODO duplicate below for PropertyDescriptors and in appendForm
 								if (DataType.isSingleValueType(parameterType)) {
 
-									if (actionInputParameter.isIncluded(paramName)) {
+									if (((SpringActionInputParameter) actionInputParameter).isIncluded(paramName)) {
 
 										Object propertyValue = PropertyUtils.getPropertyOrFieldValue(currentCallValue, paramName);
 
@@ -669,7 +671,7 @@ public class OldXhtmlWriter extends Writer {
 			}
 		} else {
 			appendInput(paramName, childInputParameter, childInputParameter.getValue(),
-					parentInputParameter.isReadOnly(paramName));
+					(Boolean) parentInputParameter.getInputConstraints().get(ActionInputParameter.EDITABLE));
 		}
 	}
 

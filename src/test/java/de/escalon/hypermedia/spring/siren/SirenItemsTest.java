@@ -1,10 +1,12 @@
 package de.escalon.hypermedia.spring.siren;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -179,6 +181,7 @@ public class SirenItemsTest {
 			sirenUtils.toSirenEntity(entity, item);
 			String json = objectMapper.valueToTree(entity).toString();
 			System.out.println(json);
+			FileUtils.writeStringToFile(new File("siren.html"), json);
 
 		}
 	}

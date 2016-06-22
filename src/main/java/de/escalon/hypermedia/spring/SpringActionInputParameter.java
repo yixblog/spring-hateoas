@@ -94,6 +94,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	 */
 	public SpringActionInputParameter(MethodParameter methodParameter, Object value, ConversionService conversionService,
 			String name) {
+		System.out.println("NAME CREATED:" + name);
 		this.methodParameter = methodParameter;
 		this.value = value;
 		this.name = name;
@@ -262,6 +263,11 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	}
 
 	@Override
+	public void setHtmlInputFieldType(Type type) {
+		fieldType = type;
+	}
+
+	@Override
 	public boolean isRequestBody() {
 		return requestBody != null;
 	}
@@ -313,14 +319,11 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	 * @param property name or property path
 	 * @return true if hidden
 	 */
-	@Override
-	public boolean isHidden(String property) {
-		Input inputAnnotation = methodParameter.getParameterAnnotation(Input.class);
-		return inputAnnotation != null && arrayContains(inputAnnotation.hidden(), property);
+	boolean isHidden(String property) {
+		return arrayContains(hidden, property);
 	}
 
-	@Override
-	public boolean isReadOnly(String property) {
+	boolean isReadOnly(String property) {
 		return (!editable || arrayContains(readOnly, property));
 	}
 
@@ -335,9 +338,14 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		putInputConstraint(ActionInputParameter.REQUIRED, "", required);
 	}
 
-	@Override
 	public boolean isIncluded(String property) {
-		return !hasExplicitOrImplicitPropertyIncludeValue() || containsPropertyIncludeValue(property);
+		if (isExcluded(property)) {
+			return false;
+		}
+		if (include == null || include.length == 0) {
+			return true;
+		}
+		return containsPropertyIncludeValue(property);
 	}
 
 	/**
@@ -351,23 +359,12 @@ public class SpringActionInputParameter implements ActionInputParameter {
 	}
 
 	/**
-	 * Has any explicit include value or might have implicit includes because there is a hidden or readOnly flag.
-	 *
-	 * @return true if explicitly or implicitly included.
-	 */
-	private boolean hasExplicitOrImplicitPropertyIncludeValue() {
-		// TODO maybe not a useful optimization
-		return readOnly.length > 0 || hidden.length > 0 || include.length > 0;
-	}
-
-	/**
 	 * Determines if request body input parameter should be excluded, considering {@link Input#exclude}.
 	 *
 	 * @param property name or property path
 	 * @return true if excluded, false if no include statement found or not excluded
 	 */
-	@Override
-	public boolean isExcluded(String property) {
+	private boolean isExcluded(String property) {
 		return excluded != null && arrayContains(excluded, property);
 	}
 
