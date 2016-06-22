@@ -579,15 +579,17 @@ public class XhtmlWriter extends Writer {
 		if (actionInputParameter.isRequired()) {
 			attributes.and("required", "required");
 		}
-		beginSelect(requestParamName, possibleValues.length, attributes);
+
 		// Check if is a remote type select
 		if (SuggestType.REMOTE == possibleValues[0].getType()) {
 			attributes.and("data-remote", possibleValues[0].getValue().toString());
+			beginSelect(requestParamName, possibleValues.length, attributes);
 			for (Object possibleValue : actualValues) {
 				option(String.valueOf(possibleValue), attr("selected", "selected").and("value", String.valueOf(possibleValue)));
 			}
 		}
 		else {
+			beginSelect(requestParamName, possibleValues.length, attributes);
 			for (Suggest<?> possibleValue : possibleValues) {
 				if (ObjectUtils.containsElement(actualValues, possibleValue.getUnwrappedValue())) {
 					option(possibleValue.getText(), attr("selected", "selected").and("value", possibleValue.getValueAsString()));

@@ -1,16 +1,13 @@
 package de.escalon.hypermedia.spring.xhtml;
 
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.List;
 
-import de.escalon.hypermedia.action.Input;
-import de.escalon.hypermedia.spring.AffordanceBuilder;
-import de.escalon.hypermedia.spring.sample.test.CreativeWork;
-import de.escalon.hypermedia.spring.sample.test.Event;
-import de.escalon.hypermedia.spring.sample.test.EventStatusType;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +27,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import de.escalon.hypermedia.action.Input;
+import de.escalon.hypermedia.spring.AffordanceBuilder;
+import de.escalon.hypermedia.spring.sample.test.CreativeWork;
+import de.escalon.hypermedia.spring.sample.test.Event;
+import de.escalon.hypermedia.spring.sample.test.EventStatusType;
+
 /**
  * Created by Dietrich on 06.06.2015.
  */
@@ -44,8 +47,12 @@ public class XhtmlWriterTest {
 	private MockMvc mockMvc;
 
 	Writer writer = new StringWriter();
+
 	XhtmlWriter xhtml = new XhtmlWriter(writer);
 
+	Writer writerOld = new StringWriter();
+
+	OldXhtmlWriter xhtmlOld = new OldXhtmlWriter(writerOld);
 
 	@Configuration
 	@EnableWebMvc
@@ -55,7 +62,7 @@ public class XhtmlWriterTest {
 
 	@Before
 	public void setup() {
-		this.mockMvc = webAppContextSetup(this.wac).build();
+		mockMvc = webAppContextSetup(wac).build();
 	}
 
 	@Test
@@ -65,20 +72,17 @@ public class XhtmlWriterTest {
 		class DummyController {
 
 			@RequestMapping(method = RequestMethod.PUT)
-			public ResponseEntity<Void> putMultiplePossibleValues(@RequestBody Event event) {
+			public ResponseEntity<Void> putMultiplePossibleValues(@RequestBody final Event event) {
 				return null;
 			}
 		}
 
-		Link affordance = AffordanceBuilder.linkTo(AffordanceBuilder.methodOn(DummyController.class)
-				.putMultiplePossibleValues(new Event(0, null, new CreativeWork(null), null, EventStatusType
-						.EVENT_SCHEDULED)))
+		Link affordance = AffordanceBuilder
+				.linkTo(AffordanceBuilder.methodOn(DummyController.class)
+						.putMultiplePossibleValues(new Event(0, null, new CreativeWork(null), null, EventStatusType.EVENT_SCHEDULED)))
 				.withSelfRel();
 
-		xhtml.writeLinks(Arrays.asList(affordance));
-
-		String xml = writer.toString();
-		System.out.println(xml);
+		String xml = writeXml(Arrays.asList(affordance));
 
 		// renders writable event bean properties only
 		XMLAssert.assertXpathEvaluatesTo("EVENT_CANCELLED", "//select[@name='eventStatus']/option[1]", xml);
@@ -100,20 +104,17 @@ public class XhtmlWriterTest {
 		class DummyController {
 
 			@RequestMapping(method = RequestMethod.POST)
-			public ResponseEntity<Void> postMultiplePossibleValues(@RequestBody Event event) {
+			public ResponseEntity<Void> postMultiplePossibleValues(@RequestBody final Event event) {
 				return null;
 			}
 		}
 
-		Link affordance = AffordanceBuilder.linkTo(AffordanceBuilder.methodOn(DummyController.class)
-				.postMultiplePossibleValues(new Event(0, null, new CreativeWork(null), null, EventStatusType
-						.EVENT_SCHEDULED)))
+		Link affordance = AffordanceBuilder
+				.linkTo(AffordanceBuilder.methodOn(DummyController.class)
+						.postMultiplePossibleValues(new Event(0, null, new CreativeWork(null), null, EventStatusType.EVENT_SCHEDULED)))
 				.withSelfRel();
 
-		xhtml.writeLinks(Arrays.asList(affordance));
-
-		String xml = writer.toString();
-		System.out.println(xml);
+		String xml = writeXml(Arrays.asList(affordance));
 
 		// renders event bean constructor arguments
 		XMLAssert.assertXpathEvaluatesTo("EVENT_CANCELLED", "//select[@name='eventStatus']/option[1]", xml);
@@ -136,21 +137,17 @@ public class XhtmlWriterTest {
 		class DummyController {
 
 			@RequestMapping(method = RequestMethod.POST)
-			public ResponseEntity<Void> postEventStatusOnly(
-					@RequestBody @Input(readOnly = "eventStatus") Event event) {
+			public ResponseEntity<Void> postEventStatusOnly(@RequestBody @Input(readOnly = "eventStatus") final Event event) {
 				return null;
 			}
 		}
 
-		Link affordance = AffordanceBuilder.linkTo(AffordanceBuilder.methodOn(DummyController.class)
-				.postEventStatusOnly(new Event(0, null, new CreativeWork(null), null, EventStatusType
-						.EVENT_SCHEDULED)))
+		Link affordance = AffordanceBuilder
+				.linkTo(AffordanceBuilder.methodOn(DummyController.class)
+						.postEventStatusOnly(new Event(0, null, new CreativeWork(null), null, EventStatusType.EVENT_SCHEDULED)))
 				.withSelfRel();
 
-		xhtml.writeLinks(Arrays.asList(affordance));
-
-		String xml = writer.toString();
-		System.out.println(xml);
+		String xml = writeXml(Arrays.asList(affordance));
 
 		XMLAssert.assertXpathEvaluatesTo("EVENT_CANCELLED", "//select[@name='eventStatus']/option[1]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_POSTPONED", "//select[@name='eventStatus']/option[2]", xml);
@@ -171,21 +168,17 @@ public class XhtmlWriterTest {
 		class DummyController {
 
 			@RequestMapping(method = RequestMethod.POST)
-			public ResponseEntity<Void> postEventStatusOnly(
-					@RequestBody @Input(hidden = "eventStatus") Event event) {
+			public ResponseEntity<Void> postEventStatusOnly(@RequestBody @Input(hidden = "eventStatus") final Event event) {
 				return null;
 			}
 		}
 
-		Link affordance = AffordanceBuilder.linkTo(AffordanceBuilder.methodOn(DummyController.class)
-				.postEventStatusOnly(new Event(0, null, new CreativeWork(null), null, EventStatusType
-						.EVENT_SCHEDULED)))
+		Link affordance = AffordanceBuilder
+				.linkTo(AffordanceBuilder.methodOn(DummyController.class)
+						.postEventStatusOnly(new Event(0, null, new CreativeWork(null), null, EventStatusType.EVENT_SCHEDULED)))
 				.withSelfRel();
 
-		xhtml.writeLinks(Arrays.asList(affordance));
-
-		String xml = writer.toString();
-		System.out.println(xml);
+		String xml = writeXml(Arrays.asList(affordance));
 
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//option[@selected='selected']/text()", xml);
 
@@ -203,20 +196,17 @@ public class XhtmlWriterTest {
 
 			@RequestMapping(method = RequestMethod.POST)
 			public ResponseEntity<Void> postEventStatusOnly(
-					@RequestBody @Input(hidden = "eventStatus", include = "name") Event event) {
+					@RequestBody @Input(hidden = "eventStatus", include = "name") final Event event) {
 				return null;
 			}
 		}
 
-		Link affordance = AffordanceBuilder.linkTo(AffordanceBuilder.methodOn(DummyController.class)
-				.postEventStatusOnly(new Event(0, null, new CreativeWork(null), null, EventStatusType
-						.EVENT_SCHEDULED)))
+		Link affordance = AffordanceBuilder
+				.linkTo(AffordanceBuilder.methodOn(DummyController.class)
+						.postEventStatusOnly(new Event(0, null, new CreativeWork(null), null, EventStatusType.EVENT_SCHEDULED)))
 				.withSelfRel();
 
-		xhtml.writeLinks(Arrays.asList(affordance));
-
-		String xml = writer.toString();
-		System.out.println(xml);
+		String xml = writeXml(Arrays.asList(affordance));
 
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//option[@selected='selected']/text()", xml);
 		XMLAssert.assertXpathExists("//input[@name='workPerformed.name']", xml);
@@ -224,5 +214,22 @@ public class XhtmlWriterTest {
 		XMLAssert.assertXpathNotExists("//input[@name='performer']", xml);
 		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']", xml);
 		XMLAssert.assertXpathNotExists("//input[@name='location']", xml);
+	}
+
+	private String writeXml(final List<Link> links) {
+		String xml = "";
+		try {
+			xhtml.writeLinks(links);
+
+			xml = writer.toString();
+
+			xhtmlOld.writeLinks(links);
+			System.out.println("++++ new XhtmlWriter implementation result-->" + xml);
+			System.out.println("---- old XhtmlWriter implementation result-->" + writerOld.toString());
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return xml;
 	}
 }
