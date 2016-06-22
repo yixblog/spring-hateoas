@@ -80,7 +80,7 @@ public class Item implements Serializable {
 			@JsonProperty("undefinedList") @Input(maxLength = 10) final List<String> undefinedList,
 			@JsonProperty("wildCardEntityList") @DTOParam(wildcard = true) final List<ListableSubEntity> wildCardEntityList,
 			@JsonProperty("doubleLevelWildCardEntityList") @DTOParam(wildcard = true) final List<WildCardedListableSubEntity> doubleLevelWildCardEntityList,
-			@JsonProperty("stringArray") @Input final String[] stringArray,
+			@JsonProperty("stringArray") @Input(value = Type.TEXT) final String[] stringArray,
 			@JsonProperty("arraySubEntity") @DTOParam final ListableSubEntity[] arraySubEntity,
 			@JsonProperty("wildcardArraySubEntity") @DTOParam(wildcard = true) final ListableSubEntity[] wildcardArraySubEntity) {
 		this.id = id;

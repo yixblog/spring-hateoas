@@ -47,7 +47,7 @@ public class DummyController {
 
 	public static final List<Integer> NAME_REQUIRED = Arrays.asList(0, 1);
 
-	public static final List<Integer> AMOUNT_READONLY = Arrays.asList(9);
+	public static final List<Integer> AMOUNT_READONLY = Arrays.asList(0, 9);
 
 	public static final List<Integer> AMOUNT_REQUIRED = Arrays.asList(1);
 
@@ -85,7 +85,7 @@ public class DummyController {
 
 	public static final List<Integer> SUBENTITY_MULTIPLE_REQUIRED = Arrays.asList(5);
 
-	public static final List<Integer> SUBENTITY_MULTIPLE_READONLY = Arrays.asList(7);
+	public static final List<Integer> SUBENTITY_MULTIPLE_READONLY = Arrays.asList(0, 7);
 
 	public static final List<Integer> LIST_SUBENTITY_KEY_REQUIRED = Arrays.asList(3);
 
