@@ -65,7 +65,9 @@ public class XhtmlWriter extends Writer {
 			"      <div class=\"row\">";
 
 	public static final String HTML_END = "" + //
-			"      </div>" + "    </div>" + "  </body>" + //
+			"      </div>" + //
+			"    </div>" + //
+			"  </body>" + //
 			"</html>";
 
 	private String methodParam = "_method";
