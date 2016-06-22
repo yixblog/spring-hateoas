@@ -146,7 +146,7 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			include = inputAnnotation.include();
 			type = ParameterType.INPUT;
 		} else {
-			setReadOnly(!editable);
+			setReadOnly(select != null ? !select.editable() : !editable);
 			putInputConstraint(ActionInputParameter.REQUIRED, "", requiredByAnnotations);
 		}
 		if (inputAnnotation == null || inputAnnotation.value() == Type.FROM_JAVA) {
