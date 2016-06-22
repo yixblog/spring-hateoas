@@ -1,4 +1,4 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.xhtml.beans;
 
 import static de.escalon.hypermedia.spring.Path.on;
 import static de.escalon.hypermedia.spring.Path.path;

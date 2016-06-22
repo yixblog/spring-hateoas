@@ -1,4 +1,4 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.xhtml.beans;
 
 import java.io.Serializable;
 import java.util.Collections;

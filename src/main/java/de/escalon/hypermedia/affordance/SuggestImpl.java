@@ -52,7 +52,11 @@ public class SuggestImpl<T> implements Suggest<T> {
 	public String getValueAsString() {
 		if (value != null) {
 			try {
-				return String.valueOf(getField(valueField).get(value));
+				if (valueField != null) {
+					return String.valueOf(getField(valueField).get(value));
+				} else {
+					return value.toString();
+				}
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Valuefield could not be serialized", e);
 			}
@@ -61,7 +65,7 @@ public class SuggestImpl<T> implements Suggest<T> {
 	}
 
 	private Field getField(String name) throws NoSuchFieldException, SecurityException {
-		Field field = value.getClass().getDeclaredField(valueField);
+		Field field = value.getClass().getDeclaredField(name);
 		field.setAccessible(true);
 		return field;
 	}

@@ -1,9 +1,9 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.halforms.beans;
 
 import java.io.Serializable;
 
 import de.escalon.hypermedia.spring.AffordanceBuilder;
-import de.escalon.hypermedia.spring.halforms.testbeans.DummyController.RemoteOptions;
+import de.escalon.hypermedia.spring.halforms.beans.DummyController.RemoteOptions;
 
 public class AnotherSubItem implements Serializable {
 

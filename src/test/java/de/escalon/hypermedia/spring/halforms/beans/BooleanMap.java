@@ -1,4 +1,4 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.halforms.beans;
 
 import java.util.HashMap;
 

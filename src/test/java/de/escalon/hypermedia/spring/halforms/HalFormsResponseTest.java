@@ -44,8 +44,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import de.escalon.hypermedia.spring.halforms.Jackson2HalFormsModule.HalFormsHandlerInstantiator;
-import de.escalon.hypermedia.spring.halforms.testbeans.DummyController;
-import de.escalon.hypermedia.spring.halforms.testbeans.Item;
+import de.escalon.hypermedia.spring.halforms.beans.DummyController;
+import de.escalon.hypermedia.spring.halforms.beans.Item;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration

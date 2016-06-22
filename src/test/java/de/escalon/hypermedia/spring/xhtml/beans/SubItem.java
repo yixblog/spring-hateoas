@@ -1,4 +1,4 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.xhtml.beans;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import de.escalon.hypermedia.affordance.Suggest;
 import de.escalon.hypermedia.affordance.SuggestImpl;
 import de.escalon.hypermedia.affordance.SuggestType;
 import de.escalon.hypermedia.spring.AffordanceBuilder;
-import de.escalon.hypermedia.spring.halforms.testbeans.DummyController.RemoteOptions;
+import de.escalon.hypermedia.spring.halforms.beans.DummyController.RemoteOptions;
 
 public class SubItem implements Identifiable<Integer>, Serializable {
 

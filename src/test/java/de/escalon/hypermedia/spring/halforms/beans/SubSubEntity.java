@@ -1,4 +1,4 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.halforms.beans;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,27 +11,24 @@ import de.escalon.hypermedia.action.Select;
 import de.escalon.hypermedia.action.Type;
 import de.escalon.hypermedia.affordance.SuggestType;
 
-public class SubEntity implements Serializable {
+public class SubSubEntity implements Serializable {
 	private int key;
-
-	private String name;
 
 	private List<SubItem> multiple;
 
+	private String name;
+
 	private ItemType type;
 
-	private SubSubEntity subEntity;
-
 	@JsonCreator
-	public SubEntity(@JsonProperty("key") @Input(value = Type.NUMBER) final int key,
+	public SubSubEntity(@JsonProperty("key") @Input(value = Type.NUMBER) final int key,
 			final @JsonProperty("name") @Input(value = Type.TEXT) String name,
 			@JsonProperty("multiple") @Select(options = SubItem.SubItemOptions.class, type = SuggestType.EXTERNAL) final List<SubItem> multiple,
-			@JsonProperty("type") @Select final ItemType type, @JsonProperty("subEntity") final SubSubEntity subEntity) {
+			@JsonProperty("type") @Select final ItemType type) {
 		this.key = key;
 		this.name = name;
 		this.type = type;
 		this.multiple = multiple;
-		this.subEntity = subEntity;
 	}
 
 	public int getKey() {
@@ -64,13 +61,5 @@ public class SubEntity implements Serializable {
 
 	public void setMultiple(final List<SubItem> multiple) {
 		this.multiple = multiple;
-	}
-
-	public SubSubEntity getSubEntity() {
-		return subEntity;
-	}
-
-	public void setSubEntity(final SubSubEntity subEntity) {
-		this.subEntity = subEntity;
 	}
 }

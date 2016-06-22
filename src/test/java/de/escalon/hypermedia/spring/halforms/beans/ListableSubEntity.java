@@ -1,4 +1,4 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.halforms.beans;
 
 import java.io.Serializable;
 import java.util.List;
@@ -6,13 +6,12 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import de.escalon.hypermedia.action.DTOParam;
 import de.escalon.hypermedia.action.Input;
 import de.escalon.hypermedia.action.Select;
 import de.escalon.hypermedia.action.Type;
 import de.escalon.hypermedia.affordance.SuggestType;
 
-public class WildCardedListableSubEntity implements Serializable {
+public class ListableSubEntity implements Serializable {
 	private int lkey;
 
 	private String lname;
@@ -21,18 +20,14 @@ public class WildCardedListableSubEntity implements Serializable {
 
 	private List<ListableItemType> multiple;
 
-	private List<SubItem> subItemList;
-
 	@JsonCreator
-	public WildCardedListableSubEntity(@JsonProperty("lkey") @Input(value = Type.NUMBER) final int lkey,
+	public ListableSubEntity(@JsonProperty("lkey") @Input(value = Type.NUMBER) final int lkey,
 			final @JsonProperty("lname") @Input(value = Type.TEXT) String lname, @JsonProperty("type") @Select final ListableItemType ltype,
-			@JsonProperty("multiple") @Select(type = SuggestType.EXTERNAL) final List<ListableItemType> multiple,
-			@JsonProperty("subItemList") @DTOParam(wildcard = true) final List<SubItem> subItemList) {
+			@JsonProperty("multiple") @Select(type = SuggestType.EXTERNAL) final List<ListableItemType> multiple) {
 		this.lkey = lkey;
 		this.lname = lname;
 		type = ltype;
 		this.multiple = multiple;
-		this.subItemList = subItemList;
 	}
 
 	public int getLkey() {
@@ -65,14 +60,6 @@ public class WildCardedListableSubEntity implements Serializable {
 
 	public void setMultiple(final List<ListableItemType> multiple) {
 		this.multiple = multiple;
-	}
-
-	public List<SubItem> getSubItemList() {
-		return subItemList;
-	}
-
-	public void setSubItemList(final List<SubItem> subItemList) {
-		this.subItemList = subItemList;
 	}
 
 }

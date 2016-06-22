@@ -1,4 +1,4 @@
-package de.escalon.hypermedia.spring.halforms.testbeans;
+package de.escalon.hypermedia.spring.xhtml.beans;
 
 import static de.escalon.hypermedia.spring.AffordanceBuilder.linkTo;
 import static de.escalon.hypermedia.spring.AffordanceBuilder.methodOn;
