@@ -65,4 +65,11 @@ public @interface Select {
 	 */
 	boolean required() default false;
 
+	/**
+	 * Entire parameter is not editable, refers both to single values and to all properties of a bean parameter.
+	 *
+	 * @return
+	 */
+	boolean editable() default true;
+
 }
