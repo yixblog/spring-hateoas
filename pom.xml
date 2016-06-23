@@ -552,14 +552,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<!-- jsoup HTML parser library @ http://jsoup.org/ -->
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<scope>test</scope>
-			<version>1.9.2</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>

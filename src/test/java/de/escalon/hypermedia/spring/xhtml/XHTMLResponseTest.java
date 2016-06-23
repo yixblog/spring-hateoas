@@ -1,27 +1,14 @@
 package de.escalon.hypermedia.spring.xhtml;
 
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.exceptions.XpathException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,14 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.hateoas.RelProvider;
-import org.springframework.hateoas.UriTemplate;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
-import org.springframework.hateoas.core.DefaultRelProvider;
-import org.springframework.hateoas.hal.CurieProvider;
-import org.springframework.hateoas.hal.DefaultCurieProvider;
-import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -47,13 +28,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import de.escalon.hypermedia.spring.halforms.Jackson2HalFormsModule;
-import de.escalon.hypermedia.spring.halforms.Jackson2HalFormsModule.HalFormsHandlerInstantiator;
 import de.escalon.hypermedia.spring.xhtml.beans.DummyController;
+import de.escalon.hypermedia.spring.xhtml.beans.Item;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -62,24 +38,7 @@ public class XHTMLResponseTest {
 
 	public static final Logger LOG = LoggerFactory.getLogger(XHTMLResponseTest.class);
 
-	// private MockMvc mockMvc;
-
-	private static final ObjectMapper objectMapper = new ObjectMapper();
-
 	private static DummyController dm;
-
-	private static final RelProvider relProvider = new DefaultRelProvider();
-
-	private static final CurieProvider curieProvider = new DefaultCurieProvider("test",
-			new UriTemplate("http://localhost:8080/profile/{rel}"));
-
-	private enum SuggestType {
-		REMOTE, DIRECT, EMBEDDED;
-	}
-
-	private final Map<Integer, SuggestType> suggestProperties = new HashMap<Integer, SuggestType>();
-
-	private final Map<Integer, List<Map<String, Object>>> suggestsValuesList = new HashMap<Integer, List<Map<String, Object>>>();
 
 	@Configuration
 	@EnableWebMvc
@@ -100,332 +59,149 @@ public class XHTMLResponseTest {
 	@Before
 	public void setUp() {
 
-		loadControlValues();
-
 		webAppContextSetup(wac).build();
 		dm.setUp();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-		objectMapper.registerModule(new Jackson2HalModule());
-		objectMapper.registerModule(new Jackson2HalFormsModule());
-		objectMapper.setHandlerInstantiator(new HalFormsHandlerInstantiator(relProvider, curieProvider, null, true));
-	}
-
-	private void loadControlValues() {
-		suggestProperties.put(2, SuggestType.DIRECT);
-		suggestProperties.put(3, SuggestType.EMBEDDED);
-		suggestProperties.put(4, SuggestType.EMBEDDED);
-		suggestProperties.put(5, SuggestType.EMBEDDED);
-		suggestProperties.put(6, SuggestType.REMOTE);
-		suggestProperties.put(7, SuggestType.REMOTE);
-		suggestProperties.put(10, SuggestType.EMBEDDED);
-		suggestProperties.put(11, SuggestType.DIRECT);
-		suggestProperties.put(14, SuggestType.EMBEDDED);
-		suggestProperties.put(15, SuggestType.DIRECT);
-		suggestProperties.put(18, SuggestType.DIRECT);
-		suggestProperties.put(19, SuggestType.DIRECT);
-		suggestProperties.put(22, SuggestType.DIRECT);
-		suggestProperties.put(23, SuggestType.DIRECT);
-		suggestProperties.put(25, SuggestType.DIRECT);
-		suggestProperties.put(26, SuggestType.DIRECT);
-		suggestProperties.put(30, SuggestType.DIRECT);
-		suggestProperties.put(31, SuggestType.DIRECT);
-		suggestProperties.put(34, SuggestType.DIRECT);
-		suggestProperties.put(35, SuggestType.DIRECT);
-		suggestProperties.put(41, SuggestType.DIRECT);
-		suggestProperties.put(42, SuggestType.DIRECT);
-		suggestProperties.put(45, SuggestType.DIRECT);
-		suggestProperties.put(46, SuggestType.DIRECT);
-		suggestProperties.put(49, SuggestType.DIRECT);
-		suggestProperties.put(50, SuggestType.DIRECT);
-
-		List<Map<String, Object>> valuesList = new ArrayList<Map<String, Object>>();
-		Map<String, Object> suggestValue = new HashMap<String, Object>();
-		suggestValue.put("id", 1);
-		suggestValue.put("name", "S1");
-		valuesList.add(suggestValue);
-
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("id", 2);
-		suggestValue.put("name", "S2");
-		valuesList.add(suggestValue);
-
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("id", 3);
-		suggestValue.put("name", "S3");
-		valuesList.add(suggestValue);
-
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("id", 4);
-		suggestValue.put("name", "S4");
-		valuesList.add(suggestValue);
-		suggestsValuesList.put(3, valuesList);
-		suggestsValuesList.put(4, valuesList);
-		suggestsValuesList.put(5, valuesList);
-		suggestsValuesList.put(10, valuesList);
-		suggestsValuesList.put(14, valuesList);
-
-		valuesList = new ArrayList<Map<String, Object>>();
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "ONE");
-		suggestValue.put("prompt", "ONE");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "TWO");
-		suggestValue.put("prompt", "TWO");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "THREE");
-		suggestValue.put("prompt", "THREE");
-		valuesList.add(suggestValue);
-		suggestsValuesList.put(2, valuesList);
-		suggestsValuesList.put(11, valuesList);
-		suggestsValuesList.put(15, valuesList);
-
-		valuesList = new ArrayList<Map<String, Object>>();
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "FOUR");
-		suggestValue.put("prompt", "FOUR");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "FIVE");
-		suggestValue.put("prompt", "FIVE");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "SIX");
-		suggestValue.put("prompt", "SIX");
-		valuesList.add(suggestValue);
-		suggestsValuesList.put(18, valuesList);
-		suggestsValuesList.put(19, valuesList);
-		suggestsValuesList.put(22, valuesList);
-		suggestsValuesList.put(23, valuesList);
-		suggestsValuesList.put(30, valuesList);
-		suggestsValuesList.put(31, valuesList);
-		suggestsValuesList.put(34, valuesList);
-		suggestsValuesList.put(35, valuesList);
-		suggestsValuesList.put(41, valuesList);
-		suggestsValuesList.put(42, valuesList);
-		suggestsValuesList.put(45, valuesList);
-		suggestsValuesList.put(46, valuesList);
-		suggestsValuesList.put(49, valuesList);
-		suggestsValuesList.put(50, valuesList);
-
-		valuesList = new ArrayList<Map<String, Object>>();
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "true");
-		suggestValue.put("prompt", "true");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "false");
-		suggestValue.put("prompt", "false");
-		valuesList.add(suggestValue);
-		suggestsValuesList.put(25, valuesList);
-
-		valuesList = new ArrayList<Map<String, Object>>();
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "0");
-		suggestValue.put("prompt", "0");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "1");
-		suggestValue.put("prompt", "1");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "2");
-		suggestValue.put("prompt", "2");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "3");
-		suggestValue.put("prompt", "3");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "4");
-		suggestValue.put("prompt", "4");
-		valuesList.add(suggestValue);
-		suggestValue = new HashMap<String, Object>();
-		suggestValue.put("value", "5");
-		suggestValue.put("prompt", "5");
-		valuesList.add(suggestValue);
-		suggestsValuesList.put(26, valuesList);
-
 	}
 
 	@Test
 	public void testRequestWithStatusFound() throws Exception {
 
 		int index = 0;
-		// for (Item item : dm.items) {
+		for (Item item : dm.items) {
+			String htmlStr = writeXml(index, DummyController.MODIFY, HttpMethod.PUT.toString());
 
-		Document htmlDocument = assertCommonForItem(index, DummyController.MODIFY, HttpMethod.PUT.toString());
-		// assertCommonForItem(index, DummyController.DELETE, HttpMethod.DELETE.toString());
-		// JsonNode jsonNode = assertCommonForItem(index, DummyController.MODIFY, HttpMethod.PUT.toString());
-		// String jsonEdit = jsonNode.toString();
-		System.out.println(htmlDocument);
+			assertInputProperty(htmlStr, "number", "id", false, false, Integer.toString(item.getId()), false);
+			assertInputProperty(htmlStr, "text", "name", DummyController.NAME_READONLY.contains(index),
+					DummyController.NAME_REQUIRED.contains(index), item.getName(), false);
+			assertInputProperty(htmlStr, "select", "type", DummyController.TYPE_READONLY.contains(index),
+					DummyController.TYPE_REQUIRED.contains(index), item.getType().toString(), false);
+			assertInputProperty(htmlStr, "select", "multiple", false, false, item.getMultiple().toArray(), false);
+			assertInputProperty(htmlStr, "select", "singleSub", DummyController.SUBITEM_READONLY.contains(index),
+					DummyController.SUBITEM_REQUIRED.contains(index), item.getSingleSub(), false);
+			assertInputProperty(htmlStr, "select", "subItemId", DummyController.SUBITEM_ID_READONLY.contains(index),
+					DummyController.SUBITEM_ID_REQUIRED.contains(index), Integer.toString(item.getSubItemId()), false);
+			// REMOTE
+			assertInputProperty(htmlStr, "select", "searchedSubItem", DummyController.SEARCHED_SUBITEM_READONLY.contains(index),
+					DummyController.SEARCHED_SUBITEM_REQUIRED.contains(index), item.getSearchedSubItem(), false);
+			XMLAssert.assertXpathExists("//select[@name='searchedSubItem'][@data-remote='http://localhost/test/subitem/filter{?filter}']",
+					htmlStr);
+			// REMOTE
+			assertInputProperty(htmlStr, "select", "another", DummyController.ANOTHER_SUBITEM_READONLY.contains(index),
+					DummyController.ANOTHER_SUBITEM_REQUIRED.contains(index), item.getAnother(), false);
+			XMLAssert.assertXpathExists("//select[@name='another'][@data-remote='http://localhost/test/subitem/anotherFilter/{filter}/']",
+					htmlStr);
+			assertInputProperty(htmlStr, "text", "subEntity.name", DummyController.SUBENTITY_NAME_READONLY.contains(index),
+					DummyController.SUBENTITY_NAME_REQUIRED.contains(index), item.getSubEntity().getName(), false);
+			assertInputProperty(htmlStr, "select", "subEntity.multiple", DummyController.SUBENTITY_MULTIPLE_READONLY.contains(index),
+					DummyController.SUBENTITY_MULTIPLE_REQUIRED.contains(index), item.getSubEntity().getMultiple().toArray(), false);
+			assertInputProperty(htmlStr, "number", "listSubEntity[0].lkey", DummyController.LIST_SUBENTITY_KEY_READONLY.contains(index),
+					DummyController.LIST_SUBENTITY_KEY_REQUIRED.contains(index), Integer.toString(item.getListSubEntity().get(0).getLkey()),
+					false);
 
-		// assertProperty(jsonEdit, 0, path(on(Item.class).getId()), false, false, Integer.toString(item.getId()));
-		// assertProperty(jsonEdit, 1, path(on(Item.class).getName()), DummyController.NAME_READONLY.contains(index),
-		// DummyController.NAME_REQUIRED.contains(index), item.getName());
-		// assertProperty(jsonEdit, 2, path(on(Item.class).getType()), DummyController.TYPE_READONLY.contains(index),
-		// DummyController.TYPE_REQUIRED.contains(index), item.getType().toString());
-		// assertProperty(jsonEdit, 3, path(on(Item.class).getMultiple()), false, false, item.getMultiple().toString());
-		// assertProperty(jsonEdit, 4, path(on(Item.class).getSingleSub()),
-		// DummyController.SUBITEM_READONLY.contains(index),
-		// DummyController.SUBITEM_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getSingleSub()));
-		// assertProperty(jsonEdit, 5, path(on(Item.class).getSubItemId()),
-		// DummyController.SUBITEM_ID_READONLY.contains(index),
-		// DummyController.SUBITEM_ID_REQUIRED.contains(index), Integer.toString(item.getSubItemId()));
-		// assertProperty(jsonEdit, 6, path(on(Item.class).getSearchedSubItem()),
-		// DummyController.SEARCHED_SUBITEM_READONLY.contains(index),
-		// DummyController.SEARCHED_SUBITEM_REQUIRED.contains(index),
-		// Double.toString(item.getSearchedSubItem()));
-		// assertProperty(jsonEdit, 7, path(on(Item.class).getAnother()),
-		// DummyController.ANOTHER_SUBITEM_READONLY.contains(index),
-		// DummyController.ANOTHER_SUBITEM_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getAnother()));
-		// assertProperty(jsonEdit, 9, path(on(Item.class).getSubEntity().getName()),
-		// DummyController.SUBENTITY_NAME_READONLY.contains(index),
-		// DummyController.SUBENTITY_NAME_REQUIRED.contains(index),
-		// item.getSubEntity().getName());
-		// assertProperty(jsonEdit, 10, path(on(Item.class).getSubEntity().getMultiple()),
-		// DummyController.SUBENTITY_MULTIPLE_READONLY.contains(index),
-		// DummyController.SUBENTITY_MULTIPLE_REQUIRED.contains(index),
-		// objectMapper.writeValueAsString(item.getSubEntity().getMultiple()));
-		// assertProperty(jsonEdit, 16, path(on(Item.class).getListSubEntity()) + "[0].lkey",
-		// DummyController.LIST_SUBENTITY_KEY_READONLY.contains(index),
-		// DummyController.LIST_SUBENTITY_KEY_REQUIRED.contains(index),
-		// Integer.toString(item.getListSubEntity().get(0).getLkey()));
-		// assertProperty(jsonEdit, 24, path(on(Item.class).getAmount()), DummyController.AMOUNT_READONLY.contains(index),
-		// DummyController.AMOUNT_REQUIRED.contains(index), Double.toString(item.getAmount()));
-		// assertProperty(jsonEdit, 25, path(on(Item.class).isFlag()), DummyController.FLAG_READONLY.contains(index),
-		// DummyController.FLAG_REQUIRED.contains(index), String.valueOf(item.isFlag()));
-		// assertProperty(jsonEdit, 26, path(on(Item.class).getIntegerList()),
-		// DummyController.INTEGER_LIST_READONLY.contains(index),
-		// DummyController.INTEGER_LIST_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getIntegerList()));
-		// assertProperty(jsonEdit, 32, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].lkey",
-		// DummyController.LIST_WC_SUBENTITY_KEY_READONLY.contains(index),
-		// DummyController.LIST_WC_SUBENTITY_KEY_REQUIRED.contains(index),
-		// Integer.toString(item.getDoubleLevelWildCardEntityList().get(0).getLkey()));
-		// assertProperty(jsonEdit, 33, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].lname",
-		// DummyController.LIST_WC_SUBENTITY_NAME_READONLY.contains(index),
-		// DummyController.LIST_WC_SUBENTITY_NAME_REQUIRED.contains(index),
-		// item.getDoubleLevelWildCardEntityList().get(0).getLname());
-		// assertProperty(jsonEdit, 36, path(on(Item.class).getDoubleLevelWildCardEntityList()) + "[*].subItemList[*].id",
-		// DummyController.LIST_WC_SUBENTITYLIST_ID_READONLY.contains(index),
-		// DummyController.LIST_WC_SUBENTITYLIST_ID_REQUIRED.contains(index),
-		// Integer.toString(item.getDoubleLevelWildCardEntityList().get(0).getSubItemList().get(0).getId()));
-		// assertProperty(jsonEdit, 38, path(on(Item.class).getStringArray()),
-		// DummyController.ARRAY_READONLY.contains(index),
-		// DummyController.ARRAY_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getStringArray()));
+			assertInputProperty(htmlStr, "select", "listSubEntity[0].multiple",
+					DummyController.LIST_SUBENTITY_MULTIPLE_READONLY.contains(index),
+					DummyController.LIST_SUBENTITY_MULTIPLE_REQUIRED.contains(index),
+					item.getListSubEntity().get(0).getMultiple().toArray(), false);
 
-		// assertSuggest(jsonNode);
+			assertInputProperty(htmlStr, "number", "amount", DummyController.AMOUNT_READONLY.contains(index),
+					DummyController.AMOUNT_REQUIRED.contains(index), item.getAmount(), false);
+			assertInputProperty(htmlStr, "select", "flag", DummyController.FLAG_READONLY.contains(index),
+					DummyController.FLAG_REQUIRED.contains(index), item.isFlag(), false);
+			assertInputProperty(htmlStr, "select", "integerList", DummyController.INTEGER_LIST_READONLY.contains(index),
+					DummyController.INTEGER_LIST_REQUIRED.contains(index), item.getIntegerList().toArray(), false);
+			assertInputProperty(htmlStr, "number", "doubleLevelWildCardEntityList[*].lkey",
+					DummyController.LIST_WC_SUBENTITY_KEY_READONLY.contains(index),
+					DummyController.LIST_WC_SUBENTITY_KEY_REQUIRED.contains(index),
+					item.getDoubleLevelWildCardEntityList().get(0).getLkey(), false);
+			assertInputProperty(htmlStr, "text", "doubleLevelWildCardEntityList[*].lname",
+					DummyController.LIST_WC_SUBENTITY_NAME_READONLY.contains(index),
+					DummyController.LIST_WC_SUBENTITY_NAME_REQUIRED.contains(index),
+					item.getDoubleLevelWildCardEntityList().get(0).getLname(), false);
+			assertInputProperty(htmlStr, "number", "doubleLevelWildCardEntityList[*].subItemList[*].id",
+					DummyController.LIST_WC_SUBENTITYLIST_ID_READONLY.contains(index),
+					DummyController.LIST_WC_SUBENTITYLIST_ID_REQUIRED.contains(index),
+					item.getDoubleLevelWildCardEntityList().get(0).getSubItemList().get(0).getId(), false);
+			assertInputProperty(htmlStr, "text", "stringArray", DummyController.ARRAY_READONLY.contains(index),
+					DummyController.ARRAY_REQUIRED.contains(index), item.getStringArray(), false);
 
-		index++;
-		// }
+			index++;
+		}
 	}
 
-	private void assertProperty(final String jsonEdit, final int i, final String name, final boolean readOnly, final boolean required,
-			final String value) {
-		assertThat(jsonEdit, hasJsonPath("$._templates.default.properties[" + i + "].name", equalTo(name)));
-		assertThat(jsonEdit, hasJsonPath("$._templates.default.properties[" + i + "].readOnly", equalTo(readOnly)));
+	private void assertInputProperty(final String htmlStr, final String htmlType, final String name, final boolean readOnly,
+			final boolean required, final Object valueObj, final boolean isHidden) throws XpathException, IOException, SAXException {
 
-		String requiredProperty = "$._templates.default.properties[" + i + "].required";
-		if (required) {
-			assertThat(jsonEdit, hasJsonPath(requiredProperty, equalTo(required)));
+		String value;
+		Object[] values;
+		if (valueObj instanceof Object[]) {
+			values = (Object[]) valueObj;
 		}
 		else {
-			try {
-				assertThat(jsonEdit, hasJsonPath(requiredProperty, equalTo(required)));
-
-			}
-			catch (AssertionError e) {
-				assertThat(jsonEdit, hasNoJsonPath(requiredProperty));
-
-			}
+			values = new Object[] { valueObj };
 		}
-		if (value != null) {
-			try {
-				assertThat(jsonEdit, hasJsonPath("$._templates.default.properties[" + i + "].value", equalTo(value)));
-			}
-			catch (AssertionError e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
-	private void assertSuggest(final JsonNode jsonNode) {
-		String jsonEdit = jsonNode.toString();
-		JsonNode properties = jsonNode.get("_templates").get("default").get("properties");
-		for (int i = 0; i < properties.size(); i++) {
-			String suggestPropPath = "$._templates.default.properties[" + i + "].suggest";
-			if (suggestProperties.containsKey(i)) {
-				assertThat(jsonEdit, hasJsonPath(suggestPropPath));
-				String promptField = "name";
-				String embeddedName = "test:subItemList";
-
-				if (suggestProperties.get(i).equals(SuggestType.EMBEDDED)) {
-					assertThat(jsonEdit, hasJsonPath(suggestPropPath + ".embedded", equalTo(embeddedName)));
-					assertThat(jsonEdit, hasJsonPath(suggestPropPath + ".prompt-field", equalTo(promptField)));
-					checkSuggestValues(jsonEdit, "$._embedded.test:subItemList", suggestsValuesList.get(i),
-							jsonNode.get("_embedded").get(embeddedName).size());
-				}
-				else if (suggestProperties.get(i).equals(SuggestType.DIRECT)) {
-					checkSuggestValues(jsonEdit, suggestPropPath, suggestsValuesList.get(i), properties.get(i).get("suggest").size());
-				}
-				else {
-					assertThat(jsonEdit, hasJsonPath(suggestPropPath + ".href"));
-					assertThat(jsonEdit, hasJsonPath(suggestPropPath + ".prompt-field"));
-				}
+		for (int i = 0; i < values.length; i++) {
+			value = values[i].toString();
+			if (isHidden) {
+				XMLAssert.assertXpathExists("//input[@type='hidden'][@name='" + name + "'][@value='" + value + "']", htmlStr);
 			}
 			else {
-				assertThat(jsonEdit, hasNoJsonPath(suggestPropPath));
+				XMLAssert.assertXpathExists("//label[@for='" + name + "']", htmlStr);
+				if (!"select".equals(htmlType)) {
+					XMLAssert.assertXpathExists("//input[@type='" + htmlType + "'][@name='" + name + "'][@value='" + value + "']", htmlStr);
+					if (required) {
+						XMLAssert.assertXpathExists("//input[@type='" + htmlType + "'][@name='" + name + "'][@value='" + value
+								+ "'][@required='" + String.valueOf(required) + "']", htmlStr);
+					}
+					else {
+						XMLAssert.assertXpathNotExists("//input[@type='" + htmlType + "'][@name='" + name + "'][@value='" + value
+								+ "'][@required='" + String.valueOf(!required) + "']", htmlStr);
+					}
+					if (readOnly) {
+						XMLAssert.assertXpathExists("//input[@type='" + htmlType + "'][@name='" + name + "'][@value='" + value
+								+ "'][@editable='" + String.valueOf(!readOnly) + "']", htmlStr);
+					}
+					else {
+						XMLAssert.assertXpathNotExists("//input[@type='" + htmlType + "'][@name='" + name + "'][@value='" + value
+								+ "'][@editable='" + String.valueOf(readOnly) + "']", htmlStr);
+					}
+				}
+				else {
+					if (value != null && !"".equals(value)) {
+						XMLAssert.assertXpathExists("//select[@name='" + name + "']/option[@selected][@value='" + value + "']", htmlStr);
+						if (readOnly) {
+							XMLAssert.assertXpathExists("//input[@type='hidden'][@name='" + name + "'][@value='" + value + "']", htmlStr);
+						}
+					}
+				}
 			}
 		}
 	}
 
-	private void checkSuggestValues(final String jsonEdit, final String halFormSuggestPath, final List<Map<String, Object>> suggestValues,
-			final int halFormSuggestSize) {
-
-		assertEquals(halFormSuggestSize, suggestValues.size());
-		for (int j = 0; j < suggestValues.size(); j++) {
-			for (Entry<String, Object> val : suggestValues.get(j).entrySet()) {
-				assertThat(jsonEdit, hasJsonPath(halFormSuggestPath + "[" + j + "]." + val.getKey(), equalTo(val.getValue())));
-			}
+	private String writeXml(final int item, final String rel, final String method) throws IOException {
+		String html = "";
+		Writer writer = null;
+		XhtmlWriter xhtml = null;
+		try {
+			writer = new StringWriter();
+			xhtml = new XhtmlWriter(writer);
+			xhtml.writeLinks(Arrays.asList(dm.get(item, rel).getLink(rel)));
+			html = writer.toString();
 		}
-	}
+		catch (IOException e) {
+			LOG.error("Error writing xhtml.", e);
+		}
+		finally {
+			if (xhtml != null) {
+				xhtml.flush();
+				xhtml.close();
+			}
+			if (writer != null) {
+				writer.flush();
+				writer.close();
+			}
 
-	// private JsonNode assertCommonForItem(final int item, final String rel, final String method) {
-	// // If @RequestParam annotation is not present the request is correct
-	// Object entity = HalFormsUtils.toHalFormsDocument(dm.get(item, rel), objectMapper);
-	// JsonNode jsonNode = objectMapper.valueToTree(entity);
-	// String json = jsonNode.toString();
-	// System.out.println(json);
-	//
-	// assertThat(json, hasJsonPath("$._links.self"));
-	// assertThat(json, hasJsonPath("$._templates"));
-	// /**
-	// * By default we are sending three links, get (even that it has no parameters), put and delete, the first one is
-	// default as it is
-	// * mandatory
-	// */
-	// assertThat(json, hasJsonPath("$._templates.default"));
-	// assertThat(json, hasJsonPath("$._templates.default.method", equalTo(method)));
-	// if (method.equals("GET") || method.equals("DELETE")) {
-	// assertThat(json, hasNoJsonPath("$._templates.delete.properties"));
-	// }
-	// return jsonNode;
-	// }
-
-	Writer writer = new StringWriter();
-
-	XhtmlWriter xhtml = new XhtmlWriter(writer);
-
-	private Document assertCommonForItem(final int item, final String rel, final String method)
-			throws IOException, SAXException, ParserConfigurationException {
-		xhtml.writeLinks(Arrays.asList(dm.get(item, rel).getLink(rel)));
-		String html = writer.toString();
-		Document doc = Jsoup.parse(html);
-		PrintWriter writer = new PrintWriter("htmlDoc.html", "UTF-8");
-		writer.println(html);
-		writer.close();
-		return doc;
+		}
+		return html;
 	}
 }

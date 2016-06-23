@@ -87,6 +87,10 @@ public class DummyController {
 
 	public static final List<Integer> SUBENTITY_MULTIPLE_READONLY = Arrays.asList(0, 7);
 
+	public static final List<Integer> LIST_SUBENTITY_MULTIPLE_REQUIRED = Arrays.asList(5, 9);
+
+	public static final List<Integer> LIST_SUBENTITY_MULTIPLE_READONLY = Arrays.asList(0, 1, 7);
+
 	public static final List<Integer> LIST_SUBENTITY_KEY_REQUIRED = Arrays.asList(3);
 
 	public static final List<Integer> LIST_SUBENTITY_KEY_READONLY = Arrays.asList(1);
@@ -194,6 +198,8 @@ public class DummyController {
 					.getActionInputParameter(path(on(Item.class).getSubEntity().getName()));
 			ActionInputParameter subEntityMultipleInputParameter = editTransferBuilder.getActionDescriptors().get(0)
 					.getActionInputParameter(path(on(Item.class).getSubEntity().getMultiple()));
+			ActionInputParameter listSubEntityMultipleInputParameter = editTransferBuilder.getActionDescriptors().get(0)
+					.getActionInputParameter(path(on(Item.class).getListSubEntity()) + "[0].multiple");
 			ActionInputParameter wildcardsubEntityKeyInputParameter = editTransferBuilder.getActionDescriptors().get(0)
 					.getActionInputParameter(
 							path(on(Item.class).getDoubleLevelWildCardEntityList()) + DTOParam.WILDCARD_LIST_MASK + ".lkey");
@@ -220,6 +226,7 @@ public class DummyController {
 			param(item, integerListInputParameter, INTEGER_LIST_READONLY, INTEGER_LIST_REQUIRED);
 			param(item, subEntityNameInputParameter, SUBENTITY_NAME_READONLY, SUBENTITY_NAME_REQUIRED);
 			param(item, subEntityMultipleInputParameter, SUBENTITY_MULTIPLE_READONLY, SUBENTITY_MULTIPLE_REQUIRED);
+			param(item, listSubEntityMultipleInputParameter, LIST_SUBENTITY_MULTIPLE_READONLY, LIST_SUBENTITY_MULTIPLE_REQUIRED);
 			param(item, subEntityListKeyInputParameter, LIST_SUBENTITY_KEY_READONLY, LIST_SUBENTITY_KEY_REQUIRED);
 			param(item, wildcardsubEntityKeyInputParameter, LIST_WC_SUBENTITY_KEY_READONLY, LIST_WC_SUBENTITY_KEY_REQUIRED);
 			param(item, wildcardsubEntityNameInputParameter, LIST_WC_SUBENTITY_NAME_READONLY, LIST_WC_SUBENTITY_NAME_REQUIRED);

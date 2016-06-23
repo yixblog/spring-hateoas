@@ -453,17 +453,13 @@ public class XhtmlWriter extends Writer {
 		write("</a>");
 	}
 
-	public void writeBr() throws IOException {
-		write("<br />");
-	}
-
 	private void writeAnchor(final OptionalAttributes attrs, final String value) throws IOException {
 		beginAnchor(attrs);
 		write(value);
 		endAnchor();
 	}
 
-	public static String capitalize(final String name) {
+	private String capitalize(final String name) {
 		if (name != null && name.length() != 0) {
 			char[] chars = name.toCharArray();
 			chars[0] = Character.toUpperCase(chars[0]);
@@ -553,20 +549,25 @@ public class XhtmlWriter extends Writer {
 		boolean isMultiple = actionInputParameter.isArrayOrCollection();
 		OptionalAttributes attributes = attr("class", formControlClass);
 		Object callValue;
-		Object[] actualValues;
+		String[] actualValues;
 		if (isMultiple) {
-			actualValues = actionInputParameter.getValues();
-			if (actualValues.length > 0) {
-				callValue = actualValues[0];
+			Object[] actionParamValues = actionInputParameter.getValues();
+			if (actionParamValues.length > 0) {
+				callValue = actionParamValues[0];
 			}
 			else {
 				callValue = null;
 			}
+			actualValues = new String[actionParamValues.length];
+			for (int i = 0; i < actionParamValues.length; i++) {
+				actualValues[i] = String.valueOf(actionParamValues[i]);
+			}
+
 			attributes = attributes.and("multiple", "multiple");
 		}
 		else {
 			callValue = actionInputParameter.getValue();
-			actualValues = new Object[] { callValue };
+			actualValues = new String[] { callValue.toString() };
 		}
 		String documentationUrl = documentationProvider.getDocumentationUrl(actionInputParameter, callValue);
 		writeLabelWithDoc(requestParamName, documentationUrl);
@@ -601,7 +602,7 @@ public class XhtmlWriter extends Writer {
 		else {
 			beginSelect(requestParamName, possibleValues.length, attributes);
 			for (Suggest<?> possibleValue : possibleValues) {
-				if (ObjectUtils.containsElement(actualValues, possibleValue.getUnwrappedValue())) {
+				if (ObjectUtils.containsElement(actualValues, possibleValue.getValueAsString())) {
 					option(possibleValue.getText(), attr("selected", "selected").and("value", possibleValue.getValueAsString()));
 				}
 				else {
