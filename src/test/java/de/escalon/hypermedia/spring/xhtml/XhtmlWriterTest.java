@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,8 +43,6 @@ public class XhtmlWriterTest {
 	@Autowired
 	private WebApplicationContext wac;
 
-	private MockMvc mockMvc;
-
 	Writer writer = new StringWriter();
 
 	XhtmlWriter xhtml = new XhtmlWriter(writer);
@@ -62,7 +59,7 @@ public class XhtmlWriterTest {
 
 	@Before
 	public void setup() {
-		mockMvc = webAppContextSetup(wac).build();
+		webAppContextSetup(wac).build();
 	}
 
 	@Test
@@ -84,7 +81,6 @@ public class XhtmlWriterTest {
 
 		String xml = writeXml(Arrays.asList(affordance));
 
-		// renders writable event bean properties only
 		XMLAssert.assertXpathEvaluatesTo("EVENT_CANCELLED", "//select[@name='eventStatus']/option[1]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_POSTPONED", "//select[@name='eventStatus']/option[2]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//select[@name='eventStatus']/option[3]", xml);
@@ -92,9 +88,20 @@ public class XhtmlWriterTest {
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//select[@name='eventStatus']/option[@selected]", xml);
 		XMLAssert.assertXpathEvaluatesTo("7-10", "//select[@name='typicalAgeRange']/option[1]", xml);
 		XMLAssert.assertXpathEvaluatesTo("11-", "//select[@name='typicalAgeRange']/option[2]", xml);
+		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']/options[@selected]", xml);
 
-		XMLAssert.assertXpathNotExists("//input[@name='performer']", xml);
+		XMLAssert.assertXpathExists("//label[@for='eventStatus']", xml);
+		XMLAssert.assertXpathExists("//label[@for='performer']", xml);
+		XMLAssert.assertXpathExists("//input[@name='performer'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//input[@name='workPerformed.name'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='location']", xml);
+		XMLAssert.assertXpathExists("//input[@name='location'][@type='text']", xml);
 		XMLAssert.assertXpathNotExists("//select[@multiple]", xml);
+		XMLAssert.assertXpathExists("//input[@type='hidden']", xml);
+		XMLAssert.assertXpathNotExists("//input[@readonly='readonly']", xml);
+		XMLAssert.assertXpathNotExists("//input[@required='true']", xml);
+		XMLAssert.assertXpathNotExists("//input[@editable='false']", xml);
 	}
 
 	@Test
@@ -116,7 +123,6 @@ public class XhtmlWriterTest {
 
 		String xml = writeXml(Arrays.asList(affordance));
 
-		// renders event bean constructor arguments
 		XMLAssert.assertXpathEvaluatesTo("EVENT_CANCELLED", "//select[@name='eventStatus']/option[1]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_POSTPONED", "//select[@name='eventStatus']/option[2]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//select[@name='eventStatus']/option[3]", xml);
@@ -124,10 +130,20 @@ public class XhtmlWriterTest {
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//select[@name='eventStatus']/option[@selected]", xml);
 		XMLAssert.assertXpathEvaluatesTo("7-10", "//select[@name='typicalAgeRange']/option[1]", xml);
 		XMLAssert.assertXpathEvaluatesTo("11-", "//select[@name='typicalAgeRange']/option[2]", xml);
-		XMLAssert.assertXpathExists("//input[@name='performer']", xml);
-		XMLAssert.assertXpathExists("//input[@name='location']", xml);
-		XMLAssert.assertXpathExists("//input[@name='workPerformed.name']", xml);
+		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']/options[@selected]", xml);
+
+		XMLAssert.assertXpathExists("//label[@for='eventStatus']", xml);
+		XMLAssert.assertXpathExists("//label[@for='performer']", xml);
+		XMLAssert.assertXpathExists("//input[@name='performer'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//input[@name='workPerformed.name'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='location']", xml);
+		XMLAssert.assertXpathExists("//input[@name='location'][@type='text']", xml);
 		XMLAssert.assertXpathNotExists("//select[@multiple]", xml);
+		XMLAssert.assertXpathNotExists("//input[@type='hidden']", xml);
+		XMLAssert.assertXpathNotExists("//input[@readonly='readonly']", xml);
+		XMLAssert.assertXpathNotExists("//input[@required='true']", xml);
+		XMLAssert.assertXpathNotExists("//input[@editable='false']", xml);
 	}
 
 	@Test
@@ -149,16 +165,28 @@ public class XhtmlWriterTest {
 
 		String xml = writeXml(Arrays.asList(affordance));
 
+		XMLAssert.assertXpathExists("//select[@name='eventStatus'][@disabled='disabled']", xml);
+		XMLAssert.assertXpathExists("//input[@type='hidden'][@name='eventStatus'][@value='EVENT_SCHEDULED']", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_CANCELLED", "//select[@name='eventStatus']/option[1]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_POSTPONED", "//select[@name='eventStatus']/option[2]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//select[@name='eventStatus']/option[3]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_RESCHEDULED", "//select[@name='eventStatus']/option[4]", xml);
 		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//select[@name='eventStatus']/option[@selected]", xml);
+		XMLAssert.assertXpathEvaluatesTo("7-10", "//select[@name='typicalAgeRange']/option[1]", xml);
+		XMLAssert.assertXpathEvaluatesTo("11-", "//select[@name='typicalAgeRange']/option[2]", xml);
+		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']/options[@selected]", xml);
 
-		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']", xml);
-		XMLAssert.assertXpathNotExists("//input[@name='performer']", xml);
-		XMLAssert.assertXpathNotExists("//input[@name='location']", xml);
-		XMLAssert.assertXpathNotExists("//input[@name='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//label[@for='eventStatus']", xml);
+		XMLAssert.assertXpathExists("//label[@for='performer']", xml);
+		XMLAssert.assertXpathExists("//input[@name='performer'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//input[@name='workPerformed.name'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='location']", xml);
+		XMLAssert.assertXpathExists("//input[@name='location'][@type='text']", xml);
+		XMLAssert.assertXpathNotExists("//select[@multiple]", xml);
+		XMLAssert.assertXpathNotExists("//input[@readonly='readonly']", xml);
+		XMLAssert.assertXpathNotExists("//input[@required='true']", xml);
+		XMLAssert.assertXpathNotExists("//input[@editable='false']", xml);
 	}
 
 	@Test
@@ -180,16 +208,25 @@ public class XhtmlWriterTest {
 
 		String xml = writeXml(Arrays.asList(affordance));
 
-		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//option[@selected='selected']/text()", xml);
+		XMLAssert.assertXpathExists("//input[@type='hidden'][@name='eventStatus'][@value='EVENT_SCHEDULED']", xml);
+		XMLAssert.assertXpathEvaluatesTo("7-10", "//select[@name='typicalAgeRange']/option[1]", xml);
+		XMLAssert.assertXpathEvaluatesTo("11-", "//select[@name='typicalAgeRange']/option[2]", xml);
+		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']/options[@selected]", xml);
 
-		XMLAssert.assertXpathNotExists("//input[@name='performer']", xml);
-		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']", xml);
-		XMLAssert.assertXpathNotExists("//input[@name='location']", xml);
-		XMLAssert.assertXpathNotExists("//input[@name='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//label[@for='performer']", xml);
+		XMLAssert.assertXpathExists("//input[@name='performer'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//input[@name='workPerformed.name'][@type='text']", xml);
+		XMLAssert.assertXpathExists("//label[@for='location']", xml);
+		XMLAssert.assertXpathExists("//input[@name='location'][@type='text']", xml);
+		XMLAssert.assertXpathNotExists("//select[@multiple]", xml);
+		XMLAssert.assertXpathNotExists("//input[@readonly='readonly']", xml);
+		XMLAssert.assertXpathNotExists("//input[@required='true']", xml);
+		XMLAssert.assertXpathNotExists("//input[@editable='false']", xml);
 	}
 
 	@Test
-	public void testPostBodyHiddenEventStatusWithWorkPerformedName() throws Exception {
+	public void testPostBodyHiddenEventStatusWithName() throws Exception {
 
 		@RequestMapping("/")
 		class DummyController {
@@ -208,12 +245,53 @@ public class XhtmlWriterTest {
 
 		String xml = writeXml(Arrays.asList(affordance));
 
-		XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//option[@selected='selected']/text()", xml);
-		XMLAssert.assertXpathExists("//input[@name='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//input[@type='hidden'][@name='eventStatus'][@value='EVENT_SCHEDULED']", xml);
 
-		XMLAssert.assertXpathNotExists("//input[@name='performer']", xml);
-		XMLAssert.assertXpathNotExists("//select[@name='typicalAgeRange']", xml);
-		XMLAssert.assertXpathNotExists("//input[@name='location']", xml);
+		// XMLAssert.assertXpathEvaluatesTo("EVENT_SCHEDULED", "//option[@selected='selected']/text()", xml);
+		XMLAssert.assertXpathNotExists("//input[@name='workPerformed.name']", xml);
+
+		XMLAssert.assertXpathNotExists("//label[@for='performer']", xml);
+		XMLAssert.assertXpathNotExists("//input[@name='performer'][@type='text']", xml);
+		XMLAssert.assertXpathNotExists("//label[@for='workPerformed.name']", xml);
+		XMLAssert.assertXpathNotExists("//input[@name='workPerformed.name'][@type='text']", xml);
+		XMLAssert.assertXpathNotExists("//label[@for='location']", xml);
+		XMLAssert.assertXpathNotExists("//input[@name='location'][@type='text']", xml);
+		XMLAssert.assertXpathNotExists("//select[@multiple]", xml);
+		XMLAssert.assertXpathNotExists("//input[@readonly='readonly']", xml);
+		XMLAssert.assertXpathNotExists("//input[@required='true']", xml);
+		XMLAssert.assertXpathNotExists("//input[@editable='false']", xml);
+	}
+
+	@Test
+	public void testPostBodyHiddenEventStatusWithWorkPerformedName() throws Exception {
+
+		@RequestMapping("/")
+		class DummyController {
+
+			@RequestMapping(method = RequestMethod.POST)
+			public ResponseEntity<Void> postEventStatusOnly(
+					@RequestBody @Input(hidden = "eventStatus", include = "workPerformed.name") final Event event) {
+				return null;
+			}
+		}
+
+		Link affordance = AffordanceBuilder.linkTo(AffordanceBuilder.methodOn(DummyController.class)
+				.postEventStatusOnly(new Event(0, null, new CreativeWork("workPerformedName"), null, EventStatusType.EVENT_SCHEDULED)))
+				.withSelfRel();
+
+		String xml = writeXml(Arrays.asList(affordance));
+
+		XMLAssert.assertXpathExists("//input[@type='hidden'][@name='eventStatus'][@value='EVENT_SCHEDULED']", xml);
+		XMLAssert.assertXpathExists("//label[@for='workPerformed.name']", xml);
+		XMLAssert.assertXpathExists("//input[@name='workPerformed.name'][@type='text'][@value='workPerformedName']", xml);
+		XMLAssert.assertXpathNotExists("//label[@for='performer']", xml);
+		XMLAssert.assertXpathNotExists("//input[@name='performer'][@type='text']", xml);
+		XMLAssert.assertXpathNotExists("//label[@for='location']", xml);
+		XMLAssert.assertXpathNotExists("//input[@name='location'][@type='text']", xml);
+		XMLAssert.assertXpathNotExists("//select[@multiple]", xml);
+		XMLAssert.assertXpathNotExists("//input[@readonly='readonly']", xml);
+		XMLAssert.assertXpathNotExists("//input[@required='true']", xml);
+		XMLAssert.assertXpathNotExists("//input[@editable='false']", xml);
 	}
 
 	private String writeXml(final List<Link> links) {
