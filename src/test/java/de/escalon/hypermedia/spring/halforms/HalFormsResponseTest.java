@@ -257,14 +257,15 @@ public class HalFormsResponseTest {
 					DummyController.NAME_REQUIRED.contains(index), item.getName());
 			assertProperty(jsonEdit, 2, path(on(Item.class).getType()), DummyController.TYPE_READONLY.contains(index),
 					DummyController.TYPE_REQUIRED.contains(index), item.getType().toString());
-			assertProperty(jsonEdit, 3, path(on(Item.class).getMultiple()), false, false, item.getMultiple().toString());
+			assertProperty(jsonEdit, 3, path(on(Item.class).getMultiple()), false, false,
+					objectMapper.writeValueAsString(item.getMultiple()));
 			assertProperty(jsonEdit, 4, path(on(Item.class).getSingleSub()), DummyController.SUBITEM_READONLY.contains(index),
 					DummyController.SUBITEM_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getSingleSub()));
 			assertProperty(jsonEdit, 5, path(on(Item.class).getSubItemId()), DummyController.SUBITEM_ID_READONLY.contains(index),
 					DummyController.SUBITEM_ID_REQUIRED.contains(index), Integer.toString(item.getSubItemId()));
 			assertProperty(jsonEdit, 6, path(on(Item.class).getSearchedSubItem()),
 					DummyController.SEARCHED_SUBITEM_READONLY.contains(index), DummyController.SEARCHED_SUBITEM_REQUIRED.contains(index),
-					Double.toString(item.getSearchedSubItem()));
+					String.valueOf(item.getSearchedSubItem()));
 			assertProperty(jsonEdit, 7, path(on(Item.class).getAnother()), DummyController.ANOTHER_SUBITEM_READONLY.contains(index),
 					DummyController.ANOTHER_SUBITEM_REQUIRED.contains(index), objectMapper.writeValueAsString(item.getAnother()));
 			assertProperty(jsonEdit, 9, path(on(Item.class).getSubEntity().getName()),
