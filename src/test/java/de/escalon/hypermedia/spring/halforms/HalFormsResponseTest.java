@@ -250,7 +250,6 @@ public class HalFormsResponseTest {
 			assertCommonForItem(index, DummyController.DELETE, HttpMethod.DELETE.toString());
 			JsonNode jsonNode = assertCommonForItem(index, DummyController.MODIFY, HttpMethod.PUT.toString());
 			String jsonEdit = jsonNode.toString();
-			System.out.println(jsonEdit);
 
 			assertProperty(jsonEdit, 0, path(on(Item.class).getId()), false, false, Integer.toString(item.getId()));
 			assertProperty(jsonEdit, 1, path(on(Item.class).getName()), DummyController.NAME_READONLY.contains(index),
@@ -381,7 +380,6 @@ public class HalFormsResponseTest {
 		Object entity = HalFormsUtils.toHalFormsDocument(dm.get(item, rel), objectMapper);
 		JsonNode jsonNode = objectMapper.valueToTree(entity);
 		String json = jsonNode.toString();
-		System.out.println(json);
 
 		assertThat(json, hasJsonPath("$._links.self"));
 		assertThat(json, hasJsonPath("$._templates"));
