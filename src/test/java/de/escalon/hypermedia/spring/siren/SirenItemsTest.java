@@ -180,7 +180,6 @@ public class SirenItemsTest {
 			SirenEntity entity = new SirenEntity();
 			sirenUtils.toSirenEntity(entity, item);
 			String json = objectMapper.valueToTree(entity).toString();
-			System.out.println(json);
 			FileUtils.writeStringToFile(new File("siren.html"), json);
 
 		}

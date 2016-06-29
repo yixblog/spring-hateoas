@@ -567,7 +567,7 @@ public class XhtmlWriter extends Writer {
 		}
 		else {
 			callValue = actionInputParameter.getValue();
-			actualValues = new String[] { callValue.toString() };
+			actualValues = new String[] { callValue != null ? callValue.toString() : "" };
 		}
 		String documentationUrl = documentationProvider.getDocumentationUrl(actionInputParameter, callValue);
 		writeLabelWithDoc(requestParamName, documentationUrl);

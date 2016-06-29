@@ -301,9 +301,9 @@ public class XhtmlWriterTest {
 
 			xml = writer.toString();
 
-			xhtmlOld.writeLinks(links);
+			// xhtmlOld.writeLinks(links);
 			System.out.println("++++ new XhtmlWriter implementation result-->" + xml);
-			System.out.println("---- old XhtmlWriter implementation result-->" + writerOld.toString());
+			// System.out.println("---- old XhtmlWriter implementation result-->" + writerOld.toString());
 		}
 		catch (IOException e) {
 			e.printStackTrace();
