@@ -237,9 +237,8 @@ public class Item implements Serializable {
 	public static class IntegerListOptions implements Options<SuggestObjectWrapper<Integer>> {
 
 		@Override
-		public List<Suggest<SuggestObjectWrapper<Integer>>> get(final SuggestType type, final String[] value,
-				final Object... args) {
-			return SimpleSuggest.wrap(new Integer[] { 0, 1, 2, 3, 4, 5 }, type);
+		public List<Suggest<SuggestObjectWrapper<Integer>>> get(final String[] value, final Object... args) {
+			return SimpleSuggest.wrap(new Integer[] { 0, 1, 2, 3, 4, 5 });
 		}
 
 	}

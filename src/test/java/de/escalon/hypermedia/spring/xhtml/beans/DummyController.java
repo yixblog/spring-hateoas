@@ -34,7 +34,6 @@ import de.escalon.hypermedia.action.Type;
 import de.escalon.hypermedia.affordance.ActionInputParameter;
 import de.escalon.hypermedia.affordance.Suggest;
 import de.escalon.hypermedia.affordance.SuggestImpl;
-import de.escalon.hypermedia.affordance.SuggestType;
 import de.escalon.hypermedia.spring.AffordanceBuilder;
 
 @Controller
@@ -441,13 +440,13 @@ public class DummyController {
 		}
 
 		@Override
-		public List<Suggest<String>> get(final SuggestType type, final String[] value, final Object... args) {
+		public List<Suggest<String>> get(final String[] value, final Object... args) {
 			Link link = AffordanceBuilder.linkTo(lastInvocation).withSelfRel();
-			return SuggestImpl.wrap(Arrays.asList(link.getHref()), idField, textField, SuggestType.REMOTE);
+			return SuggestImpl.wrap(Arrays.asList(link.getHref()), idField, textField);
 		}
 
 		public static List<Suggest<String>> wrap(final String url, final Suggest<String> suggest) {
-			return SuggestImpl.wrap(Arrays.asList(url), suggest.getValueField(), suggest.getTextField(), suggest.getType());
+			return SuggestImpl.wrap(Arrays.asList(url), suggest.getValueField(), suggest.getTextField());
 		}
 	}
 

@@ -90,7 +90,7 @@ public class HalFormsUtils {
 		final List<de.escalon.hypermedia.affordance.Suggest<Object>> possibleValues = actionInputParameter
 				.getPossibleValues(actionDescriptor);
 		ValueSuggest<?> suggest = null;
-		SuggestType suggestType = SuggestType.INTERNAL;
+		final SuggestType suggestType = actionInputParameter.getSuggestType();
 		boolean multi = false;
 		if (!possibleValues.isEmpty()) {
 			try {
@@ -113,7 +113,6 @@ public class HalFormsUtils {
 				values.add(possibleValue.getValue());
 				textField = possibleValue.getTextField();
 				valueField = possibleValue.getValueField();
-				suggestType = possibleValue.getType();
 			}
 			suggest = new ValueSuggest<Object>(values, textField, valueField, suggestType);
 		} else {

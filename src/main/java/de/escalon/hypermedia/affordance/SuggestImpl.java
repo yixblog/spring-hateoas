@@ -9,15 +9,13 @@ public class SuggestImpl<T> implements Suggest<T> {
 	private final T value;
 	private final String valueField;
 	private final String textField;
-	private final SuggestType type;
 
-	public SuggestImpl(T value, SuggestType type) {
-		this(value, type, null, null);
+	public SuggestImpl(T value) {
+		this(value, null, null);
 	}
 
-	public SuggestImpl(T value, SuggestType type, String valueField, String textField) {
+	public SuggestImpl(T value, String valueField, String textField) {
 		this.value = value;
-		this.type = type;
 		this.valueField = valueField;
 		this.textField = textField;
 	}
@@ -71,15 +69,10 @@ public class SuggestImpl<T> implements Suggest<T> {
 		return field;
 	}
 
-	@Override
-	public SuggestType getType() {
-		return type;
-	}
-
-	public static <T> List<Suggest<T>> wrap(List<T> list, String valueField, String textField, SuggestType type) {
+	public static <T> List<Suggest<T>> wrap(List<T> list, String valueField, String textField) {
 		List<Suggest<T>> suggests = new ArrayList<Suggest<T>>(list.size());
 		for (T value : list) {
-			suggests.add(new SuggestImpl<T>(value, type, valueField, textField));
+			suggests.add(new SuggestImpl<T>(value, valueField, textField));
 		}
 		return suggests;
 	}

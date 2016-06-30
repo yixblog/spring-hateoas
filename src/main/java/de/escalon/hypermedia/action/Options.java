@@ -16,7 +16,6 @@ package de.escalon.hypermedia.action;
 import java.util.List;
 
 import de.escalon.hypermedia.affordance.Suggest;
-import de.escalon.hypermedia.affordance.SuggestType;
 
 /**
  * Allows to determine possible values for an argument annotated with {@link Select}.
@@ -62,5 +61,5 @@ public interface Options<T> {
 	 * @return possible values
 	 * @see StringOptions
 	 */
-	public List<Suggest<T>> get(SuggestType type, String[] value, Object... args);
+	public List<Suggest<T>> get(String[] value, Object... args);
 }

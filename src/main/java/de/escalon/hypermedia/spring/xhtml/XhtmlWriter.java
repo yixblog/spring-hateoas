@@ -581,7 +581,7 @@ public class XhtmlWriter extends Writer {
 		}
 
 		// Check if is a remote type select
-		if (SuggestType.REMOTE == possibleValues.get(0).getType()) {
+		if (SuggestType.REMOTE == actionInputParameter.getSuggestType()) {
 			attributes.and("data-remote", possibleValues.get(0).getValue().toString());
 			beginSelect(requestParamName, possibleValues.size(), attributes);
 			for (Object possibleValue : actualValues) {

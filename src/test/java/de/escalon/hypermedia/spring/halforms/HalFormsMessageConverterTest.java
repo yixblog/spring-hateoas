@@ -137,9 +137,8 @@ public class HalFormsMessageConverterTest {
 	public static class SizeOptions implements Options<Size> {
 
 		@Override
-		public List<de.escalon.hypermedia.affordance.Suggest<Size>> get(final SuggestType type, final String[] value,
-				final Object... args) {
-			return SuggestImpl.wrap(Arrays.asList(new Size("small", "Small"), new Size("big", "Big")), "value", "text", type);
+		public List<de.escalon.hypermedia.affordance.Suggest<Size>> get(final String[] value, final Object... args) {
+			return SuggestImpl.wrap(Arrays.asList(new Size("small", "Small"), new Size("big", "Big")), "value", "text");
 		}
 
 	}
@@ -147,8 +146,8 @@ public class HalFormsMessageConverterTest {
 	public static class RemoteOptions implements Options<String> {
 
 		@Override
-		public List<Suggest<String>> get(final SuggestType type, final String[] value, final Object... args) {
-			return SuggestImpl.wrap(Arrays.asList("http://localhost/orders/countries"), "value", "text", type);
+		public List<Suggest<String>> get(final String[] value, final Object... args) {
+			return SuggestImpl.wrap(Arrays.asList("http://localhost/orders/countries"), "value", "text");
 		}
 
 	}

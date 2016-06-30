@@ -95,8 +95,8 @@ public class SpringActionInputParameter implements ActionInputParameter {
 
 	ParameterType type = ParameterType.UNKNOWN;
 
-	@SuppressWarnings({ "unchecked",
-			"rawtypes" }) PossibleValuesResolver<?> resolver = new FixedPossibleValuesResolver(EMPTY_SUGGEST);
+	@SuppressWarnings({ "unchecked", "rawtypes" }) PossibleValuesResolver<?> resolver = new FixedPossibleValuesResolver(
+			EMPTY_SUGGEST, SuggestType.INTERNAL);
 
 	private static final ConversionService DEFAULT_CONVERSION_SERVICE = new DefaultFormattingConversionService();
 
@@ -212,17 +212,17 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			this.type = ParameterType.SELECT;
 		} else if (Enum[].class.isAssignableFrom(parameterType)) {
 			resolver = new FixedPossibleValuesResolver(
-					SimpleSuggest.wrap(parameterType.getComponentType().getEnumConstants(), type));
+					SimpleSuggest.wrap(parameterType.getComponentType().getEnumConstants()), type);
 			this.type = ParameterType.SELECT;
 		} else if (Enum.class.isAssignableFrom(parameterType)) {
-			resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(parameterType.getEnumConstants(), type));
+			resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(parameterType.getEnumConstants()), type);
 			this.type = ParameterType.SELECT;
 		} else if (Collection.class.isAssignableFrom(parameterType)) {
 			TypeDescriptor descriptor = TypeDescriptor.nested(methodParameter, 1);
 			if (descriptor != null) {
 				nested = descriptor.getType();
 				if (Enum.class.isAssignableFrom(nested)) {
-					resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(nested.getEnumConstants(), type));
+					resolver = new FixedPossibleValuesResolver(SimpleSuggest.wrap(nested.getEnumConstants()), type);
 					this.type = ParameterType.SELECT;
 				}
 			}
@@ -413,7 +413,17 @@ public class SpringActionInputParameter implements ActionInputParameter {
 
 	@Override
 	public <T> void setPossibleValues(final List<Suggest<T>> possibleValues) {
-		resolver = new FixedPossibleValuesResolver<T>(possibleValues);
+		resolver = new FixedPossibleValuesResolver<T>(possibleValues, resolver.getType());
+	}
+
+	@Override
+	public SuggestType getSuggestType() {
+		return resolver.getType();
+	}
+
+	@Override
+	public void setSuggestType(SuggestType type) {
+		resolver.setType(type);
 	}
 
 	/**
@@ -630,14 +640,20 @@ public class SpringActionInputParameter implements ActionInputParameter {
 		String[] getParams();
 
 		List<Suggest<T>> getValues(List<?> value);
+
+		SuggestType getType();
+
+		void setType(SuggestType type);
 	}
 
 	class FixedPossibleValuesResolver<T> implements PossibleValuesResolver<T> {
 
 		private final List<Suggest<T>> values;
+		private SuggestType type;
 
-		public FixedPossibleValuesResolver(final List<Suggest<T>> values) {
+		public FixedPossibleValuesResolver(final List<Suggest<T>> values, SuggestType type) {
 			this.values = values;
+			setType(type);
 		}
 
 		@Override
@@ -650,6 +666,16 @@ public class SpringActionInputParameter implements ActionInputParameter {
 			return values;
 		}
 
+		@Override
+		public SuggestType getType() {
+			return type;
+		}
+
+		@Override
+		public void setType(SuggestType type) {
+			this.type = type;
+		}
+
 	}
 
 	class OptionsPossibleValuesResolver<T> implements PossibleValuesResolver<T> {
@@ -657,9 +683,12 @@ public class SpringActionInputParameter implements ActionInputParameter {
 
 		private final Select select;
 
+		private SuggestType type;
+
 		@SuppressWarnings("unchecked")
 		public OptionsPossibleValuesResolver(final Select select) {
 			this.select = select;
+			setType(select.type());
 			options = getOptions((Class<Options<T>>) select.options());
 		}
 
@@ -670,7 +699,17 @@ public class SpringActionInputParameter implements ActionInputParameter {
 
 		@Override
 		public List<Suggest<T>> getValues(final List<?> args) {
-			return options.get(select.type(), select.value(), args.toArray());
+			return options.get(select.value(), args.toArray());
+		}
+
+		@Override
+		public SuggestType getType() {
+			return type;
+		}
+
+		@Override
+		public void setType(SuggestType type) {
+			this.type = type;
 		}
 	}
 

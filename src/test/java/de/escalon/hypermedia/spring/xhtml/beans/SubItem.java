@@ -10,7 +10,6 @@ import org.springframework.hateoas.Identifiable;
 import de.escalon.hypermedia.action.Options;
 import de.escalon.hypermedia.affordance.Suggest;
 import de.escalon.hypermedia.affordance.SuggestImpl;
-import de.escalon.hypermedia.affordance.SuggestType;
 import de.escalon.hypermedia.spring.AffordanceBuilder;
 import de.escalon.hypermedia.spring.halforms.beans.DummyController.RemoteOptions;
 
@@ -92,8 +91,8 @@ public class SubItem implements Identifiable<Integer>, Serializable {
 	public static class SubItemOptions implements Options<SubItem> {
 
 		@Override
-		public List<Suggest<SubItem>> get(final SuggestType type, final String[] value, final Object... args) {
-			return SuggestImpl.wrap(Arrays.asList(VALIDS), null, "name", type);
+		public List<Suggest<SubItem>> get(final String[] value, final Object... args) {
+			return SuggestImpl.wrap(Arrays.asList(VALIDS), null, "name");
 		}
 
 	}
@@ -101,8 +100,8 @@ public class SubItem implements Identifiable<Integer>, Serializable {
 	public static class SubItemOptionsId implements Options<SubItem> {
 
 		@Override
-		public List<Suggest<SubItem>> get(final SuggestType type, final String[] value, final Object... args) {
-			return SuggestImpl.wrap(Arrays.asList(VALIDS), "id", "name", type);
+		public List<Suggest<SubItem>> get(final String[] value, final Object... args) {
+			return SuggestImpl.wrap(Arrays.asList(VALIDS), "id", "name");
 		}
 
 	}

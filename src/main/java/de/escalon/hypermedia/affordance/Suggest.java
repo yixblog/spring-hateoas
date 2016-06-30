@@ -65,11 +65,4 @@ public interface Suggest<T> {
 	 */
 	String getText();
 
-	/**
-	 * Suggest type
-	 * 
-	 * @return
-	 */
-	SuggestType getType();
-
 }

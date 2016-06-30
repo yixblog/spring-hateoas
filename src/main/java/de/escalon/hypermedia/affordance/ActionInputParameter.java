@@ -118,6 +118,20 @@ public interface ActionInputParameter {
 	<T> void setPossibleValues(List<Suggest<T>> possibleValues);
 
 	/**
+	 * Retrieve the suggest type
+	 * 
+	 * @return
+	 */
+	SuggestType getSuggestType();
+
+	/**
+	 * Sets the suggest type
+	 * 
+	 * @param type
+	 */
+	void setSuggestType(SuggestType type);
+
+	/**
 	 * Parameter is an array or collection, think {?val*} in uri template.
 	 *
 	 * @return true for collection or array
