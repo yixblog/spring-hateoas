@@ -1,6 +1,7 @@
 package de.escalon.hypermedia.affordance;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SuggestImpl<T> implements Suggest<T> {
@@ -75,11 +76,10 @@ public class SuggestImpl<T> implements Suggest<T> {
 		return type;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> Suggest<T>[] wrap(List<T> list, String valueField, String textField, SuggestType type) {
-		SuggestImpl<T>[] suggests = new SuggestImpl[list.size()];
-		for (int index = 0; index < suggests.length; index++) {
-			suggests[index] = new SuggestImpl<T>(list.get(index), type, valueField, textField);
+	public static <T> List<Suggest<T>> wrap(List<T> list, String valueField, String textField, SuggestType type) {
+		List<Suggest<T>> suggests = new ArrayList<Suggest<T>>(list.size());
+		for (T value : list) {
+			suggests.add(new SuggestImpl<T>(value, type, valueField, textField));
 		}
 		return suggests;
 	}

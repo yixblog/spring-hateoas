@@ -81,7 +81,8 @@ public class ActionInputParameterTest {
 
 		assertEquals("reviewBody", actionInputParameter.getParameterName());
 		assertEquals(String.class, actionInputParameter.getParameterType());
-		assertEquals(0, actionInputParameter.getPossibleValues(new SpringActionDescriptor("post", RequestMethod.POST.name())).length);
+		assertEquals(0,
+				actionInputParameter.getPossibleValues(new SpringActionDescriptor("post", RequestMethod.POST.name())).size());
 		assertEquals(Type.TEXT, actionInputParameter.getHtmlInputFieldType());
 		assertNull(actionInputParameter.getRequestHeaderName());
 
@@ -112,7 +113,8 @@ public class ActionInputParameterTest {
 
 		assertEquals("rating", actionInputParameter.getParameterName());
 		assertEquals(String.class, actionInputParameter.getParameterType());
-		assertEquals(3, actionInputParameter.getPossibleValues(new SpringActionDescriptor("post", RequestMethod.POST.name())).length);
+		assertEquals(3,
+				actionInputParameter.getPossibleValues(new SpringActionDescriptor("post", RequestMethod.POST.name())).size());
 		assertEquals(Type.TEXT, actionInputParameter.getHtmlInputFieldType());
 
 		assertFalse(actionInputParameter.isArrayOrCollection());
@@ -143,9 +145,10 @@ public class ActionInputParameterTest {
 
 		assertEquals("searchTerms", actionInputParameter.getParameterName());
 		assertEquals(List.class, actionInputParameter.getParameterType());
-		assertEquals(new ParameterizedTypeReference<List<String>>() {
-		}.getType(), actionInputParameter.getGenericParameterType());
-		assertEquals(3, actionInputParameter.getPossibleValues(new SpringActionDescriptor("post", RequestMethod.POST.name())).length);
+		assertEquals(new ParameterizedTypeReference<List<String>>() {}.getType(),
+				actionInputParameter.getGenericParameterType());
+		assertEquals(3,
+				actionInputParameter.getPossibleValues(new SpringActionDescriptor("post", RequestMethod.POST.name())).size());
 		assertNull(actionInputParameter.getHtmlInputFieldType());
 
 		assertTrue(actionInputParameter.isRequestParam());
@@ -188,7 +191,8 @@ public class ActionInputParameterTest {
 		assertEquals("shade", actionInputParameter.getParameterName());
 		assertEquals(ShadeOfBlue.class, actionInputParameter.getParameterType());
 		assertEquals(ShadeOfBlue.class, actionInputParameter.getGenericParameterType());
-		assertEquals(4, actionInputParameter.getPossibleValues(new SpringActionDescriptor("get", RequestMethod.GET.name())).length);
+		assertEquals(4,
+				actionInputParameter.getPossibleValues(new SpringActionDescriptor("get", RequestMethod.GET.name())).size());
 		assertEquals(Type.TEXT, actionInputParameter.getHtmlInputFieldType());
 
 		assertTrue(actionInputParameter.isRequestParam());
@@ -228,7 +232,8 @@ public class ActionInputParameterTest {
 		assertEquals("shade", actionInputParameter.getParameterName());
 		assertEquals(ShadeOfBlue[].class, actionInputParameter.getParameterType());
 		assertEquals(ShadeOfBlue[].class, actionInputParameter.getGenericParameterType());
-		assertEquals(4, actionInputParameter.getPossibleValues(new SpringActionDescriptor("get", RequestMethod.GET.name())).length);
+		assertEquals(4,
+				actionInputParameter.getPossibleValues(new SpringActionDescriptor("get", RequestMethod.GET.name())).size());
 		assertNull(actionInputParameter.getHtmlInputFieldType());
 
 		assertTrue(actionInputParameter.isRequestParam());
@@ -267,9 +272,10 @@ public class ActionInputParameterTest {
 		assertEquals("shade", actionInputParameter.getParameterName());
 		assertEquals(List.class, actionInputParameter.getParameterType());
 
-		assertEquals(new ParameterizedTypeReference<List<ShadeOfBlue>>() {
-		}.getType(), actionInputParameter.getGenericParameterType());
-		assertEquals(4, actionInputParameter.getPossibleValues(new SpringActionDescriptor("get", RequestMethod.GET.name())).length);
+		assertEquals(new ParameterizedTypeReference<List<ShadeOfBlue>>() {}.getType(),
+				actionInputParameter.getGenericParameterType());
+		assertEquals(4,
+				actionInputParameter.getPossibleValues(new SpringActionDescriptor("get", RequestMethod.GET.name())).size());
 		assertNull(actionInputParameter.getHtmlInputFieldType());
 
 		assertTrue(actionInputParameter.isRequestParam());

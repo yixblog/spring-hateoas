@@ -353,7 +353,7 @@ public class SirenUtils {
 
 		@Override
 		public void visit(ActionInputParameter inputParameter) {
-			final Suggest<?>[] possibleValues = inputParameter.getPossibleValues(actionDescriptor);
+			final List<Suggest<Object>> possibleValues = inputParameter.getPossibleValues(actionDescriptor);
 
 			// dot-separated property path as field name
 			SirenField sirenField = createSirenField(inputParameter.getName(), inputParameter.getValue(), inputParameter,
@@ -364,9 +364,9 @@ public class SirenUtils {
 	}
 
 	private SirenField createSirenField(String paramName, Object propertyValue, ActionInputParameter inputParameter,
-			Suggest<?>[] possibleValues) {
+			List<Suggest<Object>> possibleValues) {
 		SirenField sirenField;
-		if (possibleValues.length == 0) {
+		if (possibleValues.isEmpty()) {
 			String propertyValueAsString = propertyValue == null ? null : propertyValue.toString();
 			Type htmlInputFieldType = inputParameter.getHtmlInputFieldType();
 			// TODO: null -> array or bean parameter without possible values

@@ -10,6 +10,8 @@
 
 package de.escalon.hypermedia.action;
 
+import java.util.List;
+
 import de.escalon.hypermedia.affordance.ActionDescriptor;
 import de.escalon.hypermedia.affordance.SimpleSuggest;
 import de.escalon.hypermedia.affordance.Suggest;
@@ -32,7 +34,7 @@ public class StringOptions implements Options<SuggestObjectWrapper<String>> {
 	 * </pre>
 	 */
 	@Override
-	public Suggest<SuggestObjectWrapper<String>>[] get(SuggestType type, String[] value, Object... args) {
+	public List<Suggest<SuggestObjectWrapper<String>>> get(SuggestType type, String[] value, Object... args) {
 		return SimpleSuggest.wrap(value, type);
 	}
 }

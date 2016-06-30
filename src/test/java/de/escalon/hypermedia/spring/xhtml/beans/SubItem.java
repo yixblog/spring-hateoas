@@ -83,8 +83,7 @@ public class SubItem implements Identifiable<Integer>, Serializable {
 			if (other.name != null) {
 				return false;
 			}
-		}
-		else if (!name.equals(other.name)) {
+		} else if (!name.equals(other.name)) {
 			return false;
 		}
 		return true;
@@ -93,7 +92,7 @@ public class SubItem implements Identifiable<Integer>, Serializable {
 	public static class SubItemOptions implements Options<SubItem> {
 
 		@Override
-		public Suggest<SubItem>[] get(final SuggestType type, final String[] value, final Object... args) {
+		public List<Suggest<SubItem>> get(final SuggestType type, final String[] value, final Object... args) {
 			return SuggestImpl.wrap(Arrays.asList(VALIDS), null, "name", type);
 		}
 
@@ -102,7 +101,7 @@ public class SubItem implements Identifiable<Integer>, Serializable {
 	public static class SubItemOptionsId implements Options<SubItem> {
 
 		@Override
-		public Suggest<SubItem>[] get(final SuggestType type, final String[] value, final Object... args) {
+		public List<Suggest<SubItem>> get(final SuggestType type, final String[] value, final Object... args) {
 			return SuggestImpl.wrap(Arrays.asList(VALIDS), "id", "name", type);
 		}
 

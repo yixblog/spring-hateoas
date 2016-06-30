@@ -61,17 +61,24 @@ public class Item implements Serializable {
 		this(id, name, ItemType.ONE, Collections.<SubItem> emptyList(), SubItem.VALIDS[0], SubItem.VALIDS[0].getId(),
 				SubItem.VALIDS[0].getId(), AnotherSubItem.VALIDS[0], null, null, 1.0, false, Collections.<Integer> emptyList(),
 				Collections.<String> emptyList(), Collections.<ListableSubEntity> emptyList(),
-				Collections.<WildCardedListableSubEntity> emptyList(), new String[1], new ListableSubEntity[1], new ListableSubEntity[1]);
+				Collections.<WildCardedListableSubEntity> emptyList(), new String[1], new ListableSubEntity[1],
+				new ListableSubEntity[1]);
 	}
 
 	@JsonCreator
 	public Item(@JsonProperty("id") @Input(value = Type.NUMBER) final int id,
-			final @JsonProperty("name") @Input(value = Type.TEXT) String name, @JsonProperty("type") @Select final ItemType type,
-			@JsonProperty("multiple") @Select(options = SubItem.SubItemOptions.class, type = SuggestType.EXTERNAL) final List<SubItem> multiple,
-			@JsonProperty("singleSub") @Select(options = SubItem.SubItemOptions.class, type = SuggestType.EXTERNAL) final SubItem singleSub,
-			@JsonProperty("subItemId") @Select(options = SubItem.SubItemOptionsId.class, type = SuggestType.EXTERNAL) final int subItemId,
-			@JsonProperty("searchedSubItem") @Select(options = SubItem.SubItemSearchableOptions.class, type = SuggestType.REMOTE) final int searchedSubItem,
-			@JsonProperty("another") @Select(options = AnotherSubItem.SubItemSearchableOptions.class, type = SuggestType.REMOTE) final AnotherSubItem another,
+			final @JsonProperty("name") @Input(value = Type.TEXT) String name,
+			@JsonProperty("type") @Select final ItemType type,
+			@JsonProperty("multiple") @Select(options = SubItem.SubItemOptions.class,
+					type = SuggestType.EXTERNAL) final List<SubItem> multiple,
+			@JsonProperty("singleSub") @Select(options = SubItem.SubItemOptions.class,
+					type = SuggestType.EXTERNAL) final SubItem singleSub,
+			@JsonProperty("subItemId") @Select(options = SubItem.SubItemOptionsId.class,
+					type = SuggestType.EXTERNAL) final int subItemId,
+			@JsonProperty("searchedSubItem") @Select(options = SubItem.SubItemSearchableOptions.class,
+					type = SuggestType.REMOTE) final int searchedSubItem,
+			@JsonProperty("another") @Select(options = AnotherSubItem.SubItemSearchableOptions.class,
+					type = SuggestType.REMOTE) final AnotherSubItem another,
 			@JsonProperty("subEntity") final SubEntity subEntity,
 			@JsonProperty("listSubEntity") @DTOParam(wildcard = false) final List<ListableSubEntity> listSubEntity,
 			@JsonProperty("amount") @Input(value = Type.NUMBER) final double amount,
@@ -79,10 +86,12 @@ public class Item implements Serializable {
 			@JsonProperty("integerList") @Select(options = IntegerListOptions.class) final List<Integer> integerList,
 			@JsonProperty("undefinedList") @Input(maxLength = 10) final List<String> undefinedList,
 			@JsonProperty("wildCardEntityList") @DTOParam(wildcard = true) final List<ListableSubEntity> wildCardEntityList,
-			@JsonProperty("doubleLevelWildCardEntityList") @DTOParam(wildcard = true) final List<WildCardedListableSubEntity> doubleLevelWildCardEntityList,
+			@JsonProperty("doubleLevelWildCardEntityList") @DTOParam(
+					wildcard = true) final List<WildCardedListableSubEntity> doubleLevelWildCardEntityList,
 			@JsonProperty("stringArray") @Input final String[] stringArray,
 			@JsonProperty("arraySubEntity") @DTOParam final ListableSubEntity[] arraySubEntity,
-			@JsonProperty("wildcardArraySubEntity") @DTOParam(wildcard = true) final ListableSubEntity[] wildcardArraySubEntity) {
+			@JsonProperty("wildcardArraySubEntity") @DTOParam(
+					wildcard = true) final ListableSubEntity[] wildcardArraySubEntity) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
@@ -159,8 +168,7 @@ public class Item implements Serializable {
 			if (other.name != null) {
 				return false;
 			}
-		}
-		else if (!name.equals(other.name)) {
+		} else if (!name.equals(other.name)) {
 			return false;
 		}
 		return true;
@@ -229,7 +237,8 @@ public class Item implements Serializable {
 	public static class IntegerListOptions implements Options<SuggestObjectWrapper<Integer>> {
 
 		@Override
-		public Suggest<SuggestObjectWrapper<Integer>>[] get(final SuggestType type, final String[] value, final Object... args) {
+		public List<Suggest<SuggestObjectWrapper<Integer>>> get(final SuggestType type, final String[] value,
+				final Object... args) {
 			return SimpleSuggest.wrap(new Integer[] { 0, 1, 2, 3, 4, 5 }, type);
 		}
 

@@ -13,6 +13,8 @@
 
 package de.escalon.hypermedia.action;
 
+import java.util.List;
+
 import de.escalon.hypermedia.affordance.Suggest;
 import de.escalon.hypermedia.affordance.SuggestType;
 
@@ -60,5 +62,5 @@ public interface Options<T> {
 	 * @return possible values
 	 * @see StringOptions
 	 */
-	public Suggest<T>[] get(SuggestType type, String[] value, Object... args);
+	public List<Suggest<T>> get(SuggestType type, String[] value, Object... args);
 }

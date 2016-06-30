@@ -1,5 +1,8 @@
 package de.escalon.hypermedia.affordance;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SimpleSuggest<T> extends SuggestImpl<SuggestObjectWrapper<T>> {
 
 	@SuppressWarnings("unchecked")
@@ -15,12 +18,11 @@ public class SimpleSuggest<T> extends SuggestImpl<SuggestObjectWrapper<T>> {
 		super(wrapper, type, SuggestObjectWrapper.ID, SuggestObjectWrapper.TEXT);
 	}
 
-	public static <T> Suggest<SuggestObjectWrapper<T>>[] wrap(T[] values, SuggestType type) {
-		@SuppressWarnings("unchecked")
-		Suggest<SuggestObjectWrapper<T>>[] suggests = new Suggest[values.length];
-		for (int i = 0; i < suggests.length; i++) {
-			suggests[i] = new SimpleSuggest<T>(
-					new SuggestObjectWrapper<T>(String.valueOf(values[i]), String.valueOf(values[i]), values[i]), type);
+	public static <T> List<Suggest<SuggestObjectWrapper<T>>> wrap(T[] values, SuggestType type) {
+		List<Suggest<SuggestObjectWrapper<T>>> suggests = new ArrayList<Suggest<SuggestObjectWrapper<T>>>(values.length);
+		for (int i = 0; i < values.length; i++) {
+			suggests.add(new SimpleSuggest<T>(
+					new SuggestObjectWrapper<T>(String.valueOf(values[i]), String.valueOf(values[i]), values[i]), type));
 		}
 		return suggests;
 	}

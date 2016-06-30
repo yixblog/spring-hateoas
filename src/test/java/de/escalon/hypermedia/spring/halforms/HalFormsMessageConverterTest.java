@@ -86,7 +86,8 @@ public class HalFormsMessageConverterTest {
 
 	private final RelProvider relProvider = new DefaultRelProvider();
 
-	private final CurieProvider curieProvider = new DefaultCurieProvider("test", new UriTemplate("http://localhost:8080/profile/{rel}"));
+	private final CurieProvider curieProvider = new DefaultCurieProvider("test",
+			new UriTemplate("http://localhost:8080/profile/{rel}"));
 
 	@Relation("customer")
 	class Customer {
@@ -136,7 +137,8 @@ public class HalFormsMessageConverterTest {
 	public static class SizeOptions implements Options<Size> {
 
 		@Override
-		public de.escalon.hypermedia.affordance.Suggest<Size>[] get(final SuggestType type, final String[] value, final Object... args) {
+		public List<de.escalon.hypermedia.affordance.Suggest<Size>> get(final SuggestType type, final String[] value,
+				final Object... args) {
 			return SuggestImpl.wrap(Arrays.asList(new Size("small", "Small"), new Size("big", "Big")), "value", "text", type);
 		}
 
@@ -145,7 +147,7 @@ public class HalFormsMessageConverterTest {
 	public static class RemoteOptions implements Options<String> {
 
 		@Override
-		public Suggest<String>[] get(final SuggestType type, final String[] value, final Object... args) {
+		public List<Suggest<String>> get(final SuggestType type, final String[] value, final Object... args) {
 			return SuggestImpl.wrap(Arrays.asList("http://localhost/orders/countries"), "value", "text", type);
 		}
 
@@ -177,7 +179,8 @@ public class HalFormsMessageConverterTest {
 				@Input(required = true) @JsonProperty("productCode") final String productCode,
 				@Input(editable = true, pattern = "%d") @JsonProperty("quantity") final Integer quantity,
 				@Select(options = SizeOptions.class, type = SuggestType.EXTERNAL) @JsonProperty("size") final String size,
-				@Select(options = RemoteOptions.class, type = SuggestType.REMOTE) @JsonProperty("country") final Country country) {
+				@Select(options = RemoteOptions.class,
+						type = SuggestType.REMOTE) @JsonProperty("country") final Country country) {
 			this.orderNumber = orderNumber;
 			this.productCode = productCode;
 			this.quantity = quantity;
@@ -243,7 +246,8 @@ public class HalFormsMessageConverterTest {
 		}
 
 		@JsonCreator
-		public OrderFilter(@Input @JsonProperty("count") final int count, @Input @JsonProperty("status") final String status) {
+		public OrderFilter(@Input @JsonProperty("count") final int count,
+				@Input @JsonProperty("status") final String status) {
 			this.status = status;
 			this.count = count;
 		}
@@ -279,13 +283,17 @@ public class HalFormsMessageConverterTest {
 			return null;
 		}
 
-		@RequestMapping(value = "/{orderNumber}/items", method = RequestMethod.GET, params = "rel", consumes = MediaType.APPLICATION_JSON_VALUE)
-		public ResponseEntity<Void> addOrderItemsPrepareForm(@PathVariable final int orderNumber, @RequestParam final String rel) {
+		@RequestMapping(value = "/{orderNumber}/items", method = RequestMethod.GET, params = "rel",
+				consumes = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<Void> addOrderItemsPrepareForm(@PathVariable final int orderNumber,
+				@RequestParam final String rel) {
 			return null;
 		}
 
-		@RequestMapping(value = "/{orderNumber}/items", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-		public ResponseEntity<Void> addOrderItems(@PathVariable final int orderNumber, @RequestBody final OrderItem orderItem) {
+		@RequestMapping(value = "/{orderNumber}/items", method = RequestMethod.POST,
+				consumes = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<Void> addOrderItems(@PathVariable final int orderNumber,
+				@RequestBody final OrderItem orderItem) {
 			return null;
 		}
 
@@ -337,8 +345,7 @@ public class HalFormsMessageConverterTest {
 
 	}
 
-	@Autowired
-	private WebApplicationContext wac;
+	@Autowired private WebApplicationContext wac;
 
 	private MockMvc mockMvc;
 
@@ -358,7 +365,8 @@ public class HalFormsMessageConverterTest {
 
 		AffordanceBuilder builder = linkTo(
 				methodOn(DummyOrderController.class).addOrderItems(42, new OrderItem(42, null, null, null, null)));
-		Link link = linkTo(methodOn(DummyOrderController.class).addOrderItemsPrepareForm(42, null)).and(builder).withSelfRel();
+		Link link = linkTo(methodOn(DummyOrderController.class).addOrderItemsPrepareForm(42, null)).and(builder)
+				.withSelfRel();
 
 		Order order = new Order();
 		order.add(link);
@@ -391,7 +399,8 @@ public class HalFormsMessageConverterTest {
 	public void testTemplatesFromRequestParamComplexWithoutRequestParamAnnotation() throws JsonProcessingException {
 
 		Order order = new Order();
-		Affordance affordance = linkTo(methodOn(DummyOrderController.class).getOrdersFiltered(new OrderFilter())).withRel("orders");
+		Affordance affordance = linkTo(methodOn(DummyOrderController.class).getOrdersFiltered(new OrderFilter()))
+				.withRel("orders");
 		Assert.assertArrayEquals(new String[] { "count", "status" },
 				affordance.getActionDescriptors().get(0).getRequestParamNames().toArray(new String[0]));
 
@@ -401,14 +410,16 @@ public class HalFormsMessageConverterTest {
 		String json = objectMapper.valueToTree(entity).toString();
 
 		// If there are no @RequestParam AffordanceBuilder doesn't declare a UriTemplate variable
-		assertThat(json, hasJsonPath("$._links['test:orders'].href", equalTo("http://localhost/orders/filtered{?count,status}")));
+		assertThat(json,
+				hasJsonPath("$._links['test:orders'].href", equalTo("http://localhost/orders/filtered{?count,status}")));
 	}
 
 	@Test
 	public void testTemplatesFromRequestParamComplexWithRequestParamAnnotation() throws JsonProcessingException {
 
 		Order order = new Order();
-		Affordance affordance = linkTo(methodOn(DummyOrderController.class).getOrdersFilteredWithRequestParam(null)).withRel("orders");
+		Affordance affordance = linkTo(methodOn(DummyOrderController.class).getOrdersFilteredWithRequestParam(null))
+				.withRel("orders");
 		order.add(affordance);
 
 		Object entity = HalFormsUtils.toHalFormsDocument(order, objectMapper);
@@ -417,7 +428,8 @@ public class HalFormsMessageConverterTest {
 		// al anotar el método del controller con @RequestParam mete una variable en la url pero no es correcta ya que
 		// Spring espera dos parámetros derivados de los fields de OrderFilter: status y count. Por lo tanto la UriTemplate
 		// correcta debería ser http://localhost/orders/filteredWithRP{?status, count}
-		assertThat(json, hasJsonPath("$._links['test:orders'].href", equalTo("http://localhost/orders/filteredWithRP{?filter}")));
+		assertThat(json,
+				hasJsonPath("$._links['test:orders'].href", equalTo("http://localhost/orders/filteredWithRP{?filter}")));
 
 	}
 
@@ -429,8 +441,7 @@ public class HalFormsMessageConverterTest {
 					.andExpect(status().is5xxServerError()).andReturn();
 
 			// Spring waits a @RequestParam called "filter"
-		}
-		catch (MissingServletRequestParameterException e) {
+		} catch (MissingServletRequestParameterException e) {
 			assertThat(e.getParameterName(), equalTo("filter"));
 		}
 
@@ -440,7 +451,8 @@ public class HalFormsMessageConverterTest {
 	public void testRequestWithStatusFound() throws Exception {
 
 		// If @RequestParam annotation is not present the request is correct
-		MvcResult result = mockMvc.perform(get("http://localhost/orders/filtered?status=accepted").accept(MediaType.APPLICATION_JSON))
+		MvcResult result = mockMvc
+				.perform(get("http://localhost/orders/filtered?status=accepted").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andReturn();
 
 		LOG.debug(result.getResponse().getContentAsString());
@@ -452,7 +464,8 @@ public class HalFormsMessageConverterTest {
 
 		AffordanceBuilder builder = linkTo(
 				methodOn(DummyOrderController.class).addOrderItems(42, new OrderItem(42, null, null, null, null)));
-		Link link = linkTo(methodOn(DummyOrderController.class).addOrderItemsPrepareForm(42, null)).and(builder).withSelfRel();
+		Link link = linkTo(methodOn(DummyOrderController.class).addOrderItemsPrepareForm(42, null)).and(builder)
+				.withSelfRel();
 
 		Order order = new Order();
 		order.add(link);

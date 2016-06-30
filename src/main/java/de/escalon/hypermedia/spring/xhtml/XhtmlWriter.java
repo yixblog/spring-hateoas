@@ -209,7 +209,8 @@ public class XhtmlWriter extends Writer {
 			return attributeBuilder;
 		}
 
-		private static void addAttributeIfValueNotNull(final String name, final String value, final OptionalAttributes attributeBuilder) {
+		private static void addAttributeIfValueNotNull(final String name, final String value,
+				final OptionalAttributes attributeBuilder) {
 			if (value != null) {
 				attributeBuilder.attributes.put(name, value);
 			}
@@ -243,8 +244,7 @@ public class XhtmlWriter extends Writer {
 				if (actionDescriptors.isEmpty()) {
 					// treat like simple link
 					appendLinkWithoutActionDescriptor(affordance);
-				}
-				else {
+				} else {
 					if (affordance.isTemplated()) {
 						// TODO ensure that template expansion always takes place for base uri
 						if (!affordance.isBaseUriTemplated()) {
@@ -258,40 +258,38 @@ public class XhtmlWriter extends Writer {
 								// TODO write human-readable description of additional methods?
 							}
 						}
-					}
-					else {
+					} else {
 						for (ActionDescriptor actionDescriptor : actionDescriptors) {
 							// TODO write documentation about the supported action and maybe fields?
 							if ("GET".equals(actionDescriptor.getHttpMethod()) && actionDescriptor.getRequestParamNames().isEmpty()) {
 								beginDiv();
 								// GET without params is simple <a href>
-								writeAnchor(OptionalAttributes.attr("href", affordance.expand().getHref()).and("rel", affordance.getRel()),
+								writeAnchor(
+										OptionalAttributes.attr("href", affordance.expand().getHref()).and("rel", affordance.getRel()),
 										affordance.getRel());
 								endDiv();
-							}
-							else {
+							} else {
 								appendForm(affordance, actionDescriptor);
 							}
 						}
 					}
 				}
-			}
-			else { // simple link, may be templated
+			} else { // simple link, may be templated
 				appendLinkWithoutActionDescriptor(link);
 			}
 		}
 	}
 
 	/**
-	 * Appends form and squashes non-GET or POST to POST. If required, adds _method field for handling by an appropriate filter such as
-	 * Spring's HiddenHttpMethodFilter.
+	 * Appends form and squashes non-GET or POST to POST. If required, adds _method field for handling by an appropriate
+	 * filter such as Spring's HiddenHttpMethodFilter.
 	 *
 	 * @param affordance to make into a form
 	 * @param actionDescriptor describing the form action
 	 * @throws IOException
 	 * @see <a href=
-	 * "http://docs.spring.io/spring/docs/3.0 .x/javadoc-api/org/springframework/web/filter/HiddenHttpMethodFilter.html" >Spring MVC
-	 * HiddenHttpMethodFilter</a>
+	 *      "http://docs.spring.io/spring/docs/3.0 .x/javadoc-api/org/springframework/web/filter/HiddenHttpMethodFilter.html"
+	 *      >Spring MVC HiddenHttpMethodFilter</a>
 	 */
 	private void appendForm(final Affordance affordance, final ActionDescriptor actionDescriptor) throws IOException {
 		String formName = actionDescriptor.getActionName();
@@ -299,8 +297,8 @@ public class XhtmlWriter extends Writer {
 
 		// Link's expand method removes non-required variables from URL
 		String actionUrl = affordance.expand().getHref();
-		beginForm(
-				OptionalAttributes.attr("action", actionUrl).and("method", getHtmlConformingHttpMethod(httpMethod)).and("name", formName));
+		beginForm(OptionalAttributes.attr("action", actionUrl).and("method", getHtmlConformingHttpMethod(httpMethod))
+				.and("name", formName));
 		write("<h4>");
 		write("Form " + formName);
 		write("</h4>");
@@ -311,11 +309,10 @@ public class XhtmlWriter extends Writer {
 			@Override
 			public void visit(final ActionInputParameter actionInputParameter) {
 				try {
-					Suggest<?>[] possibleValues = actionInputParameter.getPossibleValues(actionDescriptor);
-					if (!Type.HIDDEN.equals(actionInputParameter.getHtmlInputFieldType()) && possibleValues.length > 0) {
+					List<Suggest<Object>> possibleValues = actionInputParameter.getPossibleValues(actionDescriptor);
+					if (!Type.HIDDEN.equals(actionInputParameter.getHtmlInputFieldType()) && !possibleValues.isEmpty()) {
 						appendSelect(possibleValues, actionInputParameter);
-					}
-					else {
+					} else {
 						if (actionInputParameter.isArrayOrCollection()) {
 							// have as many inputs as there are call values, list of 5 nulls gives you five input fields
 							// TODO support for free list input instead, code on demand?
@@ -325,20 +322,17 @@ public class XhtmlWriter extends Writer {
 								Object value;
 								if (i < callValues.length) {
 									value = callValues[i];
-								}
-								else {
+								} else {
 									value = null;
 								}
 								appendInput(actionInputParameter, value); // not readonly
 							}
-						}
-						else {
+						} else {
 							String callValueFormatted = actionInputParameter.getValueFormatted();
 							appendInput(actionInputParameter, callValueFormatted); // not readonly
 						}
 					}
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -359,8 +353,7 @@ public class XhtmlWriter extends Writer {
 				writeLabelWithDoc(label, variableName, null); // no documentation url
 				input(variableName, Type.TEXT);
 			}
-		}
-		else {
+		} else {
 			String rel = link.getRel();
 			String title = (rel != null ? rel : link.getHref());
 			// TODO: write html <link> instead of anchor <a> here?
@@ -464,31 +457,30 @@ public class XhtmlWriter extends Writer {
 			char[] chars = name.toCharArray();
 			chars[0] = Character.toUpperCase(chars[0]);
 			return new String(chars);
-		}
-		else {
+		} else {
 			return name;
 		}
 	}
 
 	private void writeHiddenHttpMethodField(final RequestMethod httpMethod) throws IOException {
 		switch (httpMethod) {
-		case GET:
-		case POST:
-			break;
-		default:
-			hidden(methodParam, httpMethod.name());
+			case GET:
+			case POST:
+				break;
+			default:
+				hidden(methodParam, httpMethod.name());
 		}
 	}
 
 	private String getHtmlConformingHttpMethod(final RequestMethod requestMethod) {
 		String ret;
 		switch (requestMethod) {
-		case GET:
-		case POST:
-			ret = requestMethod.name();
-			break;
-		default:
-			ret = RequestMethod.POST.name();
+			case GET:
+			case POST:
+				ret = requestMethod.name();
+				break;
+			default:
+				ret = RequestMethod.POST.name();
 		}
 		return ret;
 	}
@@ -503,8 +495,7 @@ public class XhtmlWriter extends Writer {
 		String val = value == null ? "" : value.toString();
 		if (Type.HIDDEN.equals(htmlInputFieldType)) {
 			hidden(requestParamName, val);
-		}
-		else {
+		} else {
 			beginDiv(OptionalAttributes.attr("class", formGroupClass));
 			String documentationUrl = documentationProvider.getDocumentationUrl(actionInputParameter, value);
 			// TODO consider @Input-include/exclude/hidden here
@@ -530,12 +521,12 @@ public class XhtmlWriter extends Writer {
 		writeLabelWithDoc(fieldName, fieldName, documentationUrl);
 	}
 
-	private void writeLabelWithDoc(final String label, final String fieldName, final String documentationUrl) throws IOException {
+	private void writeLabelWithDoc(final String label, final String fieldName, final String documentationUrl)
+			throws IOException {
 		beginLabel(attr("for", fieldName).and("class", controlLabelClass));
 		if (documentationUrl == null) {
 			write(label);
-		}
-		else {
+		} else {
 			beginAnchor(attr("href", documentationUrl).and("title", documentationUrl));
 			write(label);
 			endAnchor();
@@ -543,7 +534,8 @@ public class XhtmlWriter extends Writer {
 		endLabel();
 	}
 
-	private void appendSelect(final Suggest<?>[] possibleValues, final ActionInputParameter actionInputParameter) throws IOException {
+	private void appendSelect(final List<Suggest<Object>> possibleValues, final ActionInputParameter actionInputParameter)
+			throws IOException {
 		beginDiv(attr("class", formGroupClass));
 		String requestParamName = actionInputParameter.getName();
 		boolean isMultiple = actionInputParameter.isArrayOrCollection();
@@ -554,8 +546,7 @@ public class XhtmlWriter extends Writer {
 			Object[] actionParamValues = actionInputParameter.getValues();
 			if (actionParamValues.length > 0) {
 				callValue = actionParamValues[0];
-			}
-			else {
+			} else {
 				callValue = null;
 			}
 			actualValues = new String[actionParamValues.length];
@@ -564,8 +555,7 @@ public class XhtmlWriter extends Writer {
 			}
 
 			attributes = attributes.and("multiple", "multiple");
-		}
-		else {
+		} else {
 			callValue = actionInputParameter.getValue();
 			actualValues = new String[] { callValue != null ? callValue.toString() : "" };
 		}
@@ -580,8 +570,7 @@ public class XhtmlWriter extends Writer {
 				Object value;
 				if (i < actualValues.length) {
 					value = actualValues[i];
-				}
-				else {
+				} else {
 					value = "";
 				}
 				hidden(requestParamName, value.toString());
@@ -592,20 +581,18 @@ public class XhtmlWriter extends Writer {
 		}
 
 		// Check if is a remote type select
-		if (SuggestType.REMOTE == possibleValues[0].getType()) {
-			attributes.and("data-remote", possibleValues[0].getValue().toString());
-			beginSelect(requestParamName, possibleValues.length, attributes);
+		if (SuggestType.REMOTE == possibleValues.get(0).getType()) {
+			attributes.and("data-remote", possibleValues.get(0).getValue().toString());
+			beginSelect(requestParamName, possibleValues.size(), attributes);
 			for (Object possibleValue : actualValues) {
 				option(String.valueOf(possibleValue), attr("selected", "selected").and("value", String.valueOf(possibleValue)));
 			}
-		}
-		else {
-			beginSelect(requestParamName, possibleValues.length, attributes);
+		} else {
+			beginSelect(requestParamName, possibleValues.size(), attributes);
 			for (Suggest<?> possibleValue : possibleValues) {
 				if (ObjectUtils.containsElement(actualValues, possibleValue.getValueAsString())) {
 					option(possibleValue.getText(), attr("selected", "selected").and("value", possibleValue.getValueAsString()));
-				}
-				else {
+				} else {
 					option(possibleValue.getText(), attr("value", possibleValue.getValueAsString()));
 				}
 			}

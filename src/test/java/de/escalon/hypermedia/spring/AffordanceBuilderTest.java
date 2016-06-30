@@ -10,6 +10,8 @@
 
 package de.escalon.hypermedia.spring;
 
+import java.util.List;
+
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -149,11 +151,11 @@ public class AffordanceBuilderTest {
 		Assert.assertEquals("Link-Template: <http://example.com/things/1/eventStatus{?eventStatus}>; rel=\"eventStatus\"",
 				affordance.toString());
 		final ActionDescriptor actionDescriptor = affordance.getActionDescriptors().get(0);
-		Suggest<EventStatusType>[] values = actionDescriptor.getActionInputParameter("eventStatus")
+		List<Suggest<EventStatusType>> values = actionDescriptor.getActionInputParameter("eventStatus")
 				.getPossibleValues(actionDescriptor);
-		EventStatusType[] types = new EventStatusType[values.length];
+		EventStatusType[] types = new EventStatusType[values.size()];
 		for (int i = 0; i < types.length; i++) {
-			types[i] = values[i].getUnwrappedValue();
+			types[i] = values.get(i).getUnwrappedValue();
 		}
 		Assert.assertThat(types, Matchers.arrayContainingInAnyOrder(EventStatusType.EVENT_CANCELLED,
 				EventStatusType.EVENT_POSTPONED, EventStatusType.EVENT_RESCHEDULED, EventStatusType.EVENT_SCHEDULED));
