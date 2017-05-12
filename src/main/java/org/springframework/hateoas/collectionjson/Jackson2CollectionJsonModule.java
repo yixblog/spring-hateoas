@@ -853,11 +853,11 @@ public class Jackson2CollectionJsonModule extends SimpleModule {
 				/**
 				 * For Collection+JSON, "queries" are only collected for GET affordances where the URI is NOT a self link.
 				 */
-				if (affordance.getHttpMethod().equals(HttpMethod.GET) && !model.getUri().equals(selfLink.getHref())) {
+				if (affordance.getHttpMethod().equals(HttpMethod.GET) && !model.getURI().equals(selfLink.getHref())) {
 
 					queries.add(new CollectionJsonQuery()
 						.withRel(model.getRel())
-						.withHref(model.getUri())
+						.withHref(model.getURI())
 						.withData(model.getQueryProperties()));
 				}
 			});

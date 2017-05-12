@@ -45,7 +45,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Unit tests for {@link ControllerLinkBuilder}.
- * 
+ *
  * @author Oliver Gierke
  * @author Dietrich Schulten
  * @author Kamill Sokol
@@ -238,8 +238,8 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 	public void linksToMethodWithPathVariableAndMultiValueRequestParams() {
 
 		Link link = linkTo(
-				methodOn(ControllerWithMethods.class).methodWithMultiValueRequestParams("1", Arrays.asList(3, 7), 5))
-						.withSelfRel();
+			methodOn(ControllerWithMethods.class).methodWithMultiValueRequestParams("1", Arrays.asList(3, 7), 5))
+			.withSelfRel();
 
 		UriComponents components = toComponents(link);
 		assertThat(components.getPath()).isEqualTo("/something/1/foo");
@@ -256,7 +256,7 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 	public void returnsUriComponentsBuilder() {
 
 		UriComponents components = linkTo(PersonController.class).slash("something?foo=bar").toUriComponentsBuilder()
-				.build();
+			.build();
 
 		assertThat(components.getPath()).isEqualTo("/people/something");
 		assertThat(components.getQuery()).isEqualTo("foo=bar");
@@ -294,7 +294,7 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 
 		Link link = linkTo(methodOn(ControllerWithMethods.class).methodForOptionalNextPage(null)).withSelfRel();
 
-		assertThat(link.getVariables(), contains(new TemplateVariable("offset", VariableType.REQUEST_PARAM)));
+		assertThat(link.getVariables(), contains(TemplateVariable.of("offset", VariableType.REQUEST_PARAM)));
 		assertThat(link.expand().getHref()).endsWith("/foo");
 	}
 
@@ -305,7 +305,7 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 	public void rejectsMissingPathVariable() {
 
 		Link link = linkTo(methodOn(ControllerWithMethods.class).methodWithPathVariable(null))//
-				.withSelfRel();
+			.withSelfRel();
 
 		exception.expect(IllegalArgumentException.class);
 
@@ -481,7 +481,7 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 	public void createsPartiallyExpandedLink() {
 
 		Link link = linkTo(methodOn(PersonsAddressesController.class, "some id").getAddressesForCountry(null))
-				.withSelfRel();
+			.withSelfRel();
 
 		assertThat(link.isTemplated()).isTrue();
 		assertThat(link.getHref()).contains("some%20id");
@@ -511,7 +511,7 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 
 		Link link = linkTo(methodOn(ControllerWithMethods.class).methodForNextPage("1", null, 5)).withSelfRel();
 
-		assertThat(link.getVariables(), contains(new TemplateVariable("offset", VariableType.REQUEST_PARAM_CONTINUED)));
+		assertThat(link.getVariables(), contains(TemplateVariable.of("offset", VariableType.REQUEST_PARAM_CONTINUED)));
 
 		UriComponents components = toComponents(link);
 
@@ -562,7 +562,7 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 	public void considersEmptyOptionalMethodParameterOptional() {
 
 		Link link = linkTo(methodOn(ControllerWithMethods.class).methodWithJdk8Optional(Optional.empty()))
-				.withSelfRel();
+			.withSelfRel();
 
 		assertThat(link.isTemplated()).isTrue();
 		assertThat(link.getVariableNames(), contains("value"));
@@ -647,13 +647,13 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 
 		@RequestMapping(value = "/{id}/foo")
 		HttpEntity<Void> methodForNextPage(@PathVariable String id, @RequestParam(required = false) Integer offset,
-				@RequestParam Integer limit) {
+										   @RequestParam Integer limit) {
 			return null;
 		}
 
 		@RequestMapping(value = "/{id}/foo")
 		HttpEntity<Void> methodWithMultiValueRequestParams(@PathVariable String id, @RequestParam List<Integer> items,
-				@RequestParam Integer limit) {
+														   @RequestParam Integer limit) {
 			return null;
 		}
 

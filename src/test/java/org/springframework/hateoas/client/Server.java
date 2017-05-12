@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Helper class for integration tests.
- * 
+ *
  * @author Oliver Gierke
  * @author Greg Turnquist
  */
@@ -64,46 +64,46 @@ public class Server implements Closeable {
 		this.mapper.setHandlerInstantiator(new Jackson2HalModule.HalHandlerInstantiator(relProvider, null, null));
 
 		initJadler() //
-				.withDefaultResponseContentType(MediaTypes.HAL_JSON.toString()) //
-				.withDefaultResponseEncoding(Charset.forName("UTF-8")) //
-				.withDefaultResponseStatus(200);
+			.withDefaultResponseContentType(MediaTypes.HAL_JSON.toString()) //
+			.withDefaultResponseEncoding(Charset.forName("UTF-8")) //
+			.withDefaultResponseStatus(200);
 
 		onRequest(). //
-				havingPathEqualTo("/"). //
-				respond(). //
-				withBody("");
+			havingPathEqualTo("/"). //
+			respond(). //
+			withBody("");
 
 		// For GitHubLinkDiscoverer tests
 
 		onRequest(). //
-				havingPathEqualTo("/github"). //
-				respond(). //
-				withBody("{ \"foo_url\" : \"" + rootResource() + "/github/4711\"}"). //
-				withContentType(MediaType.APPLICATION_JSON_VALUE);
+			havingPathEqualTo("/github"). //
+			respond(). //
+			withBody("{ \"foo_url\" : \"" + rootResource() + "/github/4711\"}"). //
+			withContentType(MediaType.APPLICATION_JSON_VALUE);
 
 		onRequest(). //
-				havingPathEqualTo("/github/4711"). //
-				respond(). //
-				withBody("{ \"key\" : \"value\"}"). //
-				withContentType(MediaType.APPLICATION_JSON_VALUE);
+			havingPathEqualTo("/github/4711"). //
+			respond(). //
+			withBody("{ \"key\" : \"value\"}"). //
+			withContentType(MediaType.APPLICATION_JSON_VALUE);
 
 		// For templated link access
 
 		onRequest(). //
-				havingPathEqualTo("/link"). //
-				respond(). //
-				withBody("{ \"_links\" : { \"self\" : { \"href\" : \"/{?template}\" }}}"). //
-				withContentType(MediaTypes.HAL_JSON.toString());
+			havingPathEqualTo("/link"). //
+			respond(). //
+			withBody("{ \"_links\" : { \"self\" : { \"href\" : \"/{?template}\" }}}"). //
+			withContentType(MediaTypes.HAL_JSON.toString());
 
 		// Sample traversal of HAL docs based on Spring-a-Gram showcase
 		org.springframework.core.io.Resource springagramRoot = resourceLoader
-				.getResource("classpath:springagram-root.json");
+			.getResource("classpath:springagram-root.json");
 		org.springframework.core.io.Resource springagramItems = resourceLoader
-				.getResource("classpath:springagram-items.json");
+			.getResource("classpath:springagram-items.json");
 		org.springframework.core.io.Resource springagramItem = resourceLoader
-				.getResource("classpath:springagram-item.json");
+			.getResource("classpath:springagram-item.json");
 		org.springframework.core.io.Resource springagramItemWithoutImage = resourceLoader
-				.getResource("classpath:springagram-item-without-image.json");
+			.getResource("classpath:springagram-item-without-image.json");
 
 		String springagramRootTemplate;
 		String springagramItemsTemplate;
@@ -115,51 +115,51 @@ public class Server implements Closeable {
 			springagramItemsTemplate = StreamUtils.copyToString(springagramItems.getInputStream(), Charset.forName("UTF-8"));
 			springagramItemTemplate = StreamUtils.copyToString(springagramItem.getInputStream(), Charset.forName("UTF-8"));
 			springagramItemWithoutImageTemplate = StreamUtils.copyToString(springagramItemWithoutImage.getInputStream(),
-					Charset.forName("UTF-8"));
+				Charset.forName("UTF-8"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
 		String springagramRootHalDocument = String.format(springagramRootTemplate, rootResource(), rootResource());
 		String springagramItemsHalDocument = String.format(springagramItemsTemplate, rootResource(), rootResource(),
-				rootResource());
+			rootResource());
 		String springagramItemHalDocument = String.format(springagramItemTemplate, rootResource(), rootResource());
 		String springagramItemWithoutImageHalDocument = String.format(springagramItemWithoutImageTemplate, rootResource());
 
 		onRequest(). //
-				havingPathEqualTo("/springagram"). //
-				respond(). //
-				withBody(springagramRootHalDocument). //
-				withContentType(MediaTypes.HAL_JSON.toString());
+			havingPathEqualTo("/springagram"). //
+			respond(). //
+			withBody(springagramRootHalDocument). //
+			withContentType(MediaTypes.HAL_JSON.toString());
 
 		onRequest(). //
-				havingPathEqualTo("/springagram/items"). //
-				havingQueryString(equalTo("projection=noImages")). //
-				respond(). //
-				withBody(springagramItemsHalDocument). //
-				withContentType(MediaTypes.HAL_JSON.toString());
+			havingPathEqualTo("/springagram/items"). //
+			havingQueryString(equalTo("projection=noImages")). //
+			respond(). //
+			withBody(springagramItemsHalDocument). //
+			withContentType(MediaTypes.HAL_JSON.toString());
 
 		onRequest(). //
-				havingPathEqualTo("/springagram/items/1"). //
-				respond(). //
-				withBody(springagramItemHalDocument). //
-				withContentType(MediaTypes.HAL_JSON.toString());
+			havingPathEqualTo("/springagram/items/1"). //
+			respond(). //
+			withBody(springagramItemHalDocument). //
+			withContentType(MediaTypes.HAL_JSON.toString());
 
 		onRequest(). //
-				havingPathEqualTo("/springagram/items/1"). //
-				havingQueryString(equalTo("projection=noImages")). //
-				respond(). //
-				withBody(springagramItemWithoutImageHalDocument). //
-				withContentType(MediaTypes.HAL_JSON.toString());
+			havingPathEqualTo("/springagram/items/1"). //
+			havingQueryString(equalTo("projection=noImages")). //
+			respond(). //
+			withBody(springagramItemWithoutImageHalDocument). //
+			withContentType(MediaTypes.HAL_JSON.toString());
 
 		// For Traverson URI double encoding test
 
 		onRequest(). //
-				havingPathEqualTo("/springagram/items"). //
-				havingQueryString(equalTo("projection=no%20images")). //
-				respond(). //
-				withBody(springagramItemsHalDocument). //
-				withContentType(MediaTypes.HAL_JSON.toString());
+			havingPathEqualTo("/springagram/items"). //
+			havingQueryString(equalTo("projection=no%20images")). //
+			respond(). //
+			withBody(springagramItemsHalDocument). //
+			withContentType(MediaTypes.HAL_JSON.toString());
 
 	}
 
@@ -208,16 +208,16 @@ public class Server implements Closeable {
 
 		try {
 			onRequest(). //
-					havingMethodEqualTo("GET"). //
-					havingPathEqualTo(path). //
-					respond().//
-					withBody(mapper.writeValueAsString(response));
+				havingMethodEqualTo("GET"). //
+				havingPathEqualTo(path). //
+				respond().//
+				withBody(mapper.writeValueAsString(response));
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see java.io.Closeable#close()
 	 */

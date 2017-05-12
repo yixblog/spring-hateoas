@@ -41,6 +41,8 @@ class CollectionJsonAffordanceModel implements AffordanceModel {
 	private static final List<HttpMethod> METHODS_FOR_INPUT_DETECTION = Arrays.asList(HttpMethod.POST, HttpMethod.PUT,
 		HttpMethod.PATCH);
 
+	private final @Getter Collection<MediaType> mediaTypes = Collections.singleton(MediaTypes.COLLECTION_JSON);
+
 	private final Affordance affordance;
 	private final UriComponents components;
 	private final @Getter List<CollectionJsonData> inputProperties;
@@ -55,16 +57,11 @@ class CollectionJsonAffordanceModel implements AffordanceModel {
 		this.queryProperties = determineQueryProperties();
 	}
 
-	@Override
-	public Collection<MediaType> getMediaTypes() {
-		return Collections.singleton(MediaTypes.COLLECTION_JSON);
-	}
-
 	public String getRel() {
 		return isHttpGetMethod() ? this.affordance.getName() : "";
 	}
 
-	public String getUri() {
+	public String getURI() {
 		return isHttpGetMethod() ? this.components.toUriString() : "";
 	}
 
@@ -100,10 +97,7 @@ class CollectionJsonAffordanceModel implements AffordanceModel {
 
 		return this.affordance.getInputMethodParameters().stream()
 			.findFirst()
-			.map(methodParameter -> {
-				ResolvableType resolvableType = ResolvableType.forMethodParameter(methodParameter);
-				return PropertyUtils.findProperties(resolvableType);
-			})
+			.map(methodParameter -> PropertyUtils.findProperties(ResolvableType.forMethodParameter(methodParameter)))
 			.orElse(Collections.emptyList())
 			.stream()
 			.map(property -> new CollectionJsonData().withName(property).withValue(""))

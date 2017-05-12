@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
@@ -35,6 +36,7 @@ import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.LinkDiscoverer;
 import org.springframework.hateoas.collectionjson.CollectionJsonWebMvcConfigurer;
 import org.springframework.hateoas.hal.forms.HalFormsWebMvcConfigurer;
+import org.springframework.hateoas.uber.UberConfigurationWebMvcConfigurer;
 
 /**
  * Activates hypermedia support in the {@link ApplicationContext}. Will register infrastructure beans available for
@@ -63,7 +65,7 @@ public @interface EnableHypermediaSupport {
 	 * 
 	 * @return
 	 */
-	HypermediaType[] type();
+	HypermediaType[] type() default {};
 
 	/**
 	 * Hypermedia representation types supported.
@@ -93,8 +95,14 @@ public @interface EnableHypermediaSupport {
 		 *
 		 * @see http://amundsen.com/media-types/collection/format/
 		 */
-		COLLECTION_JSON(CollectionJsonWebMvcConfigurer.class);
+		COLLECTION_JSON(CollectionJsonWebMvcConfigurer.class),
 
+		/**
+		 * UBER - Uniform Basis for Exchanging Representations
+		 *
+		 * @see http://rawgit.com/uber-hypermedia/specification/master/uber-hypermedia.html#rfc4627
+		 */
+		UBER(UberConfigurationWebMvcConfigurer.class);
 
 		private final List<Class<?>> configurations;
 
@@ -123,7 +131,7 @@ public @interface EnableHypermediaSupport {
 			LOG.debug("Registering support for hypermedia types {} according to configuration on {}", types,
 					metadata.getClassName());
 
-			List<String> configurationNames = new ArrayList<String>();
+			List<String> configurationNames = new ArrayList<>();
 
 			for (HypermediaType type : types) {
 				for (Class<?> configuration : type.configurations) {

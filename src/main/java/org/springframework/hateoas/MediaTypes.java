@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
  * @author Oliver Gierke
  * @author Przemek Nowak
  * @author Drummond Dawson
+ * @author Dietrich Schulten
  * @author Greg Turnquist
  */
 public class MediaTypes {
@@ -76,4 +77,14 @@ public class MediaTypes {
 	 * Public constant media type for {@code application/vnd.collection+json}.
 	 */
 	public static final MediaType COLLECTION_JSON = MediaType.valueOf(COLLECTION_JSON_VALUE);
+
+	/**
+	 * A String equivalent of {@link MediaTypes#UBER_JSON}.
+	 */
+	public static final String UBER_JSON_VALUE = "application/vnd.amundsen-uber+json";
+
+	/**
+	 * Public constant media type for {@code application/vnd.amundsen-uber+json}.
+	 */
+	public static final MediaType UBER_JSON = MediaType.parseMediaType(UBER_JSON_VALUE);
 }

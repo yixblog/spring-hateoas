@@ -48,7 +48,7 @@ public class HalFormsConfiguration {
 
 	/**
 	 * Translate a {@link HalFormsConfiguration} into a {@link HalConfiguration}.
-	 * 
+	 *
 	 * @return
 	 */
 	public HalConfiguration toHalConfiguration() {

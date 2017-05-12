@@ -63,6 +63,8 @@ import org.springframework.hateoas.hal.forms.HalFormsConfiguration;
 import org.springframework.hateoas.hal.forms.HalFormsLinkDiscoverer;
 import org.springframework.hateoas.hal.forms.Jackson2HalFormsModule;
 import org.springframework.hateoas.mvc.TypeConstrainedMappingJackson2HttpMessageConverter;
+import org.springframework.hateoas.uber.Jackson2UberModule;
+import org.springframework.hateoas.uber.UberLinkDiscoverer;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -91,6 +93,7 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 	private static final String HAL_OBJECT_MAPPER_BEAN_NAME = "_halObjectMapper";
 	private static final String HAL_FORMS_OBJECT_MAPPER_BEAN_NAME = "_halFormsObjectMapper";
 	private static final String COLLECTION_JSON_OBJECT_MAPPER_BEAN_NAME = "_collectionJsonObjectMapper";
+	private static final String UBER_OBJECT_MAPPER_BEAN_NAME = "_uberObjectMapper";
 	private static final String MESSAGE_SOURCE_BEAN_NAME = "linkRelationMessageSource";
 
 	private static final boolean JACKSON2_PRESENT = ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper",
@@ -119,8 +122,11 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 			if (JSONPATH_PRESENT) {
 
 				AbstractBeanDefinition linkDiscovererBeanDefinition = getLinkDiscovererBeanDefinition(type);
-				registerBeanDefinition(new BeanDefinitionHolder(linkDiscovererBeanDefinition,
-						BeanDefinitionReaderUtils.generateBeanName(linkDiscovererBeanDefinition, registry)), registry);
+
+				if (linkDiscovererBeanDefinition != null) {
+					registerBeanDefinition(new BeanDefinitionHolder(linkDiscovererBeanDefinition,
+							BeanDefinitionReaderUtils.generateBeanName(linkDiscovererBeanDefinition, registry)), registry);
+				}
 			}
 		}
 
@@ -134,6 +140,10 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 
 		if (types.contains(HypermediaType.COLLECTION_JSON)) {
 			registerHypermediaComponents(metadata, registry, COLLECTION_JSON_OBJECT_MAPPER_BEAN_NAME);
+		}
+		
+		if (types.contains(HypermediaType.UBER)) {
+			registerHypermediaComponents(metadata, registry, UBER_OBJECT_MAPPER_BEAN_NAME);
 		}
 
 		if (!types.isEmpty()) {
@@ -151,6 +161,7 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 
 		registerRelProviderPluginRegistryAndDelegate(registry);
 	}
+
 
 	private static void registerHypermediaComponents(AnnotationMetadata metadata, BeanDefinitionRegistry registry,
 			String objectMapperBeanName) {
@@ -224,8 +235,11 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 			case COLLECTION_JSON:
 				definition = new RootBeanDefinition(CollectionJsonLinkDiscoverer.class);
 				break;
+			case UBER:
+				definition = new RootBeanDefinition(UberLinkDiscoverer.class);
+				break;
 			default:
-				throw new IllegalStateException(String.format("Unsupported hypermedia type %s!", type));
+				return null;
 		}
 
 		definition.setSource(this);
@@ -374,18 +388,35 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 
 				ObjectMapper collectionJsonObjectMapper = beanFactory.getBean(COLLECTION_JSON_OBJECT_MAPPER_BEAN_NAME, ObjectMapper.class);
 				MessageSourceAccessor linkRelationMessageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME,
-						MessageSourceAccessor.class);
+					MessageSourceAccessor.class);
 
 				collectionJsonObjectMapper.registerModule(new Jackson2CollectionJsonModule());
-				
+
 				collectionJsonObjectMapper.setHandlerInstantiator(
-						new Jackson2CollectionJsonModule.CollectionJsonHandlerInstantiator(linkRelationMessageSource));
+					new Jackson2CollectionJsonModule.CollectionJsonHandlerInstantiator(linkRelationMessageSource));
 
 				MappingJackson2HttpMessageConverter jsonCollectionConverter = new TypeConstrainedMappingJackson2HttpMessageConverter(
-						ResourceSupport.class);
+					ResourceSupport.class);
 				jsonCollectionConverter.setSupportedMediaTypes(Arrays.asList(COLLECTION_JSON));
 				jsonCollectionConverter.setObjectMapper(collectionJsonObjectMapper);
 				result.add(jsonCollectionConverter);
+			}
+
+			if (beanFactory.containsBean(UBER_OBJECT_MAPPER_BEAN_NAME)) {
+
+				ObjectMapper uberObjectMapper = beanFactory.getBean(UBER_OBJECT_MAPPER_BEAN_NAME, ObjectMapper.class);
+				MessageSourceAccessor linkRelationMessageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME,
+					MessageSourceAccessor.class);
+
+				uberObjectMapper.registerModule(new Jackson2UberModule());
+
+				uberObjectMapper.setHandlerInstantiator(new Jackson2UberModule.UberHandlerInstantiator());
+
+				MappingJackson2HttpMessageConverter uberConverter = new TypeConstrainedMappingJackson2HttpMessageConverter(
+					ResourceSupport.class);
+				uberConverter.setSupportedMediaTypes(Arrays.asList(UBER_JSON));
+				uberConverter.setObjectMapper(uberObjectMapper);
+				result.add(uberConverter);
 			}
 
 			result.addAll(converters);
@@ -408,6 +439,7 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 	 * the methods to do that on {@link Jackson2ObjectMapperFactoryBean} were introduced in Spring 4.1 only.
 	 *
 	 * @author Oliver Gierke
+	 * @author Greg Turnquist
 	 */
 	private static class DefaultObjectMapperCustomizer implements BeanPostProcessor {
 
@@ -418,7 +450,11 @@ class HypermediaSupportBeanDefinitionRegistrar implements ImportBeanDefinitionRe
 		@Override
 		public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
-			if (HAL_OBJECT_MAPPER_BEAN_NAME.equals(beanName) || HAL_FORMS_OBJECT_MAPPER_BEAN_NAME.equals(beanName) || COLLECTION_JSON_OBJECT_MAPPER_BEAN_NAME.equals(beanName)) {
+			if (HAL_OBJECT_MAPPER_BEAN_NAME.equals(beanName) //
+				|| HAL_FORMS_OBJECT_MAPPER_BEAN_NAME.equals(beanName) //
+				|| COLLECTION_JSON_OBJECT_MAPPER_BEAN_NAME.equals(beanName) //
+				|| UBER_OBJECT_MAPPER_BEAN_NAME.equals(beanName)) {
+				
 				ObjectMapper mapper = (ObjectMapper) bean;
 				mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 				return mapper;

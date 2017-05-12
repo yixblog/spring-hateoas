@@ -15,14 +15,11 @@
  */
 package org.springframework.hateoas.alps;
 
-import lombok.Builder;
-import lombok.Value;
-
 import java.util.List;
 
-import org.springframework.hateoas.alps.Descriptor.DescriptorBuilder;
-import org.springframework.hateoas.alps.Doc.DocBuilder;
-import org.springframework.hateoas.alps.Ext.ExtBuilder;
+import lombok.Builder;
+import lombok.Singular;
+import lombok.Value;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -30,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * An ALPS document.
  * 
  * @author Oliver Gierke
+ * @author Greg Turnquist
  * @since 0.15
  * @see http://alps.io
  * @see http://alps.io/spec/#prop-alps
@@ -40,33 +38,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class Alps {
 
 	private final String version = "1.0";
+
 	private final Doc doc;
+
+	@Singular
 	private final List<Descriptor> descriptors;
 
-	/**
-	 * Returns a new {@link DescriptorBuilder}.
-	 * 
-	 * @return
-	 */
-	public static DescriptorBuilder descriptor() {
-		return Descriptor.builder();
-	}
-
-	/**
-	 * Returns a new {@link DocBuilder}.
-	 * 
-	 * @return
-	 */
-	public static DocBuilder doc() {
-		return Doc.builder();
-	}
-
-	/**
-	 * Returns a new {@link ExtBuilder}.
-	 * 
-	 * @return
-	 */
-	public static ExtBuilder ext() {
-		return Ext.builder();
-	}
+	private final Ext ext;
 }

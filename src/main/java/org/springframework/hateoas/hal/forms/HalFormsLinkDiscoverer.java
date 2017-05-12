@@ -20,7 +20,7 @@ import org.springframework.hateoas.core.JsonPathLinkDiscoverer;
 
 /**
  * HAL-FORMS based {@link JsonPathLinkDiscoverer}.
- * 
+ *
  * @author Greg Turnquist
  */
 public class HalFormsLinkDiscoverer extends JsonPathLinkDiscoverer {

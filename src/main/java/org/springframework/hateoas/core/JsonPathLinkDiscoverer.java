@@ -42,31 +42,9 @@ import com.jayway.jsonpath.JsonPath;
  * {@link LinkDiscoverer} that uses {@link JsonPath} to find links inside a representation.
  * 
  * @author Oliver Gierke
+ * @author Greg Turnquist
  */
 public class JsonPathLinkDiscoverer implements LinkDiscoverer {
-
-	private static Method compileMethod;
-	private static Object emptyFilters;
-
-	static {
-
-		// Reflective bridging between JsonPath 0.9.x and 1.x
-		for (Method candidate : JsonPath.class.getMethods()) {
-
-			if (candidate.getName().equals("compile")) {
-
-				Class<?>[] paramTypes = candidate.getParameterTypes();
-
-				if (paramTypes.length == 2 && paramTypes[0].equals(String.class) && paramTypes[1].isArray()) {
-					compileMethod = candidate;
-					emptyFilters = Array.newInstance(paramTypes[1].getComponentType(), 0);
-					break;
-				}
-			}
-		}
-
-		Assert.state(compileMethod != null, "Unexpected JsonPath API - no compile(String, ...) method found");
-	}
 
 	private final String pathTemplate;
 	private final List<MediaType> mediaTypes;
@@ -126,7 +104,8 @@ public class JsonPathLinkDiscoverer implements LinkDiscoverer {
 	public List<Link> findLinksWithRel(String rel, String representation) {
 
 		try {
-			Object parseResult = getExpression(rel).read(representation);
+			JsonPath expression = getExpression(rel);
+			Object parseResult = expression.read(representation);
 			return createLinksFrom(parseResult, rel);
 		} catch (InvalidPathException e) {
 			return Collections.emptyList();
@@ -155,7 +134,9 @@ public class JsonPathLinkDiscoverer implements LinkDiscoverer {
 	 * @return
 	 */
 	private JsonPath getExpression(String rel) {
-		return (JsonPath) ReflectionUtils.invokeMethod(compileMethod, null, String.format(pathTemplate, rel), emptyFilters);
+
+		String expression = String.format(pathTemplate, rel);
+		return JsonPath.compile(expression);
 	}
 
 	/**
@@ -165,7 +146,7 @@ public class JsonPathLinkDiscoverer implements LinkDiscoverer {
 	 * @param rel the relation type that was parsed for.
 	 * @return
 	 */
-	private List<Link> createLinksFrom(Object parseResult, String rel) {
+	protected List<Link> createLinksFrom(Object parseResult, String rel) {
 
 		if (parseResult instanceof JSONArray) {
 

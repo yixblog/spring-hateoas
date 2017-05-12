@@ -18,6 +18,7 @@ package org.springframework.hateoas.support;
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -62,7 +63,9 @@ public class PropertyUtils {
 				FeatureDescriptor::getName,
 				descriptor -> {
 					try {
-						return descriptor.getReadMethod().invoke(object);
+						Method readMethod = descriptor.getReadMethod();
+						ReflectionUtils.makeAccessible(readMethod);
+						return readMethod.invoke(object);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new RuntimeException(e);
 					}
@@ -89,7 +92,7 @@ public class PropertyUtils {
 	}
 
 	public static Object createObjectFromProperties(Class<?> clazz, Map<String, Object> properties) {
-		
+
 		Object obj = BeanUtils.instantiateClass(clazz);
 
 		properties.entrySet().stream().forEach(entry -> {

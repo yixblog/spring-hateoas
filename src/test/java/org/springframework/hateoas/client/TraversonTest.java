@@ -50,7 +50,7 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Integration tests for {@link Traverson}.
- * 
+ *
  * @author Oliver Gierke
  * @author Greg Turnquist
  * @since 0.11
@@ -103,9 +103,9 @@ public class TraversonTest {
 		traverson.follow().toObject(String.class);
 
 		verifyThatRequest() //
-				.havingPathEqualTo("/") //
-				.havingHeader("Accept", contains(MediaTypes.HAL_JSON_UTF8_VALUE + ", " + MediaTypes.HAL_JSON_VALUE)) //
-				.receivedOnce();
+			.havingPathEqualTo("/") //
+			.havingHeader("Accept", contains(MediaTypes.HAL_JSON_UTF8_VALUE + ", " + MediaTypes.HAL_JSON_VALUE)) //
+			.receivedOnce();
 	}
 
 	/**
@@ -122,10 +122,10 @@ public class TraversonTest {
 	@Test
 	public void readsJsonPathTraversalIntoJsonPathExpression() {
 		assertThat(traverson.follow(//
-				"$._links.movies.href", //
-				"$._links.movie.href", //
-				"$._links.actor.href").<String> toObject("$.name")) //
-						.isEqualTo("Keanu Reaves");
+			"$._links.movies.href", //
+			"$._links.movie.href", //
+			"$._links.actor.href").<String> toObject("$.name")) //
+			.isEqualTo("Keanu Reaves");
 	}
 
 	/**
@@ -152,11 +152,11 @@ public class TraversonTest {
 		headers.add("Link", expectedHeader);
 
 		assertThat(traverson.follow("movies", "movie", "actor") //
-				.withHeaders(headers).<String> toObject("$.name")).isEqualTo("Keanu Reaves");
+			.withHeaders(headers).<String> toObject("$.name")).isEqualTo("Keanu Reaves");
 
 		verifyThatRequest() //
-				.havingPathEqualTo("/actors/d95dbf62-f900-4dfa-9de8-0fc71e02ffa4") //
-				.havingHeader("Link", hasItem(expectedHeader));
+			.havingPathEqualTo("/actors/d95dbf62-f900-4dfa-9de8-0fc71e02ffa4") //
+			.havingHeader("Link", hasItem(expectedHeader));
 	}
 
 	/**
@@ -171,11 +171,11 @@ public class TraversonTest {
 		headers.add("Link", expectedHeader);
 
 		traverson.follow("movies", "movie", "actor").//
-				withHeaders(headers).toEntity(Actor.class);
+			withHeaders(headers).toEntity(Actor.class);
 
 		verifyThatRequest(). //
-				havingPathEqualTo("/actors/d95dbf62-f900-4dfa-9de8-0fc71e02ffa4"). //
-				havingHeader("Link", hasItem(expectedHeader));
+			havingPathEqualTo("/actors/d95dbf62-f900-4dfa-9de8-0fc71e02ffa4"). //
+			havingHeader("Link", hasItem(expectedHeader));
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class TraversonTest {
 	public void returnsTemplatedLinkIfRequested() {
 
 		TraversalBuilder follow = new Traverson(URI.create(server.rootResource().concat("/link")), MediaTypes.HAL_JSON)
-				.follow("self");
+			.follow("self");
 
 		Link link = follow.asTemplatedLink();
 
@@ -266,7 +266,7 @@ public class TraversonTest {
 	public void returnsDefaultMessageConverters() {
 
 		List<HttpMessageConverter<?>> converters = Traverson
-				.getDefaultMessageConverters(Collections.emptyList());
+			.getDefaultMessageConverters(Collections.emptyList());
 
 		assertThat(converters).hasSize(1);
 		assertThat(converters.get(0)).isInstanceOf(StringHttpMessageConverter.class);
@@ -296,14 +296,14 @@ public class TraversonTest {
 		ParameterizedTypeReference<Resource<Item>> resourceParameterizedTypeReference = new ParameterizedTypeReference<Resource<Item>>() {};
 
 		Resource<Item> itemResource = traverson.//
-				follow(rel("items").withParameter("projection", "noImages")).//
-				follow("$._embedded.items[0]._links.self.href").//
-				toObject(resourceParameterizedTypeReference);
+			follow(rel("items").withParameter("projection", "noImages")).//
+			follow("$._embedded.items[0]._links.self.href").//
+			toObject(resourceParameterizedTypeReference);
 		// end::hop-with-param[]
 
 		assertThat(itemResource.hasLink("self")).isTrue();
 		assertThat(itemResource.getRequiredLink("self").expand().getHref())
-				.isEqualTo(server.rootResource() + "/springagram/items/1");
+			.isEqualTo(server.rootResource() + "/springagram/items/1");
 
 		final Item item = itemResource.getContent();
 		assertThat(item.image).isEqualTo(server.rootResource() + "/springagram/file/cat");
@@ -324,14 +324,14 @@ public class TraversonTest {
 		Map<String, Object> params = Collections.singletonMap("projection", "noImages");
 
 		Resource<Item> itemResource = traverson.//
-				follow(rel("items").withParameters(params)).//
-				follow("$._embedded.items[0]._links.self.href").//
-				toObject(resourceParameterizedTypeReference);
+			follow(rel("items").withParameters(params)).//
+			follow("$._embedded.items[0]._links.self.href").//
+			toObject(resourceParameterizedTypeReference);
 		// end::hop-put[]
 
 		assertThat(itemResource.hasLink("self")).isTrue();
 		assertThat(itemResource.getRequiredLink("self").expand().getHref())
-				.isEqualTo(server.rootResource() + "/springagram/items/1");
+			.isEqualTo(server.rootResource() + "/springagram/items/1");
 
 		final Item item = itemResource.getContent();
 		assertThat(item.image).isEqualTo(server.rootResource() + "/springagram/file/cat");
@@ -351,12 +351,12 @@ public class TraversonTest {
 
 		ParameterizedTypeReference<Resource<Item>> resourceParameterizedTypeReference = new ParameterizedTypeReference<Resource<Item>>() {};
 		Resource<Item> itemResource = traverson.follow(rel("items").withParameter("projection", "noImages"))
-				.follow("$._embedded.items[0]._links.self.href") // retrieve first Item in the collection
-				.withTemplateParameters(params).toObject(resourceParameterizedTypeReference);
+			.follow("$._embedded.items[0]._links.self.href") // retrieve first Item in the collection
+			.withTemplateParameters(params).toObject(resourceParameterizedTypeReference);
 
 		assertThat(itemResource.hasLink("self")).isTrue();
 		assertThat(itemResource.getRequiredLink("self").expand().getHref())
-				.isEqualTo(server.rootResource() + "/springagram/items/1");
+			.isEqualTo(server.rootResource() + "/springagram/items/1");
 
 		final Item item = itemResource.getContent();
 		assertThat(item.image).isEqualTo(server.rootResource() + "/springagram/file/cat");
@@ -372,12 +372,12 @@ public class TraversonTest {
 		this.traverson = new Traverson(URI.create(server.rootResource() + "/springagram"), MediaTypes.HAL_JSON);
 
 		Resource<?> itemResource = traverson.//
-				follow(rel("items").withParameters(Collections.singletonMap("projection", "no images"))).//
-				toObject(Resource.class);
+			follow(rel("items").withParameters(Collections.singletonMap("projection", "no images"))).//
+			toObject(Resource.class);
 
 		assertThat(itemResource.hasLink("self")).isTrue();
 		assertThat(itemResource.getRequiredLink("self").expand().getHref())
-				.isEqualTo(server.rootResource() + "/springagram/items");
+			.isEqualTo(server.rootResource() + "/springagram/items");
 	}
 
 	private void setUpActors() {
@@ -399,7 +399,7 @@ public class TraversonTest {
 
 		@Override
 		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-				throws IOException {
+			throws IOException {
 			this.intercepted++;
 			return execution.execute(request, body);
 		}

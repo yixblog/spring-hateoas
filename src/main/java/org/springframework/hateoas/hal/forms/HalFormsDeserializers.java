@@ -35,13 +35,13 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
  * Collection of components needed to deserialize a HAL-FORMS document.
- * 
+ *
  * @author Greg Turnquist
  */
 class HalFormsDeserializers {
 
 	static class HalFormsResourcesDeserializer extends ContainerDeserializerBase<List<Object>>
-			implements ContextualDeserializer {
+		implements ContextualDeserializer {
 
 		private static final long serialVersionUID = -7325599536381465624L;
 
@@ -97,10 +97,10 @@ class HalFormsDeserializers {
 
 		@Override
 		public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
-				throws JsonMappingException {
+			throws JsonMappingException {
 
 			return new HalFormsResourcesDeserializer(
-					property == null ? ctxt.getContextualType() : property.getType().getContentType());
+				property == null ? ctxt.getContextualType() : property.getType().getContentType());
 		}
 	}
 

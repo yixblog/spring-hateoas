@@ -31,7 +31,7 @@ import org.springframework.hateoas.TemplateVariable.VariableType;
 
 /**
  * Unit tests for {@link UriTemplate}.
- * 
+ *
  * @author Oliver Gierke
  */
 public class UriTemplateUnitTest {
@@ -56,7 +56,7 @@ public class UriTemplateUnitTest {
 
 		UriTemplate template = new UriTemplate("/foo{?bar}");
 
-		assertVariables(template, new TemplateVariable("bar", VariableType.REQUEST_PARAM));
+		assertVariables(template, TemplateVariable.of("bar", VariableType.REQUEST_PARAM));
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class UriTemplateUnitTest {
 
 		UriTemplate template = new UriTemplate("/foo?bar{&foobar}");
 
-		assertVariables(template, new TemplateVariable("foobar", VariableType.REQUEST_PARAM_CONTINUED));
+		assertVariables(template, TemplateVariable.of("foobar", VariableType.REQUEST_PARAM_CONTINUED));
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class UriTemplateUnitTest {
 
 		UriTemplate template = new UriTemplate("/foo{/bar}");
 
-		assertVariables(template, new TemplateVariable("bar", VariableType.SEGMENT));
+		assertVariables(template, TemplateVariable.of("bar", VariableType.SEGMENT));
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class UriTemplateUnitTest {
 
 		UriTemplate template = new UriTemplate("/foo/{bar}");
 
-		assertVariables(template, new TemplateVariable("bar", VariableType.PATH_VARIABLE));
+		assertVariables(template, TemplateVariable.of("bar", VariableType.PATH_VARIABLE));
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class UriTemplateUnitTest {
 
 		UriTemplate template = new UriTemplate("/foo{#bar}");
 
-		assertVariables(template, new TemplateVariable("bar", VariableType.FRAGMENT));
+		assertVariables(template, TemplateVariable.of("bar", VariableType.FRAGMENT));
 	}
 
 	/**
@@ -111,8 +111,8 @@ public class UriTemplateUnitTest {
 
 		UriTemplate template = new UriTemplate("/foo{?bar,foobar}");
 
-		assertVariables(template, new TemplateVariable("bar", VariableType.REQUEST_PARAM),
-				new TemplateVariable("foobar", VariableType.REQUEST_PARAM));
+		assertVariables(template, TemplateVariable.of("bar", VariableType.REQUEST_PARAM),
+			TemplateVariable.of("foobar", VariableType.REQUEST_PARAM));
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class UriTemplateUnitTest {
 	@Test
 	public void correctlyExpandsFullUri() {
 		assertThat(new UriTemplate("http://localhost:8080/foo{?bar}").expand().toString())
-				.isEqualTo("http://localhost:8080/foo");
+			.isEqualTo("http://localhost:8080/foo");
 	}
 
 	/**
@@ -198,13 +198,13 @@ public class UriTemplateUnitTest {
 	public void addsTemplateVariables() {
 
 		UriTemplate source = new UriTemplate("/{foo}/bar{?page}");
-		List<TemplateVariable> toAdd = Arrays.asList(new TemplateVariable("bar", VariableType.REQUEST_PARAM));
+		List<TemplateVariable> toAdd = Arrays.asList(TemplateVariable.of("bar", VariableType.REQUEST_PARAM));
 
 		List<TemplateVariable> expected = new ArrayList<>();
 		expected.addAll(source.getVariables());
 		expected.addAll(toAdd);
 
-		assertVariables(source.with(new TemplateVariables(toAdd)), expected);
+		assertVariables(source.with(TemplateVariables.of(toAdd)), expected);
 	}
 
 	/**
@@ -214,10 +214,10 @@ public class UriTemplateUnitTest {
 	public void doesNotAddVariablesForAlreadyExistingRequestParameters() {
 
 		UriTemplate template = new UriTemplate("/?page=2");
-		UriTemplate result = template.with(new TemplateVariables(new TemplateVariable("page", VariableType.REQUEST_PARAM)));
+		UriTemplate result = template.with(TemplateVariables.of(TemplateVariable.of("page", VariableType.REQUEST_PARAM)));
 		assertThat(result.getVariableNames()).isEmpty();
 
-		result = template.with(new TemplateVariables(new TemplateVariable("page", VariableType.REQUEST_PARAM_CONTINUED)));
+		result = template.with(TemplateVariables.of(TemplateVariable.of("page", VariableType.REQUEST_PARAM_CONTINUED)));
 		assertThat(result.getVariableNames()).isEmpty();
 	}
 
@@ -228,7 +228,7 @@ public class UriTemplateUnitTest {
 	public void doesNotAddVariablesForAlreadyExistingFragment() {
 
 		UriTemplate template = new UriTemplate("/#fragment");
-		UriTemplate result = template.with(new TemplateVariables(new TemplateVariable("fragment", VariableType.FRAGMENT)));
+		UriTemplate result = template.with(TemplateVariables.of(TemplateVariable.of("fragment", VariableType.FRAGMENT)));
 		assertThat(result.getVariableNames()).isEmpty();
 	}
 

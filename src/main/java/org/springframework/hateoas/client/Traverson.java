@@ -418,7 +418,8 @@ public class Traverson {
 			HttpEntity<?> request = prepareRequest(headers);
 			UriTemplate template = new UriTemplate(uri);
 
-			ResponseEntity<String> responseEntity = operations.exchange(template.expand(), GET, request, String.class);
+			ResponseEntity<String> responseEntity = operations.exchange(template.expand(), GET, request,
+					String.class);
 			MediaType contentType = responseEntity.getHeaders().getContentType();
 			String responseBody = responseEntity.getBody();
 

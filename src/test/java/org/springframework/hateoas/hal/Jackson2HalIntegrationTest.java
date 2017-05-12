@@ -48,7 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for Jackson 2 HAL integration.
- * 
+ *
  * @author Alexander Baetz
  * @author Oliver Gierke
  * @author Greg Turnquist
@@ -86,7 +86,7 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 
 		mapper.registerModule(new Jackson2HalModule());
 		mapper.setHandlerInstantiator(
-				new HalHandlerInstantiator(new AnnotationRelProvider(), null, null, new HalConfiguration()));
+			new HalHandlerInstantiator(new AnnotationRelProvider(), null, null, new HalConfiguration()));
 	}
 
 	/**
@@ -109,11 +109,11 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 
 		ResourceSupport resourceSupport = new ResourceSupport();
 		resourceSupport.add(new Link("localhost", "self") //
-				.withHreflang("en") //
-				.withTitle("the title") //
-				.withType("the type") //
-				.withMedia("the media") //
-				.withDeprecation("/customers/deprecated"));
+			.withHreflang("en") //
+			.withTitle("the title") //
+			.withType("the type") //
+			.withMedia("the media") //
+			.withDeprecation("/customers/deprecated"));
 
 		assertThat(write(resourceSupport)).isEqualTo(SINGLE_WITH_ALL_EXTRA_ATTRIBUTES);
 	}
@@ -181,7 +181,7 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 		expected.add(new Link("localhost"));
 
 		Resources<String> result = mapper.readValue(SIMPLE_EMBEDDED_RESOURCE_REFERENCE,
-				mapper.getTypeFactory().constructParametricType(Resources.class, String.class));
+			mapper.getTypeFactory().constructParametricType(Resources.class, String.class));
 
 		assertThat(result).isEqualTo(expected);
 
@@ -209,8 +209,8 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 		expected.add(new Link("localhost"));
 
 		Resources<Resource<SimplePojo>> result = mapper.readValue(SINGLE_EMBEDDED_RESOURCE_REFERENCE,
-				mapper.getTypeFactory().constructParametricType(Resources.class,
-						mapper.getTypeFactory().constructParametricType(Resource.class, SimplePojo.class)));
+			mapper.getTypeFactory().constructParametricType(Resources.class,
+				mapper.getTypeFactory().constructParametricType(Resource.class, SimplePojo.class)));
 
 		assertThat(result).isEqualTo(expected);
 
@@ -232,8 +232,8 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 		expected.add(new Link("localhost"));
 
 		Resources<Resource<SimplePojo>> result = mapper.readValue(LIST_EMBEDDED_RESOURCE_REFERENCE,
-				mapper.getTypeFactory().constructParametricType(Resources.class,
-						mapper.getTypeFactory().constructParametricType(Resource.class, SimplePojo.class)));
+			mapper.getTypeFactory().constructParametricType(Resources.class,
+				mapper.getTypeFactory().constructParametricType(Resource.class, SimplePojo.class)));
 
 		assertThat(result).isEqualTo(expected);
 	}
@@ -266,8 +266,8 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 		expected.add(new Link("localhost"));
 
 		Resources<Resource<SimpleAnnotatedPojo>> result = mapper.readValue(ANNOTATED_EMBEDDED_RESOURCE_REFERENCE,
-				mapper.getTypeFactory().constructParametricType(Resources.class,
-						mapper.getTypeFactory().constructParametricType(Resource.class, SimpleAnnotatedPojo.class)));
+			mapper.getTypeFactory().constructParametricType(Resources.class,
+				mapper.getTypeFactory().constructParametricType(Resource.class, SimpleAnnotatedPojo.class)));
 
 		assertThat(result).isEqualTo(expected);
 	}
@@ -287,8 +287,8 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 	public void deserializesMultipleAnnotatedResourceResourcesAsEmbedded() throws Exception {
 
 		Resources<Resource<SimpleAnnotatedPojo>> result = mapper.readValue(ANNOTATED_EMBEDDED_RESOURCES_REFERENCE,
-				mapper.getTypeFactory().constructParametricType(Resources.class,
-						mapper.getTypeFactory().constructParametricType(Resource.class, SimpleAnnotatedPojo.class)));
+			mapper.getTypeFactory().constructParametricType(Resources.class,
+				mapper.getTypeFactory().constructParametricType(Resource.class, SimpleAnnotatedPojo.class)));
 
 		assertThat(result).isEqualTo(setupAnnotatedResources());
 	}
@@ -307,8 +307,8 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 	@Test
 	public void deserializesPagedResource() throws Exception {
 		PagedResources<Resource<SimpleAnnotatedPojo>> result = mapper.readValue(ANNOTATED_PAGED_RESOURCES,
-				mapper.getTypeFactory().constructParametricType(PagedResources.class,
-						mapper.getTypeFactory().constructParametricType(Resource.class, SimpleAnnotatedPojo.class)));
+			mapper.getTypeFactory().constructParametricType(PagedResources.class,
+				mapper.getTypeFactory().constructParametricType(Resource.class, SimpleAnnotatedPojo.class)));
 
 		assertThat(result).isEqualTo(setupAnnotatedPagedResources());
 	}
@@ -414,7 +414,7 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 	public void rendersSingleLinkAsArrayWhenConfigured() throws Exception {
 
 		mapper.setHandlerInstantiator(new HalHandlerInstantiator(new AnnotationRelProvider(), null, null,
-				new HalConfiguration().withRenderSingleLinks(RenderSingleLinks.AS_ARRAY)));
+			new HalConfiguration().withRenderSingleLinks(RenderSingleLinks.AS_ARRAY)));
 
 		ResourceSupport resourceSupport = new ResourceSupport();
 		resourceSupport.add(new Link("localhost").withSelfRel());
@@ -467,7 +467,7 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 	private static ObjectMapper getCuriedObjectMapper() {
 
 		return getCuriedObjectMapper(new DefaultCurieProvider("foo", new UriTemplate("http://localhost:8080/rels/{rel}")),
-				null);
+			null);
 	}
 
 	private static ObjectMapper getCuriedObjectMapper(CurieProvider provider, MessageSource messageSource) {
@@ -475,7 +475,7 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jackson2HalModule());
 		mapper.setHandlerInstantiator(new HalHandlerInstantiator(new AnnotationRelProvider(), provider,
-				messageSource == null ? null : new MessageSourceAccessor(messageSource)));
+			messageSource == null ? null : new MessageSourceAccessor(messageSource)));
 
 		return mapper;
 	}

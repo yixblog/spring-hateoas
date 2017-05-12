@@ -16,9 +16,12 @@
 package org.springframework.hateoas.hal.forms;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.hateoas.Affordance;
 import org.springframework.hateoas.Link;
@@ -70,8 +73,8 @@ class HalFormsSerializers {
 		public void serialize(Resource<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
 
 			HalFormsDocument<?> doc = HalFormsDocument.forResource(value.getContent()) //
-					.withLinks(value.getLinks()) //
-					.withTemplates(findTemplates(value));
+				.withLinks(value.getLinks()) //
+				.withTemplates(findTemplates(value));
 
 			provider.findValueSerializer(HalFormsDocument.class, property).serialize(doc, gen, provider);
 		}
@@ -98,7 +101,7 @@ class HalFormsSerializers {
 
 		@Override
 		public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property)
-				throws JsonMappingException {
+			throws JsonMappingException {
 			return new HalFormsResourceSerializer(property);
 		}
 	}
@@ -135,17 +138,17 @@ class HalFormsSerializers {
 			if (value instanceof PagedResources) {
 
 				doc = HalFormsDocument.empty() //
-						.withEmbedded(embeddeds) //
-						.withPageMetadata(((PagedResources<?>) value).getMetadata()) //
-						.withLinks(value.getLinks()) //
-						.withTemplates(findTemplates(value));
+					.withEmbedded(embeddeds) //
+					.withPageMetadata(((PagedResources<?>) value).getMetadata()) //
+					.withLinks(value.getLinks()) //
+					.withTemplates(findTemplates(value));
 
 			} else {
 
 				doc = HalFormsDocument.empty() //
-						.withEmbedded(embeddeds) //
-						.withLinks(value.getLinks()) //
-						.withTemplates(findTemplates(value));
+					.withEmbedded(embeddeds) //
+					.withLinks(value.getLinks()) //
+					.withTemplates(findTemplates(value));
 			}
 
 			provider.findValueSerializer(HalFormsDocument.class, property).serialize(doc, gen, provider);
@@ -173,7 +176,7 @@ class HalFormsSerializers {
 
 		@Override
 		public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property)
-				throws JsonMappingException {
+			throws JsonMappingException {
 			return new HalFormsResourcesSerializer(property, embeddedMapper);
 		}
 	}
@@ -190,7 +193,7 @@ class HalFormsSerializers {
 
 		if (resource.hasLink(Link.REL_SELF)) {
 			for (Affordance affordance : resource.getLink(Link.REL_SELF).map(Link::getAffordances)
-					.orElse(Collections.emptyList())) {
+				.orElse(Collections.emptyList())) {
 
 				HalFormsAffordanceModel model = affordance.getAffordanceModel(MediaTypes.HAL_FORMS_JSON);
 
@@ -199,7 +202,7 @@ class HalFormsSerializers {
 					validate(resource, affordance, model);
 
 					HalFormsTemplate template = HalFormsTemplate.forMethod(affordance.getHttpMethod()) //
-							.withProperties(model.getProperties());
+						.withProperties(model.getProperties());
 
 					/**
 					 * First template in HAL-FORMS is "default".
@@ -214,7 +217,7 @@ class HalFormsSerializers {
 
 	/**
 	 * Verify that the resource's self link and the affordance's URI have the same relative path.
-	 * 
+	 *
 	 * @param resource
 	 * @param affordance
 	 * @param model
@@ -225,7 +228,7 @@ class HalFormsSerializers {
 		String selfLinkUri = resource.getRequiredLink(Link.REL_SELF).getHref();
 
 		if (!affordanceUri.equals(selfLinkUri)) {
-			throw new IllegalStateException("Affordance's URI " + affordanceUri + " doesn't match self link "
+			throw new IllegalStateException("Affordance's URI " + model.getURI() + " doesn't match self link "
 				+ selfLinkUri + " as expected in HAL-FORMS");
 		}
 	}

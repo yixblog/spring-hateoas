@@ -17,6 +17,10 @@ package org.springframework.hateoas.alps;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.hateoas.alps.Alps.*;
+import static org.springframework.hateoas.alps.Descriptor.*;
+import static org.springframework.hateoas.alps.Doc.*;
+import static org.springframework.hateoas.alps.Ext.*;
+import static org.springframework.hateoas.support.MappingUtils.read;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,7 +37,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Unit tests for serialization of ALPS documents.
- * 
+ *
  * @author Oliver Gierke
  */
 public class JacksonSerializationTest {
@@ -70,32 +74,5 @@ public class JacksonSerializationTest {
 				).build();
 
 		assertThat(mapper.writeValueAsString(alps)).isEqualTo(read(new ClassPathResource("reference.json", getClass())));
-	}
-
-	private static String read(Resource resource) throws IOException {
-
-		Scanner scanner = null;
-
-		try {
-
-			scanner = new Scanner(resource.getInputStream());
-			StringBuilder builder = new StringBuilder();
-
-			while (scanner.hasNextLine()) {
-
-				builder.append(scanner.nextLine());
-
-				if (scanner.hasNextLine()) {
-					builder.append(System.getProperty("line.separator"));
-				}
-			}
-
-			return builder.toString();
-
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
-		}
 	}
 }

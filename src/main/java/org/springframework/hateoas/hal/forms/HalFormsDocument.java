@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Representation of a HAL-FORMS document.
- * 
+ *
  * @author Dietrich Schulten
  * @author Greg Turnquist
  * @author Oliver Gierke
@@ -91,7 +91,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * Creates a new {@link HalFormsDocument} for the given resource.
-	 * 
+	 *
 	 * @param resource can be {@literal null}.
 	 * @return
 	 */
@@ -101,7 +101,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * returns a new {@link HalFormsDocument} for the given resources.
-	 * 
+	 *
 	 * @param resources must not be {@literal null}.
 	 * @return
 	 */
@@ -114,7 +114,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * Creates a new empty {@link HalFormsDocument}.
-	 * 
+	 *
 	 * @return
 	 */
 	public static HalFormsDocument<?> empty() {
@@ -123,7 +123,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * Returns the default template of the document.
-	 * 
+	 *
 	 * @return
 	 */
 	@JsonIgnore
@@ -133,7 +133,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * Returns the template with the given name.
-	 * 
+	 *
 	 * @param key must not be {@literal null}.
 	 * @return
 	 */
@@ -147,7 +147,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * Adds the given {@link Link} to the current document.
-	 * 
+	 *
 	 * @param link must not be {@literal null}.
 	 * @return
 	 */
@@ -163,7 +163,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * Adds the given {@link HalFormsTemplate} to the current document.
-	 * 
+	 *
 	 * @param name must not be {@literal null} or empty.
 	 * @param template must not be {@literal null}.
 	 * @return
@@ -181,7 +181,7 @@ public class HalFormsDocument<T> {
 
 	/**
 	 * Adds the given value as embedded one.
-	 * 
+	 *
 	 * @param key must not be {@literal null} or empty.
 	 * @param value must not be {@literal null}.
 	 * @return

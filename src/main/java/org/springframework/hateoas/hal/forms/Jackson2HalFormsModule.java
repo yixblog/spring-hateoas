@@ -146,11 +146,11 @@ public class Jackson2HalFormsModule extends SimpleModule {
 		 */
 		@Override
 		public JsonDeserializer<?> deserializerInstance(DeserializationConfig config, Annotated annotated,
-				Class<?> deserClass) {
+														Class<?> deserClass) {
 
 			Object jsonDeser = findInstance(deserClass);
 			return jsonDeser != null ? (JsonDeserializer<?>) jsonDeser
-					: super.deserializerInstance(config, annotated, deserClass);
+				: super.deserializerInstance(config, annotated, deserClass);
 		}
 
 		/*
@@ -159,11 +159,11 @@ public class Jackson2HalFormsModule extends SimpleModule {
 		 */
 		@Override
 		public KeyDeserializer keyDeserializerInstance(DeserializationConfig config, Annotated annotated,
-				Class<?> keyDeserClass) {
+													   Class<?> keyDeserClass) {
 
 			Object keyDeser = findInstance(keyDeserClass);
 			return keyDeser != null ? (KeyDeserializer) keyDeser
-					: super.keyDeserializerInstance(config, annotated, keyDeserClass);
+				: super.keyDeserializerInstance(config, annotated, keyDeserClass);
 		}
 
 		/*
@@ -183,11 +183,11 @@ public class Jackson2HalFormsModule extends SimpleModule {
 		 */
 		@Override
 		public TypeResolverBuilder<?> typeResolverBuilderInstance(MapperConfig<?> config, Annotated annotated,
-				Class<?> builderClass) {
+																  Class<?> builderClass) {
 
 			Object builder = findInstance(builderClass);
 			return builder != null ? (TypeResolverBuilder<?>) builder
-					: super.typeResolverBuilderInstance(config, annotated, builderClass);
+				: super.typeResolverBuilderInstance(config, annotated, builderClass);
 		}
 
 		/*
@@ -199,7 +199,7 @@ public class Jackson2HalFormsModule extends SimpleModule {
 
 			Object resolver = findInstance(resolverClass);
 			return resolver != null ? (TypeIdResolver) resolver
-					: super.typeIdResolverInstance(config, annotated, resolverClass);
+				: super.typeIdResolverInstance(config, annotated, resolverClass);
 		}
 	}
 }

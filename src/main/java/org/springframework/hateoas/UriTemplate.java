@@ -34,7 +34,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Custom URI template to support qualified URI template variables.
- * 
+ *
  * @author Oliver Gierke
  * @see http://tools.ietf.org/html/rfc6570
  * @since 0.9
@@ -49,7 +49,7 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 
 	/**
 	 * Creates a new {@link UriTemplate} using the given template string.
-	 * 
+	 *
 	 * @param template must not be {@literal null} or empty.
 	 */
 	public UriTemplate(String template) {
@@ -78,13 +78,13 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 			}
 		}
 
-		this.variables = variables.isEmpty() ? TemplateVariables.NONE : new TemplateVariables(variables);
+		this.variables = variables.isEmpty() ? TemplateVariables.NONE : TemplateVariables.of(variables);
 		this.baseUri = template.substring(0, baseUriEndIndex);
 	}
 
 	/**
 	 * Creates a new {@link UriTemplate} from the given base URI and {@link TemplateVariables}.
-	 * 
+	 *
 	 * @param baseUri must not be {@literal null} or empty.
 	 * @param variables defaults to {@link TemplateVariables#NONE}.
 	 */
@@ -98,7 +98,7 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 
 	/**
 	 * Creates a new {@link UriTemplate} with the current {@link TemplateVariable}s augmented with the given ones.
-	 * 
+	 *
 	 * @param variables can be {@literal null}.
 	 * @return will never be {@literal null}.
 	 */
@@ -132,18 +132,18 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 
 	/**
 	 * Creates a new {@link UriTemplate} with a {@link TemplateVariable} with the given name and type added.
-	 * 
+	 *
 	 * @param variableName must not be {@literal null} or empty.
 	 * @param type must not be {@literal null}.
 	 * @return will never be {@literal null}.
 	 */
 	public UriTemplate with(String variableName, TemplateVariable.VariableType type) {
-		return with(new TemplateVariables(new TemplateVariable(variableName, type)));
+		return with(TemplateVariables.of(TemplateVariable.of(variableName, type)));
 	}
 
 	/**
 	 * Returns whether the given candidate is a URI template.
-	 * 
+	 *
 	 * @param candidate
 	 * @return
 	 */
@@ -158,7 +158,7 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 
 	/**
 	 * Returns the {@link TemplateVariable}s discovered.
-	 * 
+	 *
 	 * @return
 	 */
 	public List<TemplateVariable> getVariables() {
@@ -167,19 +167,19 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 
 	/**
 	 * Returns the names of the variables discovered.
-	 * 
+	 *
 	 * @return
 	 */
 	public List<String> getVariableNames() {
 
 		return variables.asList().stream() //
-				.map(TemplateVariable::getName).collect(Collectors.toList());
+			.map(TemplateVariable::getName).collect(Collectors.toList());
 	}
 
 	/**
 	 * Expands the {@link UriTemplate} using the given parameters. The values will be applied in the order of the
 	 * variables discovered.
-	 * 
+	 *
 	 * @param parameters
 	 * @return
 	 * @see #expand(Map)
@@ -205,7 +205,7 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 
 	/**
 	 * Expands the {@link UriTemplate} using the given parameters.
-	 * 
+	 *
 	 * @param parameters must not be {@literal null}.
 	 * @return
 	 */
@@ -227,7 +227,7 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 		return builder.build().toUri();
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Iterable#iterator()
 	 */
@@ -236,7 +236,7 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 		return this.variables.iterator();
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -252,13 +252,13 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 	private TemplateVariables getOptionalVariables() {
 
 		return variables.asList().stream() //
-				.filter(variable -> !variable.isRequired()) //
-				.collect(Collectors.collectingAndThen(Collectors.toList(), TemplateVariables::new));
+			.filter(variable -> !variable.isRequired()) //
+			.collect(Collectors.collectingAndThen(Collectors.toList(), TemplateVariables::of));
 	}
 
 	/**
 	 * Appends the value for the given {@link TemplateVariable} to the given {@link UriComponentsBuilder}.
-	 * 
+	 *
 	 * @param builder must not be {@literal null}.
 	 * @param variable must not be {@literal null}.
 	 * @param value can be {@literal null}.
@@ -269,7 +269,7 @@ public class UriTemplate implements Iterable<TemplateVariable>, Serializable {
 
 			if (variable.isRequired()) {
 				throw new IllegalArgumentException(
-						String.format("Template variable %s is required but no value was given!", variable.getName()));
+					String.format("Template variable %s is required but no value was given!", variable.getName()));
 			}
 
 			return;
