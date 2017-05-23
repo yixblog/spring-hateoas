@@ -20,14 +20,15 @@ import static org.junit.Assert.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkBuilder;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.TestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -85,7 +86,7 @@ public class IdentifiableResourceAssemblerSupportUnitTest extends TestUtils {
 		Person second = new Person();
 		second.id = 2L;
 
-		List<PersonResource> result = assembler.toResources(Arrays.asList(first, second));
+		Resources<PersonResource> result = assembler.toResources(Arrays.asList(first, second));
 
 		LinkBuilder builder = linkTo(PersonController.class);
 
@@ -95,7 +96,7 @@ public class IdentifiableResourceAssemblerSupportUnitTest extends TestUtils {
 		PersonResource secondResource = new PersonResource();
 		secondResource.add(builder.slash(1L).withSelfRel());
 
-		assertThat(result.size(), is(2));
+		assertThat(result.getContent().size(), is(2));
 		assertThat(result, hasItems(firstResource, secondResource));
 	}
 
