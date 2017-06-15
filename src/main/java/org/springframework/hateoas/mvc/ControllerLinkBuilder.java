@@ -18,7 +18,6 @@ package org.springframework.hateoas.mvc;
 import static org.springframework.util.StringUtils.*;
 
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Delegate;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -53,15 +52,18 @@ import org.springframework.web.util.UriTemplate;
  * @author Kevin Conaway
  * @author Andrew Naydyonock
  * @author Oliver Trosien
+ * @author Josh Ghiloni
  * @author Greg Turnquist
  */
 public class ControllerLinkBuilder extends LinkBuilderSupport<ControllerLinkBuilder> {
 
 	private static final String REQUEST_ATTRIBUTES_MISSING = "Could not find current request via RequestContextHolder. Is this being called from a Spring MVC handler?";
 	private static final CachingAnnotationMappingDiscoverer DISCOVERER = new CachingAnnotationMappingDiscoverer(
-			new AnnotationMappingDiscoverer(RequestMapping.class));
+		new AnnotationMappingDiscoverer(RequestMapping.class));
 	private static final ControllerLinkBuilderFactory FACTORY = new ControllerLinkBuilderFactory();
 	private static final CustomUriTemplateHandler HANDLER = new CustomUriTemplateHandler();
+
+	private static MappingDiscoverer delegateDiscovererOverride = null;
 
 	private final TemplateVariables variables;
 
@@ -78,19 +80,25 @@ public class ControllerLinkBuilder extends LinkBuilderSupport<ControllerLinkBuil
 	}
 
 	/**
-	 * Creates a new {@link ControllerLinkBuilder} using the given {@link UriComponents}.
+	 * Creates a new {@link ControllerLinkBuilder} using the given {@link UriComponents}, {@link TemplateVariables}, and
+	 * {@link MappingDiscoverer}.
 	 *
 	 * @param uriComponents must not be {@literal null}.
 	 */
-	ControllerLinkBuilder(UriComponents uriComponents) {
-		this(uriComponents, TemplateVariables.NONE);
-	}
-
-	ControllerLinkBuilder(UriComponents uriComponents, TemplateVariables variables) {
+	ControllerLinkBuilder(UriComponents uriComponents, TemplateVariables variables, MappingDiscoverer discoverer) {
 
 		super(uriComponents);
 
 		this.variables = variables;
+		this.delegateDiscovererOverride = discoverer;
+	}
+
+	public static void setDelegateDiscoverer(MappingDiscoverer discoverer) {
+		delegateDiscovererOverride = discoverer;
+	}
+
+	public static void clearDelegateDiscoverer() {
+		delegateDiscovererOverride = null;
 	}
 
 	/**
@@ -304,12 +312,20 @@ public class ControllerLinkBuilder extends LinkBuilderSupport<ControllerLinkBuil
 	@RequiredArgsConstructor
 	private static class CachingAnnotationMappingDiscoverer implements MappingDiscoverer {
 
-		private final @Delegate AnnotationMappingDiscoverer delegate;
+		private final AnnotationMappingDiscoverer delegate;
 		private final Map<String, UriTemplate> templates = new ConcurrentReferenceHashMap<String, UriTemplate>();
+
+		/**
+		 * If {@link ControllerLinkBuilder} has a static {@link MappingDiscoverer}, use it instead of the delegate.
+		 * @return
+		 */
+		private MappingDiscoverer getDelegate() {
+			return (delegateDiscovererOverride != null) ? delegateDiscovererOverride : this.delegate;
+		}
 
 		public UriTemplate getMappingAsUriTemplate(Class<?> type, Method method) {
 
-			String mapping = delegate.getMapping(type, method);
+			String mapping = getDelegate().getMapping(type, method);
 
 			UriTemplate template = templates.get(mapping);
 
@@ -319,6 +335,41 @@ public class ControllerLinkBuilder extends LinkBuilderSupport<ControllerLinkBuil
 			}
 
 			return template;
+		}
+
+		/**
+		 * Returns the mapping associated with the given type.
+		 *
+		 * @param type must not be {@literal null}.
+		 * @return the type-level mapping or {@literal null} in case none is present.
+		 */
+		@Override
+		public String getMapping(Class<?> type) {
+			return getDelegate().getMapping(type);
+		}
+
+		/**
+		 * Returns the mapping associated with the given {@link Method}. This will include the type-level mapping.
+		 *
+		 * @param method must not be {@literal null}.
+		 * @return the method mapping including the type-level one or {@literal null} if neither of them present.
+		 */
+		@Override
+		public String getMapping(Method method) {
+			return getDelegate().getMapping(method);
+		}
+
+		/**
+		 * Returns the mapping for the given {@link Method} invoked on the given type. This can be used to calculate the
+		 * mapping for a super type method being invoked on a sub-type with a type mapping.
+		 *
+		 * @param type must not be {@literal null}.
+		 * @param method must not be {@literal null}.
+		 * @return the method mapping including the type-level one or {@literal null} if neither of them present.
+		 */
+		@Override
+		public String getMapping(Class<?> type, Method method) {
+			return getDelegate().getMapping(type, method);
 		}
 	}
 

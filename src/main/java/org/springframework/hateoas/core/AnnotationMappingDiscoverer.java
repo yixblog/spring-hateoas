@@ -75,7 +75,7 @@ public class AnnotationMappingDiscoverer implements MappingDiscoverer {
 		return mapping.length == 0 ? null : mapping[0];
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.hateoas.core.MappingDiscoverer#getMapping(java.lang.reflect.Method)
 	 */
@@ -86,7 +86,7 @@ public class AnnotationMappingDiscoverer implements MappingDiscoverer {
 		return getMapping(method.getDeclaringClass(), method);
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.hateoas.core.MappingDiscoverer#getMapping(java.lang.Class, java.lang.reflect.Method)
 	 */

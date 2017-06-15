@@ -21,18 +21,24 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.TemplateVariable;
 import org.springframework.hateoas.TemplateVariable.VariableType;
 import org.springframework.hateoas.TestUtils;
+import org.springframework.hateoas.core.AnnotationMappingDiscoverer;
+import org.springframework.hateoas.core.PropertyResolvingDiscoverer;
 import org.springframework.http.HttpEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,6 +58,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @author Greg Turnquist
  * @author Kevin Conaway
  * @author Oliver Trosien
+ * @author Josh Ghiloni
  * @author Greg Turnquist
  */
 public class ControllerLinkBuilderUnitTest extends TestUtils {
@@ -554,6 +561,39 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 		assertThat(linkTo(PersonControllerImpl.class).withSelfRel().getHref(), endsWith("/ctx/people"));
 	}
 
+	/**
+	 * @see #361
+	 */
+	@Test
+	public void linksToDynamicEndpoints() throws NoSuchMethodException {
+
+		Map<String, Object> source = new HashMap<String, Object>();
+		source.put("test.variable", "dynamicparent");
+		source.put("test.child", "dynamicchild");
+
+		StandardEnvironment env = new StandardEnvironment();
+		env.getPropertySources().addLast(new MapPropertySource("mapping-env", source));
+
+		PropertyResolvingDiscoverer discoverer = new PropertyResolvingDiscoverer(
+			new AnnotationMappingDiscoverer(RequestMapping.class),
+			env);
+		ControllerLinkBuilder.setDelegateDiscoverer(discoverer);
+
+		Method method = DynamicEndpointControllerWithMethod.class.getMethod("method");
+
+		Link link = linkTo(DynamicEndpointControllerWithMethod.class).withSelfRel();
+		assertThat(link.getHref(), endsWith("/dynamicparent"));
+
+		// explicitly add new Object[0] here to avoid conflict with (env, Object invocationValue)
+		link = linkTo(method, new Object[0]).withSelfRel();
+		assertThat(link.getHref(), endsWith("/dynamicparent/dynamicchild"));
+
+		link = linkTo(DynamicEndpointControllerWithMethod.class, method).withSelfRel();
+		assertThat(link.getHref(), endsWith("/dynamicparent/dynamicchild"));
+
+		ControllerLinkBuilder.clearDelegateDiscoverer();
+	}
+
 	private static UriComponents toComponents(Link link) {
 		return UriComponentsBuilder.fromUriString(link.expand().getHref()).build();
 	}
@@ -659,5 +699,12 @@ public class ControllerLinkBuilderUnitTest extends TestUtils {
 	@RequestMapping("/root")
 	interface ChildControllerWithRootMapping extends ParentControllerWithoutRootMapping {
 
+	}
+
+	@RequestMapping("/${test.variable}")
+	interface DynamicEndpointControllerWithMethod {
+
+		@RequestMapping("/${test.child}")
+		void method();
 	}
 }
