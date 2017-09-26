@@ -23,7 +23,9 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Resources;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * Base class to implement {@link ResourceAssembler}s. Will automate {@link ResourceSupport} instance creation and make
@@ -57,7 +59,9 @@ public abstract class ResourceAssemblerSupport<T, D extends ResourceSupport> imp
 	 * @see #toResource(Object)
 	 * @param entities must not be {@literal null}.
 	 * @return
+	 * @deprecated Results of this method may not render properly if returned by a Spring MVC endpoint. Cast your {@link Iterable} parameter as an {@link Object} to use the new API, which does.
 	 */
+	@Deprecated
 	public List<D> toResources(Iterable<? extends T> entities) {
 
 		Assert.notNull(entities, "Entities must not be null!");
@@ -68,6 +72,29 @@ public abstract class ResourceAssemblerSupport<T, D extends ResourceSupport> imp
 		}
 
 		return result;
+	}
+
+	/**
+	 * Converts an {@link Iterable} collection of entities into {@link Resources}. To maintain backward compatibility, using this method requires casting the {@link Iterable} input as an {@link Object}.
+	 *
+	 * TODO: Migrate from {@link Object} to {@link Iterable} when old method is removed and remove the runtime {@link ClassUtils#isAssignable(Class, Class)} check.
+	 *
+	 * @param entities
+	 * @return
+	 */
+	public Resources<D> toResources(Object entities) {
+
+		Assert.isTrue(ClassUtils.isAssignable(Iterable.class, entities.getClass()), "Entities must be Iterable!");
+		Iterable<? extends T> iterableEntities = (Iterable<? extends T>) entities;
+
+		Assert.notNull(entities, "Entities must not be null!");
+		List<D> result = new ArrayList<D>();
+
+		for (T entity : iterableEntities) {
+			result.add(toResource(entity));
+		}
+
+		return new Resources(result);
 	}
 
 	/**

@@ -28,6 +28,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.LinkBuilder;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.TestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -78,7 +79,7 @@ public class IdentifiableResourceAssemblerSupportUnitTest extends TestUtils {
 	}
 
 	@Test
-	public void convertsEntitiesToResources() {
+	public void convertsEntitiesToResourcesUsingDeprecatedSignature() {
 
 		Person first = new Person();
 		first.id = 1L;
@@ -96,6 +97,28 @@ public class IdentifiableResourceAssemblerSupportUnitTest extends TestUtils {
 		secondResource.add(builder.slash(1L).withSelfRel());
 
 		assertThat(result.size(), is(2));
+		assertThat(result, hasItems(firstResource, secondResource));
+	}
+
+	@Test
+	public void convertsEntitiesToResourcesUsingNewSignature() {
+
+		Person first = new Person();
+		first.id = 1L;
+		Person second = new Person();
+		second.id = 2L;
+
+		Resources<PersonResource> result = assembler.toResources((Object) Arrays.asList(first, second));
+
+		LinkBuilder builder = linkTo(PersonController.class);
+
+		PersonResource firstResource = new PersonResource();
+		firstResource.add(builder.slash(1L).withSelfRel());
+
+		PersonResource secondResource = new PersonResource();
+		secondResource.add(builder.slash(1L).withSelfRel());
+
+		assertThat(result.getContent().size(), is(2));
 		assertThat(result, hasItems(firstResource, secondResource));
 	}
 
