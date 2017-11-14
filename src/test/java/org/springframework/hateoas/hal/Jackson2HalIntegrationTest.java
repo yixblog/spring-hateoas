@@ -17,6 +17,7 @@ package org.springframework.hateoas.hal;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,12 +25,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.StaticMessageSource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.hateoas.AbstractJackson2MarshallingIntegrationTest;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
@@ -44,7 +47,9 @@ import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.hateoas.hal.HalConfiguration.RenderSingleLinks;
 import org.springframework.hateoas.hal.Jackson2HalModule.HalHandlerInstantiator;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Integration tests for Jackson 2 HAL integration.
@@ -420,6 +425,23 @@ public class Jackson2HalIntegrationTest extends AbstractJackson2MarshallingInteg
 		resourceSupport.add(new Link("localhost").withSelfRel());
 
 		assertThat(write(resourceSupport)).isEqualTo("{\"_links\":{\"self\":[{\"href\":\"localhost\"}]}}");
+	}
+
+	@Test
+	public void handleTemplatedLinks() throws IOException {
+
+		ResourceSupport original = new ResourceSupport();
+		original.add(new Link("/orders{?id}", "order"));
+
+		String serialized = mapper.writeValueAsString(original);
+
+		String expected = "{\"_links\":{\"order\":{\"href\":\"/orders{?id}\",\"templated\":true}}}";
+
+		assertThat(serialized).isEqualTo(expected);
+
+		ResourceSupport deserialized = mapper.readValue(serialized, ResourceSupport.class);
+
+		assertThat(deserialized).isEqualTo(original);
 	}
 
 	private static void verifyResolvedTitle(String resourceBundleKey) throws Exception {
