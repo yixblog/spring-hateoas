@@ -120,13 +120,15 @@ public class LinkUnitTest {
 				+ "media=\"pdf\";" //
 				+ "title=\"pdf customer copy\";" //
 				+ "type=\"portable document\";" //
-				+ "deprecation=\"http://example.com/customers/deprecated\"")) //
+				+ "deprecation=\"http://example.com/customers/deprecated\";" //
+				+ "profile=\"my-profile\"")) //
 						.isEqualTo(new Link("/customer/1") //
 								.withHreflang("en") //
 								.withMedia("pdf") //
 								.withTitle("pdf customer copy") //
 								.withType("portable document") //
-								.withDeprecation("http://example.com/customers/deprecated"));
+								.withDeprecation("http://example.com/customers/deprecated")
+								.withProfile("my-profile"));
 	}
 
 	/**

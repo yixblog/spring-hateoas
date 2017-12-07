@@ -73,6 +73,7 @@ public class Link implements Serializable {
 	private @XmlAttribute @Wither String title;
 	private @XmlAttribute @Wither String type;
 	private @XmlAttribute @Wither String deprecation;
+	private @XmlAttribute @Wither String profile;
 	private @XmlTransient @JsonIgnore UriTemplate template;
 	private @XmlTransient @JsonIgnore List<Affordance> affordances;
 
@@ -188,7 +189,7 @@ public class Link implements Serializable {
 	public Link withAffordances(List<Affordance> affordances) {
 
 		return new Link(this.rel, this.href, this.hreflang, this.media, this.title, this.type, this.deprecation,
-				this.template, affordances);
+				this.profile, this.template, affordances);
 	}
 
 	/**
@@ -291,6 +292,10 @@ public class Link implements Serializable {
 			linkString += ";deprecation=\"" + deprecation + "\"";
 		}
 
+		if (profile != null) {
+			linkString += ";profile=\"" + profile + "\"";
+		}
+
 		return linkString;
 	}
 
@@ -340,6 +345,10 @@ public class Link implements Serializable {
 
 			if (attributes.containsKey("deprecation")) {
 				link = link.withDeprecation(attributes.get("deprecation"));
+			}
+
+			if (attributes.containsKey("profile")) {
+				link = link.withProfile(attributes.get("profile"));
 			}
 
 			return link;
