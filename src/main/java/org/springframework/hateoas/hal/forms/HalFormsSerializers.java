@@ -31,7 +31,6 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.hal.Jackson2HalModule;
-import org.springframework.http.HttpMethod;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -197,7 +196,7 @@ class HalFormsSerializers {
 
 				HalFormsAffordanceModel model = affordance.getAffordanceModel(MediaTypes.HAL_FORMS_JSON);
 
-				if (!affordance.getHttpMethod().equals(HttpMethod.GET)) {
+				if (!affordance.getHttpMethod().equals("GET")) {
 
 					validate(resource, affordance, model);
 

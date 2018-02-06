@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hateoas.mvc;
+package org.springframework.hateoas.jaxrs;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -27,39 +27,41 @@ import org.springframework.hateoas.Affordance;
 import org.springframework.hateoas.core.AffordanceModelFactory;
 import org.springframework.hateoas.core.DummyInvocationUtils.MethodInvocation;
 import org.springframework.hateoas.core.MappingDiscoverer;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.plugin.core.PluginRegistry;
 import org.springframework.web.util.UriComponents;
 
 /**
  * Construct {@link Affordance}s using a collection of {@link AffordanceModelFactory}s.
- * 
  * @author Greg Turnquist
  */
 @RequiredArgsConstructor
-class SpringMvcAffordanceBuilder {
+class JaxRsAffordanceBuilder {
 
 	private final @NonNull PluginRegistry<? extends AffordanceModelFactory, MediaType> factories;
 
 	/**
 	 * Use the attributes of the current method call along with a collection of {@link AffordanceModelFactory}'s to create
-	 * a set of {@link Affordance}s.
-	 * 
+	 * a set of {@link org.springframework.hateoas.Affordance}s.
+	 *
 	 * @param invocation
 	 * @param discoverer
 	 * @param components
 	 * @return
 	 */
 	public Collection<Affordance> create(MethodInvocation invocation, MappingDiscoverer discoverer,
-			UriComponents components) {
+										 UriComponents components) {
 
+		if (invocation == null) {
+			return new ArrayList<>();
+		}
+		
 		Method method = invocation.getMethod();
-		List<Affordance> affordances = new ArrayList<Affordance>();
+		List<Affordance> affordances = new ArrayList<>();
 
 		for (String requestMethod : discoverer.getRequestMethod(invocation.getTargetType(), method)) {
 
-			Affordance affordance = new SpringMvcAffordance(HttpMethod.valueOf(requestMethod), invocation.getMethod());
+			Affordance affordance = new JaxRsAffordance(requestMethod, invocation.getMethod());
 
 			for (AffordanceModelFactory factory : factories) {
 				affordance.addAffordanceModel(factory.getAffordanceModel(affordance, invocation, components));
@@ -70,4 +72,5 @@ class SpringMvcAffordanceBuilder {
 
 		return affordances;
 	}
+
 }

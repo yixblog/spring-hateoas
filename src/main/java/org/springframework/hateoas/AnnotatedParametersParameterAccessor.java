@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hateoas.mvc;
+package org.springframework.hateoas;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ import org.springframework.web.util.UriTemplate;
  * @author Oliver Gierke
  */
 @RequiredArgsConstructor
-class AnnotatedParametersParameterAccessor {
+public class AnnotatedParametersParameterAccessor {
 
 	private static final Map<Method, MethodParameters> METHOD_PARAMETERS_CACHE = new ConcurrentReferenceHashMap<>(
 			16, ReferenceType.WEAK);
@@ -118,7 +118,7 @@ class AnnotatedParametersParameterAccessor {
 	 * 
 	 * @author Oliver Gierke
 	 */
-	static class BoundMethodParameter {
+	public static class BoundMethodParameter {
 
 		private static final ConversionService CONVERSION_SERVICE = new DefaultFormattingConversionService();
 		private static final TypeDescriptor STRING_DESCRIPTOR = TypeDescriptor.valueOf(String.class);

@@ -98,6 +98,11 @@ public class DummyInvocationUtils {
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
 
+			// For debugging, enable the following block. That way, watches won't generate stackoverflow exceptions.
+			if (method.getName().equals("toString")) {
+				return "";
+			}
+
 			if (GET_INVOCATIONS.equals(method)) {
 				return getLastInvocation();
 			} else if (GET_OBJECT_PARAMETERS.equals(method)) {

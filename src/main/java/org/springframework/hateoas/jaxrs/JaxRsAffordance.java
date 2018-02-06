@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hateoas.mvc;
+package org.springframework.hateoas.jaxrs;
 
 import java.lang.reflect.Method;
 
 import org.springframework.hateoas.AbstractAffordance;
-import org.springframework.http.HttpMethod;
 
 /**
+ * {@link org.springframework.hateoas.Affordance} based on a string-based HTTP method.
+ *
  * @author Greg Turnquist
  */
-class SpringMvcAffordance extends AbstractAffordance {
+class JaxRsAffordance extends AbstractAffordance {
 
-	private final HttpMethod httpMethod;
+	private final String httpMethod;
 
-	SpringMvcAffordance(HttpMethod httpMethod, Method method) {
+	JaxRsAffordance(String httpMethod, Method method) {
 
 		super(method);
 		this.httpMethod = httpMethod;
@@ -40,6 +41,6 @@ class SpringMvcAffordance extends AbstractAffordance {
 	 */
 	@Override
 	public String getHttpMethod() {
-		return this.httpMethod.name();
+		return this.httpMethod;
 	}
 }

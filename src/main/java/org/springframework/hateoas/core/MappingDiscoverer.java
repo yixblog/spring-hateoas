@@ -18,8 +18,6 @@ package org.springframework.hateoas.core;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import org.springframework.http.HttpMethod;
-
 /**
  * Strategy interface to discover a URI mapping and related {@link org.springframework.hateoas.Affordance}s for either a
  * given type or method.
@@ -63,5 +61,5 @@ public interface MappingDiscoverer {
 	 * @param method
 	 * @return
 	 */
-	Collection<HttpMethod> getRequestMethod(Class<?> type, Method method);
+	Collection<String> getRequestMethod(Class<?> type, Method method);
 }

@@ -89,7 +89,7 @@ public class HalFormsMessageConverterUnitTest {
 		assertThat(halFormsDocument.getTemplates().size(), is(1));
 		assertThat(halFormsDocument.getTemplates().keySet(), hasItems("default"));
 		assertThat(halFormsDocument.getTemplates().get("default").getContentType(), is("application/hal+json"));
-		assertThat(halFormsDocument.getTemplates().get("default").getHttpMethod(), is(HttpMethod.GET));
+		assertThat(halFormsDocument.getTemplates().get("default").getHttpMethod(), is(HttpMethod.GET.name()));
 		assertThat(halFormsDocument.getTemplates().get("default").getMethod(), is(HttpMethod.GET.toString().toLowerCase()));
 	}
 
@@ -104,7 +104,7 @@ public class HalFormsMessageConverterUnitTest {
 				.withRegex("my-regex") //
 				.withRequired(true);
 
-		HalFormsTemplate template = HalFormsTemplate.forMethod(HttpMethod.GET) //
+		HalFormsTemplate template = HalFormsTemplate.forMethod(HttpMethod.GET.name()) //
 				.withTitle("HAL-FORMS unit test") //
 				.andContentType(MediaTypes.HAL_JSON) //
 				.andProperty(property); //

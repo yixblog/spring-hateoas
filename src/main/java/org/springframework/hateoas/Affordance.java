@@ -15,7 +15,6 @@
  */
 package org.springframework.hateoas;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
 /**
@@ -31,7 +30,7 @@ public interface Affordance {
 	 *
 	 * @return
 	 */
-	HttpMethod getHttpMethod();
+	String getHttpMethod();
 
 	/**
 	 * Name for the REST action this {@link Affordance} can take.
@@ -47,4 +46,11 @@ public interface Affordance {
 	 * @return
 	 */
 	<T extends AffordanceModel> T getAffordanceModel(MediaType mediaType);
+
+	/**
+	 * Add a generated {@link AffordanceModel}.
+	 * 
+	 * @param affordanceModel
+	 */
+	void addAffordanceModel(AffordanceModel affordanceModel);
 }

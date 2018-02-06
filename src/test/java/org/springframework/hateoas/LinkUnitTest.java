@@ -284,8 +284,8 @@ public class LinkUnitTest {
 		 * @see org.springframework.hateoas.Affordance#getHttpMethod()
 		 */
 		@Override
-		public HttpMethod getHttpMethod() {
-			return HttpMethod.PATCH;
+		public String getHttpMethod() {
+			return HttpMethod.PATCH.name();
 		}
 
 		/* 
@@ -295,6 +295,10 @@ public class LinkUnitTest {
 		@Override
 		public String getName() {
 			return null;
+		}
+
+		@Override
+		public void addAffordanceModel(AffordanceModel affordanceModel) {
 		}
 	}
 }

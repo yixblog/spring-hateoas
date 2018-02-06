@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.hateoas.hal.forms.HalFormsDeserializers.MediaTypesDeserializer;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -60,7 +59,7 @@ public class HalFormsTemplate {
 	public static final String DEFAULT_KEY = "default";
 
 	private String title;
-	private @Wither(AccessLevel.PRIVATE) HttpMethod httpMethod;
+	private @Wither(AccessLevel.PRIVATE) String httpMethod;
 	private List<HalFormsProperty> properties;
 	private List<MediaType> contentTypes;
 
@@ -68,7 +67,7 @@ public class HalFormsTemplate {
 		this(null, null, Collections.emptyList(), Collections.emptyList());
 	}
 
-	public static HalFormsTemplate forMethod(HttpMethod httpMethod) {
+	public static HalFormsTemplate forMethod(String httpMethod) {
 		return new HalFormsTemplate().withHttpMethod(httpMethod);
 	}
 
@@ -120,6 +119,6 @@ public class HalFormsTemplate {
 	}
 
 	void setMethod(String method) {
-		this.httpMethod = HttpMethod.valueOf(method.toUpperCase());
+		this.httpMethod = method.toUpperCase();
 	}
 }

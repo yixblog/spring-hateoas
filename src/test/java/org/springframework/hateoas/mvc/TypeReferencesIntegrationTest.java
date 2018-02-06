@@ -33,7 +33,6 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
-import org.springframework.hateoas.hal.HalConfiguration;
 import org.springframework.hateoas.mvc.TypeReferences.ResourceType;
 import org.springframework.hateoas.mvc.TypeReferences.ResourcesType;
 import org.springframework.http.HttpMethod;

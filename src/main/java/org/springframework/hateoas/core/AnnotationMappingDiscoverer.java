@@ -20,13 +20,15 @@ import static org.springframework.core.annotation.AnnotationUtils.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import org.springframework.http.HttpMethod;
+import javax.ws.rs.Path;
+
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
@@ -121,23 +123,32 @@ public class AnnotationMappingDiscoverer implements MappingDiscoverer {
 	 * @return
 	 */
 	@Override
-	public Collection<HttpMethod> getRequestMethod(Class<?> type, Method method) {
+	public Collection<String> getRequestMethod(Class<?> type, Method method) {
 
 		Assert.notNull(type, "Type must not be null!");
 		Assert.notNull(method, "Method must not be null!");
 
 		Annotation mergedAnnotation = findMergedAnnotation(method, annotationType);
-		Object value = getValue(mergedAnnotation, "method");
 
-		RequestMethod[] requestMethods = (RequestMethod[]) value;
+		if (mergedAnnotation.annotationType().equals(RequestMapping.class)) {
 
-		List<HttpMethod> requestMethodNames = new ArrayList<HttpMethod>();
+			Object value = getValue(mergedAnnotation, "method");
 
-		for (RequestMethod requestMethod : requestMethods) {
-			requestMethodNames.add(HttpMethod.valueOf(requestMethod.toString()));
+			return Arrays.stream((RequestMethod[]) value)
+				.map(Enum::toString)
+				.collect(Collectors.toList());
+
+		} else if (mergedAnnotation.annotationType().equals(Path.class)) {
+
+			mergedAnnotation = findMergedAnnotation(method, javax.ws.rs.HttpMethod.class);
+
+			Object value = getValue(mergedAnnotation, "value");
+
+			return Arrays.asList((String) value);
+			
+		} else {
+			throw new RuntimeException("Don't know how to handle " + mergedAnnotation.annotationType());
 		}
-
-		return requestMethodNames;
 	}
 
 	private String[] getMappingFrom(Annotation annotation) {

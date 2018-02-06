@@ -34,7 +34,6 @@ import org.springframework.hateoas.AffordanceModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.core.DummyInvocationUtils.MethodInvocation;
 import org.springframework.hateoas.core.MethodParameters;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,8 +47,7 @@ import org.springframework.web.util.UriComponents;
 @Slf4j
 class HalFormsAffordanceModel implements AffordanceModel {
 
-	private static final List<HttpMethod> METHODS_FOR_INPUT_DETECTTION = Arrays.asList(HttpMethod.POST, HttpMethod.PUT,
-			HttpMethod.PATCH);
+	private static final List<String> METHODS_FOR_INPUT_DETECTION = Arrays.asList("POST", "PUT", "PATCH");
 
 	private final UriComponents components;
 	private final boolean required;
@@ -59,9 +57,9 @@ class HalFormsAffordanceModel implements AffordanceModel {
 
 		this.components = components;
 		this.required = determineRequired(affordance.getHttpMethod());
-		this.properties = METHODS_FOR_INPUT_DETECTTION.contains(affordance.getHttpMethod()) //
+		this.properties = METHODS_FOR_INPUT_DETECTION.contains(affordance.getHttpMethod()) //
 				? determineAffordanceInputs(invocationValue.getMethod()) //
-				: Collections.<String, Class<?>> emptyMap();
+				: Collections.emptyMap();
 	}
 
 	/**
@@ -109,8 +107,8 @@ class HalFormsAffordanceModel implements AffordanceModel {
 	 * @param httpMethod - string representation of an HTTP method, e.g. GET, POST, etc.
 	 * @return
 	 */
-	private boolean determineRequired(HttpMethod httpMethod) {
-		return Arrays.asList(HttpMethod.POST, HttpMethod.PUT).contains(httpMethod);
+	private boolean determineRequired(String httpMethod) {
+		return Arrays.asList("POST", "PUT").contains(httpMethod);
 	}
 
 	/**
