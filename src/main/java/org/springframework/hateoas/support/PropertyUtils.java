@@ -21,7 +21,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,16 +60,18 @@ public class PropertyUtils {
 			.filter(descriptor -> !FIELDS_TO_IGNORE.contains(descriptor.getName()))
 			.filter(descriptor -> hasJsonIgnoreOnTheField(object.getClass(), descriptor))
 			.filter(PropertyUtils::hasJsonIgnoreOnTheReader)
-			.collect(Collectors.toMap(
-				FeatureDescriptor::getName,
-				descriptor -> {
+			.collect(HashMap::new,
+				(hashMap, descriptor) -> {
 					try {
-						return descriptor.getReadMethod().invoke(object);
+						hashMap.put(descriptor.getName(), descriptor.getReadMethod().invoke(object));
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new RuntimeException(e);
 					}
-				}));
+				},
+				HashMap::putAll);
 	}
+
+
 
 	public static List<String> findProperties(ResolvableType resolvableType) {
 

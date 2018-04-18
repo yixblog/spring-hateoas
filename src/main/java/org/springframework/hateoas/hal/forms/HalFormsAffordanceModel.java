@@ -15,6 +15,8 @@
  */
 package org.springframework.hateoas.hal.forms;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,12 +26,11 @@ import java.util.stream.Collectors;
 import org.springframework.core.ResolvableType;
 import org.springframework.hateoas.Affordance;
 import org.springframework.hateoas.AffordanceModel;
+import org.springframework.hateoas.AffordanceModelProperty;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.core.MethodParameters;
 import org.springframework.hateoas.support.PropertyUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponents;
 
 /**
@@ -39,55 +40,18 @@ import org.springframework.web.util.UriComponents;
  */
 class HalFormsAffordanceModel implements AffordanceModel {
 
-	private static final List<HttpMethod> METHODS_FOR_INPUT_DETECTTION = Arrays.asList(HttpMethod.POST, HttpMethod.PUT,
-			HttpMethod.PATCH);
-
-	private final Affordance affordance;
-	private final UriComponents components;
+	private final @Getter UriComponents components;
 	private final boolean required;
-	private final List<String> properties;
+	private final @Getter List<AffordanceModelProperty> inputProperties;
 
 	public HalFormsAffordanceModel(Affordance affordance, UriComponents components) {
 
-		this.affordance = affordance;
 		this.components = components;
-		this.required = determineRequired(affordance.getHttpMethod());
-		this.properties = METHODS_FOR_INPUT_DETECTTION.contains(affordance.getHttpMethod()) //
-				? determineAffordanceInputs() //
-				: Collections.emptyList();
+		this.required = determineRequired(affordance);
+		this.inputProperties = determineAffordanceInputs(affordance);
 	}
 
-	/**
-	 * Transform the details of the REST method's {@link MethodParameters} into
-	 * {@link HalFormsProperty}s.
-	 * 
-	 * @return
-	 */
-	public List<HalFormsProperty> getProperties() {
-
-		return properties.stream() //
-			.map(name -> HalFormsProperty.named(name).withRequired(required)) //
-			.collect(Collectors.toList());
-	}
-
-	public String getURI() {
-		return components.toUriString();
-	}
-
-	/**
-	 * Returns whether the affordance is pointing to the same path as the given one.
-	 * 
-	 * @param path must not be {@literal null}.
-	 * @return
-	 */
-	public boolean hasPath(String path) {
-
-		Assert.notNull(path, "Path must not be null!");
-
-		return getURI().equals(path);
-	}
-
-	/* 
+	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.hateoas.AffordanceModel#getMediaType()
 	 */
@@ -99,24 +63,32 @@ class HalFormsAffordanceModel implements AffordanceModel {
 	/**
 	 * Based on the Spring MVC controller's HTTP method, decided whether or not input attributes are required or not.
 	 *
-	 * @param httpMethod - string representation of an HTTP method, e.g. GET, POST, etc.
+	 * @param affordance
 	 * @return
 	 */
-	private boolean determineRequired(HttpMethod httpMethod) {
-		return Arrays.asList(HttpMethod.POST, HttpMethod.PUT).contains(httpMethod);
+	private boolean determineRequired(Affordance affordance) {
+		return Arrays.asList(HttpMethod.POST, HttpMethod.PUT).contains(affordance.getHttpMethod());
 	}
 
 	/**
 	 * Look at the inputs for a Spring MVC controller method to decide the {@link Affordance}'s properties.
+	 * @param affordance
 	 */
-	private List<String> determineAffordanceInputs() {
+	private List<AffordanceModelProperty> determineAffordanceInputs(Affordance affordance) {
 
-		return this.affordance.getInputMethodParameters().stream()
-			.findFirst()
-			.map(methodParameter -> {
-				ResolvableType resolvableType = ResolvableType.forMethodParameter(methodParameter);
-				return PropertyUtils.findProperties(resolvableType);
-			})
-			.orElse(Collections.emptyList());
+		if (Arrays.asList(HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH).contains(affordance.getHttpMethod())) {
+			return affordance.getInputMethodParameters().stream()
+				.findFirst()
+				.map(methodParameter -> {
+					ResolvableType resolvableType = ResolvableType.forMethodParameter(methodParameter);
+					return PropertyUtils.findProperties(resolvableType);
+				})
+				.orElse(Collections.emptyList()).stream()
+				.map(property -> HalFormsProperty.named(property).withRequired(required))
+				.map(halFormsProperty -> (AffordanceModelProperty) halFormsProperty)
+				.collect(Collectors.toList());
+		} else {
+			return Collections.emptyList();
+		}
 	}
 }

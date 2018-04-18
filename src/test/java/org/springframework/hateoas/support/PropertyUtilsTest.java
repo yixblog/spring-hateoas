@@ -103,6 +103,20 @@ public class PropertyUtilsTest {
 			new SimpleEntry<>("usernameAndLastName", "fbaggins+++Baggins"));
 	}
 
+	@Test
+	public void objectWithNullReturningGetter() {
+
+		EmployeeWithNullReturningGetter employee = new EmployeeWithNullReturningGetter("Frodo");
+
+		Map<String, Object> properties = PropertyUtils.findProperties(employee);
+
+		assertThat(properties).hasSize(2);
+		assertThat(properties.keySet()).containsExactlyInAnyOrder("name", "father");
+		assertThat(properties.entrySet()).containsExactlyInAnyOrder(
+			new SimpleEntry<>("name", "Frodo"),
+			new SimpleEntry<>("father", null));
+	}
+
 	@Data
 	@AllArgsConstructor
 	static class EmployeeWithCustomizedReaders {
@@ -125,6 +139,17 @@ public class PropertyUtilsTest {
 		@JsonIgnore(false)
 		public String getUsernameAndLastName() {
 			return this.username + "+++" + this.lastName;
+		}
+	}
+
+	@Data
+	static class EmployeeWithNullReturningGetter {
+
+		private String name;
+		private String father;
+
+		EmployeeWithNullReturningGetter(String name) {
+			this.name = name;
 		}
 	}
 

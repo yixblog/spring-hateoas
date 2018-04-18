@@ -22,6 +22,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Wither;
 
+import org.springframework.hateoas.AffordanceModelProperty;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @Wither
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-public class HalFormsProperty {
+public class HalFormsProperty implements AffordanceModelProperty {
 
 	private @Wither(AccessLevel.PRIVATE) @NonNull String name;
 	private Boolean readOnly;

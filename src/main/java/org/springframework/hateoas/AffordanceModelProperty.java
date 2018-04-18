@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.hateoas.collectionjson;
-
-import static org.springframework.hateoas.collectionjson.Jackson2CollectionJsonModule.*;
-
-import org.springframework.hateoas.Resources;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+package org.springframework.hateoas;
 
 /**
- * Jackson 2 mixin to invoke the related serializer/deserizer.
- *
  * @author Greg Turnquist
  */
-@JsonDeserialize(using = CollectionJsonResourcesDeserializer.class)
-abstract class ResourcesMixin<T> extends Resources<T> {
+public interface AffordanceModelProperty {
 
 }

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.hateoas.AffordanceModelProperty;
 import org.springframework.hateoas.hal.forms.HalFormsDeserializers.MediaTypesDeserializer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;

@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.hateoas.Affordance;
+import org.springframework.hateoas.AffordanceModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
@@ -73,7 +75,9 @@ class HalFormsSerializers {
 					.withLinks(value.getLinks()) //
 					.withTemplates(findTemplates(value));
 
-			provider.findValueSerializer(HalFormsDocument.class, property).serialize(doc, gen, provider);
+			provider
+				.findValueSerializer(HalFormsDocument.class, property)
+				.serialize(doc, gen, provider);
 		}
 
 		@Override
@@ -148,7 +152,9 @@ class HalFormsSerializers {
 						.withTemplates(findTemplates(value));
 			}
 
-			provider.findValueSerializer(HalFormsDocument.class, property).serialize(doc, gen, provider);
+			provider
+				.findValueSerializer(HalFormsDocument.class, property)
+				.serialize(doc, gen, provider);
 		}
 
 		@Override
@@ -186,20 +192,24 @@ class HalFormsSerializers {
 	 */
 	private static Map<String, HalFormsTemplate> findTemplates(ResourceSupport resource) {
 
-		Map<String, HalFormsTemplate> templates = new HashMap<String, HalFormsTemplate>();
+		Map<String, HalFormsTemplate> templates = new HashMap<>();
 
 		if (resource.hasLink(Link.REL_SELF)) {
+
+
 			for (Affordance affordance : resource.getLink(Link.REL_SELF).map(Link::getAffordances)
 					.orElse(Collections.emptyList())) {
 
-				HalFormsAffordanceModel model = affordance.getAffordanceModel(MediaTypes.HAL_FORMS_JSON);
+				AffordanceModel model = affordance.getAffordanceModel(MediaTypes.HAL_FORMS_JSON);
 
 				if (!affordance.getHttpMethod().equals(HttpMethod.GET)) {
 
 					validate(resource, affordance, model);
 
 					HalFormsTemplate template = HalFormsTemplate.forMethod(affordance.getHttpMethod()) //
-							.withProperties(model.getProperties());
+							.withProperties(model.getInputProperties().stream()
+								.map(property -> (HalFormsProperty) property)
+								.collect(Collectors.toList()));
 
 					/**
 					 * First template in HAL-FORMS is "default".
@@ -219,10 +229,10 @@ class HalFormsSerializers {
 	 * @param affordance
 	 * @param model
 	 */
-	private static void validate(ResourceSupport resource, Affordance affordance, HalFormsAffordanceModel model) {
+	private static void validate(ResourceSupport resource, Affordance affordance, AffordanceModel model) {
 
 		String affordanceUri = model.getURI();
-		String selfLinkUri = resource.getRequiredLink(Link.REL_SELF).getHref();
+		String selfLinkUri = resource.getRequiredLink(Link.REL_SELF).expand().getHref();
 
 		if (!affordanceUri.equals(selfLinkUri)) {
 			throw new IllegalStateException("Affordance's URI " + affordanceUri + " doesn't match self link "

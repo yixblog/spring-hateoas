@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.hateoas.Affordance;
+import org.springframework.hateoas.AffordanceModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
@@ -75,6 +76,11 @@ public class Jackson2CollectionJsonModule extends SimpleModule {
 		setMixInAnnotation(Resource.class, ResourceMixin.class);
 		setMixInAnnotation(Resources.class, ResourcesMixin.class);
 		setMixInAnnotation(PagedResources.class, PagedResourcesMixin.class);
+
+		addSerializer(new CollectionJsonPagedResourcesSerializer());
+		addSerializer(new CollectionJsonResourcesSerializer());
+		addSerializer(new CollectionJsonResourceSerializer());
+		addSerializer(new CollectionJsonResourceSupportSerializer());
 	}
 
 	/**
@@ -848,17 +854,20 @@ public class Jackson2CollectionJsonModule extends SimpleModule {
 
 			selfLink.getAffordances().forEach(affordance -> {
 
-				CollectionJsonAffordanceModel model = affordance.getAffordanceModel(MediaTypes.COLLECTION_JSON);
+				AffordanceModel model = affordance.getAffordanceModel(MediaTypes.COLLECTION_JSON);
 
 				/**
 				 * For Collection+JSON, "queries" are only collected for GET affordances where the URI is NOT a self link.
 				 */
-				if (affordance.getHttpMethod().equals(HttpMethod.GET) && !model.getUri().equals(selfLink.getHref())) {
+				if (affordance.getHttpMethod().equals(HttpMethod.GET) && !model.getURI().equals(selfLink.getHref())) {
+
 
 					queries.add(new CollectionJsonQuery()
 						.withRel(model.getRel())
-						.withHref(model.getUri())
-						.withData(model.getQueryProperties()));
+						.withHref(model.getURI())
+						.withData(model.getQueryProperties().stream()
+							.map(affordanceModelProperty -> (CollectionJsonData) affordanceModelProperty)
+							.collect(Collectors.toList())));
 				}
 			});
 		}
@@ -878,7 +887,7 @@ public class Jackson2CollectionJsonModule extends SimpleModule {
 		if (resource.hasLink(Link.REL_SELF)) {
 			resource.getRequiredLink(Link.REL_SELF).getAffordances().forEach(affordance -> {
 
-				CollectionJsonAffordanceModel model = affordance.getAffordanceModel(MediaTypes.COLLECTION_JSON);
+				AffordanceModel model = affordance.getAffordanceModel(MediaTypes.COLLECTION_JSON);
 
 				/**
 				 * For Collection+JSON, "templates" are made of any non-GET affordances.
@@ -886,7 +895,9 @@ public class Jackson2CollectionJsonModule extends SimpleModule {
 				if (!affordance.getHttpMethod().equals(HttpMethod.GET)) {
 
 					CollectionJsonTemplate template = new CollectionJsonTemplate() //
-						.withData(model.getInputProperties());
+						.withData(model.getInputProperties().stream()
+							.map(affordanceModelProperty -> (CollectionJsonData) affordanceModelProperty)
+							.collect(Collectors.toList()));
 
 					templates.add(template);
 				}

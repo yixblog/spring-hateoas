@@ -15,9 +15,11 @@
  */
 package org.springframework.hateoas.collectionjson;
 
-import lombok.AccessLevel;
 import lombok.Value;
 import lombok.experimental.Wither;
+
+import org.springframework.hateoas.AffordanceModelProperty;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,9 +31,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Greg Turnquist
  */
 @Value
-@Wither(AccessLevel.PACKAGE)
+@Wither
 @JsonIgnoreProperties()
-class CollectionJsonData {
+public class CollectionJsonData implements AffordanceModelProperty {
 
 	@JsonInclude(Include.NON_NULL) //
 	private String name;
@@ -54,4 +56,18 @@ class CollectionJsonData {
 	CollectionJsonData() {
 		this(null, null, null);
 	}
+
+	/**
+	 * Creates a new {@link CollectionJsonData} with the given name.
+	 *
+	 * @param name must not be {@literal null} or empty.
+	 * @return
+	 */
+	public static CollectionJsonData named(String name) {
+
+		Assert.hasText(name, "Property name must not be null or empty!");
+
+		return new CollectionJsonData().withName(name);
+	}
+
 }
